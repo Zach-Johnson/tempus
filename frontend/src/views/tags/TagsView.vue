@@ -228,7 +228,7 @@ async function saveTag(tagData) {
   try {
     if (isEdit.value) {
       const id = selectedTag.value.id
-      await tagsStore.updateTag(id, tagData, { paths: ['name', 'category_ids'] })
+      await tagsStore.updateTag(id, tagData, 'name,category_ids')
       appStore.showSuccessMessage(`Tag "${tagData.name}" updated successfully`)
     } else {
       await tagsStore.createTag(tagData)

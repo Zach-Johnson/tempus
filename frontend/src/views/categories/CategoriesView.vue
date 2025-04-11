@@ -167,7 +167,18 @@ const headers = [
 
 // Computed
 const filteredCategories = computed(() => {
-  let result = categoriesStore.categories
+  // First deduplicate the categories by ID
+  const uniqueCategories = []
+  const seenIds = new Set()
+  
+  categoriesStore.categories.forEach(category => {
+    if (!seenIds.has(category.id)) {
+      seenIds.add(category.id)
+      uniqueCategories.push(category)
+    }
+  })
+  
+  let result = uniqueCategories
   
   // Search filter
   if (search.value) {
@@ -212,7 +223,7 @@ async function saveCategory(categoryData) {
   try {
     if (isEdit.value) {
       const id = selectedCategory.value.id
-      await categoriesStore.updateCategory(id, categoryData, { paths: ['name', 'description'] })
+      await categoriesStore.updateCategory(id, categoryData, 'name,description')
       appStore.showSuccessMessage(`Category "${categoryData.name}" updated successfully`)
     } else {
       await categoriesStore.createCategory(categoryData)

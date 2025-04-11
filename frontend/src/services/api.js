@@ -108,7 +108,10 @@ const sessionsAPI = {
     updateExercise: (sessionId, exerciseId, data, updateMask) =>
         api.patch(
             `/sessions/${sessionId}/exercises/${exerciseId}`,
-            { exercise: data, update_mask: updateMask },
+            {
+                exercise: data,
+                update_mask: updateMask,
+            },
         ),
     deleteExercise: (id) => api.delete(`/session-exercises/${id}`),
     getStats: (params = {}) => api.get("/sessions/stats", { params }),
@@ -120,7 +123,10 @@ const historyAPI = {
     get: (id) => api.get(`/history/${id}`),
     create: (data) => api.post("/history", data),
     update: (id, data, updateMask) =>
-        api.patch(`/history/${id}`, { history: data, update_mask: updateMask }),
+        api.patch(`/history/${id}`, {
+            history: data,
+            update_mask: updateMask,
+        }),
     delete: (id) => api.delete(`/history/${id}`),
 };
 

@@ -1,4 +1,4 @@
-import { historyAPI } from "@/services/api.js";
+import { historyAPI } from "@/services/api";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
@@ -14,8 +14,7 @@ export const useHistoryStore = defineStore("history", () => {
     const entriesSortedByDate = computed(
         () => {
             return [...historyEntries.value].sort(
-                (a, b) => { // Sort by start_time in descending order (newest
-                    // first)
+                (a, b) => { // Sort by start_time in descending order (newest first)
                     return new Date(b.start_time) - new Date(a.start_time);
                 },
             );
@@ -126,7 +125,20 @@ export const useHistoryStore = defineStore("history", () => {
         error.value = null;
 
         try {
-            const response = await historyAPI.update(id, entryData, updateMask);
+            // Convert paths array to comma-separated string if it's in object
+            // format
+            let formattedUpdateMask = updateMask;
+            if (
+                updateMask && typeof updateMask === "object" && updateMask.paths
+            ) {
+                formattedUpdateMask = updateMask.paths.join(",");
+            }
+
+            const response = await historyAPI.update(
+                id,
+                entryData,
+                formattedUpdateMask,
+            );
             const updatedEntry = response.data;
 
             // Update in the historyEntries array
@@ -139,8 +151,7 @@ export const useHistoryStore = defineStore("history", () => {
 
             // Update currentHistoryEntry if it's the one being edited
             if (
-                currentHistoryEntry.value &&
-                currentHistoryEntry.value.id === id
+                currentHistoryEntry.value && currentHistoryEntry.value.id === id
             ) {
                 currentHistoryEntry.value = updatedEntry;
             }
@@ -170,8 +181,7 @@ export const useHistoryStore = defineStore("history", () => {
 
             // Clear currentHistoryEntry if it's the one being deleted
             if (
-                currentHistoryEntry.value &&
-                currentHistoryEntry.value.id === id
+                currentHistoryEntry.value && currentHistoryEntry.value.id === id
             ) {
                 currentHistoryEntry.value = null;
             }
@@ -200,9 +210,14 @@ export const useHistoryStore = defineStore("history", () => {
         const progressByDay = {};
 
         sorted.forEach((entry) => {
-            const date = new Date(entry.start_time).toISOString().split("T")[0];
+            const date = new Date(entry.start_time)
+                .toISOString()
+                .split("T")[0];
 
-            if (!progressByDay[date] || entry.bpm > progressByDay[date]) {
+            if (
+                !progressByDay[date] ||
+                entry.bpm > progressByDay[date]
+            ) {
                 progressByDay[date] = entry.bpm;
             }
         });

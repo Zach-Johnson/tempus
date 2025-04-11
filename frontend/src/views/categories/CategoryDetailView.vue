@@ -268,7 +268,7 @@ function goToTags() {
 
 async function saveCategory(categoryData) {
   try {
-    await categoriesStore.updateCategory(categoryId.value, categoryData, { paths: ['name', 'description'] })
+    await categoriesStore.updateCategory(categoryId.value, categoryData, 'name,description')
     appStore.showSuccessMessage(`Category "${categoryData.name}" updated successfully`)
     dialogVisible.value = false
   } catch (error) {

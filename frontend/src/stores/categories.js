@@ -1,6 +1,6 @@
+import { categoriesAPI } from "@/services/api.js";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { categoriesAPI } from "@/services/api.js";
 
 export const useCategoriesStore = defineStore("categories", () => {
     // State
@@ -11,11 +11,13 @@ export const useCategoriesStore = defineStore("categories", () => {
     const currentCategoryLoading = ref(false);
 
     // Getters
-    const categoriesSorted = computed(() => {
-        return [...categories.value].sort((a, b) =>
-            a.name.localeCompare(b.name)
-        );
-    });
+    const categoriesSorted = computed(
+        () => {
+            return [...categories.value].sort(
+                (a, b) => a.name.localeCompare(b.name),
+            );
+        },
+    );
 
     const categoryById = computed(() => {
         return (id) => categories.value.find((cat) => cat.id === id);
@@ -104,10 +106,19 @@ export const useCategoriesStore = defineStore("categories", () => {
         error.value = null;
 
         try {
+            // Convert paths array to comma-separated string if it's in object
+            // format
+            let formattedUpdateMask = updateMask;
+            if (
+                updateMask && typeof updateMask === "object" && updateMask.paths
+            ) {
+                formattedUpdateMask = updateMask.paths.join(",");
+            }
+
             const response = await categoriesAPI.update(
                 id,
                 categoryData,
-                updateMask,
+                formattedUpdateMask,
             );
             const updatedCategory = response.data;
 

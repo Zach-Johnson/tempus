@@ -94,7 +94,20 @@ export const useTagsStore = defineStore("tags", () => {
         error.value = null;
 
         try {
-            const response = await tagsAPI.update(id, tagData, updateMask);
+            // Convert paths array to comma-separated string if it's in object
+            // format
+            let formattedUpdateMask = updateMask;
+            if (
+                updateMask && typeof updateMask === "object" && updateMask.paths
+            ) {
+                formattedUpdateMask = updateMask.paths.join(",");
+            }
+
+            const response = await tagsAPI.update(
+                id,
+                tagData,
+                formattedUpdateMask,
+            );
             const updatedTag = response.data;
 
             // Update in the tags array
