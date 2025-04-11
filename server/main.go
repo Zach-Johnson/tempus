@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -14,7 +15,7 @@ import (
 	"time"
 
 	pb "github.com/Zach-Johnson/tempus/proto/api/v1/tempus"
-	"github.com/Zach-Johnson/tempus/server/db"
+	storage "github.com/Zach-Johnson/tempus/server/db"
 	"github.com/Zach-Johnson/tempus/server/handlers"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/mattn/go-sqlite3"
@@ -122,11 +123,9 @@ func startHTTPServer() {
 	defer cancel()
 
 	// Create a client connection to the gRPC server
-	conn, err := grpc.DialContext(
-		ctx,
+	conn, err := grpc.NewClient(
 		fmt.Sprintf("localhost:%d", *grpcPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		log.Fatalf("Failed to dial gRPC server: %v", err)
@@ -154,7 +153,7 @@ func startHTTPServer() {
 	// Create HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", *httpPort),
-		Handler: corsMiddleware(gwmux),
+		Handler: middleware(gwmux),
 	}
 
 	// Start HTTP server
@@ -164,8 +163,18 @@ func startHTTPServer() {
 	}
 }
 
-// Add CORS middleware for REST API
-func corsMiddleware(handler http.Handler) http.Handler {
+type statusRec struct {
+	http.ResponseWriter
+	status int
+}
+
+func (r *statusRec) WriteHeader(status int) {
+	r.status = status
+	r.ResponseWriter.WriteHeader(status)
+}
+
+// Add middleware for REST API
+func middleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
@@ -176,7 +185,19 @@ func corsMiddleware(handler http.Handler) http.Handler {
 			return
 		}
 
-		handler.ServeHTTP(w, r)
+		start := time.Now()
+		wrapped := &statusRec{ResponseWriter: w, status: http.StatusOK}
+
+		handler.ServeHTTP(wrapped, r)
+
+		if r.URL.Path != "/healthz" || wrapped.status != http.StatusOK {
+			slog.Info("request",
+				"method", r.Method,
+				"path", r.URL.Path,
+				"duration", time.Since(start),
+				"status", wrapped.status,
+			)
+		}
 	})
 }
 

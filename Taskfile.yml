@@ -36,3 +36,7 @@ tasks:
     desc: Populate some data
     cmds:
       - ./data.sh
+
+  list-tags:
+    cmds:
+      - "curl -s http://localhost:8080/v1/tags -H 'Content-Type: application/json' | jq "
