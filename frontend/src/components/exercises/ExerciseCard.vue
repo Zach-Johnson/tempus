@@ -1,7 +1,7 @@
 <template>
   <v-card
     class="exercise-card"
-    :to="to"
+    :to="computedTo"
     :flat="flat"
     :variant="variant"
     @click="$emit('click', exercise)"
@@ -60,6 +60,14 @@
 
 <script setup>
 import { computed } from 'vue'
+
+// Computed props
+const computedTo = computed(() => {
+  if (props.to) return props.to
+  return props.exercise && props.exercise.id 
+    ? { name: 'exercise-detail', params: { id: props.exercise.id } }
+    : null
+})
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
@@ -72,7 +80,7 @@ const props = defineProps({
   },
   to: {
     type: [String, Object],
-    default: () => ({ name: 'exercise-detail', params: { id: props?.exercise?.id } })
+    default: null
   },
   flat: {
     type: Boolean,

@@ -105,57 +105,12 @@
             md="4"
             lg="3"
           >
-            <v-card
+            <exercise-card
+              :exercise="exercise"
               :to="selectable ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
-              @click="selectable ? selectExercise(exercise) : undefined"
               variant="outlined"
-              class="h-100"
-            >
-              <v-card-title class="text-subtitle-1">{{ exercise.name }}</v-card-title>
-              <v-card-text>
-                <p v-if="exercise.description" class="text-body-2 mb-2">
-                  {{ truncateText(exercise.description, 100) }}
-                </p>
-                
-                <div v-if="exercise.categoryIds && exercise.categoryIds.length > 0" class="mb-2">
-                  <v-chip-group>
-                    <category-chip
-                      v-for="categoryId in exercise.categoryIds.slice(0, 3)"
-                      :key="categoryId"
-                      :category="getCategoryById(categoryId)"
-                      size="x-small"
-                    ></category-chip>
-                    <v-chip
-                      v-if="exercise.categoryIds.length > 3"
-                      size="x-small"
-                      color="secondary"
-                      variant="outlined"
-                    >
-                      +{{ exercise.categoryIds.length - 3 }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
-                
-                <div v-if="exercise.tagIds && exercise.tagIds.length > 0">
-                  <v-chip-group>
-                    <tag-chip
-                      v-for="tagId in exercise.tagIds.slice(0, 3)"
-                      :key="tagId"
-                      :tag="getTagById(tagId)"
-                      size="x-small"
-                    ></tag-chip>
-                    <v-chip
-                      v-if="exercise.tagIds.length > 3"
-                      size="x-small"
-                      color="primary"
-                      variant="outlined"
-                    >
-                      +{{ exercise.tagIds.length - 3 }}
-                    </v-chip>
-                  </v-chip-group>
-                </div>
-              </v-card-text>
-            </v-card>
+              @click="selectable ? selectExercise(exercise) : undefined"
+            ></exercise-card>
           </v-col>
         </v-row>
       </div>
@@ -178,6 +133,7 @@ import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
 import TagChip from '@/components/tags/TagChip.vue'
+import ExerciseCard from '@/components/exercises/ExerciseCard.vue'
 
 const props = defineProps({
   exercises: {
@@ -233,3 +189,78 @@ const props = defineProps({
     type: Array,
     default: () => []
   }
+})
+
+const emit = defineEmits(['update:page', 'select-exercise'])
+
+// Store access
+const exercisesStore = useExercisesStore()
+const categoriesStore = useCategoriesStore()
+const tagsStore = useTagsStore()
+
+// Local state
+const localPage = ref(props.page)
+
+// Table headers
+const tableHeaders = [
+  { title: 'Name', key: 'name' },
+  { title: 'Description', key: 'description' },
+  { title: 'Categories', key: 'categories' },
+  { title: 'Tags', key: 'tags' },
+  { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
+]
+
+// Watch for changes in page
+watch(localPage, (newPage) => {
+  emit('update:page', newPage)
+})
+
+// Watch for changes in page prop
+watch(() => props.page, (newPage) => {
+  localPage.value = newPage
+})
+
+// Methods
+function truncateText(text, maxLength) {
+  if (!text) return ''
+  return text.length > maxLength 
+    ? text.substring(0, maxLength) + '...' 
+    : text
+}
+
+function getCategoryById(categoryId) {
+  return categoriesStore.categoryById(categoryId)
+}
+
+function getTagById(tagId) {
+  return tagsStore.tagById(tagId)
+}
+
+function selectExercise(exercise) {
+  emit('select-exercise', exercise)
+}
+
+// Ensure categories and tags are loaded
+onMounted(async () => {
+  if (categoriesStore.categories.length === 0) {
+    await categoriesStore.fetchCategories()
+  }
+  
+  if (tagsStore.tags.length === 0) {
+    await tagsStore.fetchTags()
+  }
+})
+</script>
+
+<style scoped>
+.exercise-table-container,
+.exercise-list-container,
+.exercise-grid-container {
+  width: 100%;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+}
+</style>
