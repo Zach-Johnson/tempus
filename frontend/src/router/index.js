@@ -26,19 +26,19 @@ const routes = [
         component: () => import("@/views/tags/TagsView.vue"),
         meta: { title: "Tags" },
     },
-    // {
-    //     path: "/exercises",
-    //     name: "exercises",
-    //     component: () => import("@/views/exercises/ExercisesView.vue"),
-    //     meta: { title: "Exercises" },
-    // },
-    // {
-    //     path: "/exercises/:id",
-    //     name: "exercise-detail",
-    //     component: () => import("@/views/exercises/ExerciseDetailView.vue"),
-    //     meta: { title: "Exercise Detail" },
-    //     props: true,
-    // },
+    {
+        path: "/exercises",
+        name: "exercises",
+        component: () => import("@/views/exercises/ExercisesView.vue"),
+        meta: { title: "Exercises" },
+    },
+    {
+        path: "/exercises/:id",
+        name: "exercise-detail",
+        component: () => import("@/views/exercises/ExerciseDetailView.vue"),
+        meta: { title: "Exercise Detail" },
+        props: true,
+    },
     // {
     //     path: "/sessions",
     //     name: "sessions",
