@@ -58,7 +58,7 @@ func (h *CategoryHandler) CreateCategory(ctx context.Context, req *pb.CreateCate
 
 	// Return the created category
 	return &pb.Category{
-		Id:          id,
+		Id:          int32(id),
 		Name:        req.Name,
 		Description: req.Description,
 		CreatedAt:   timestamppb.New(createdAt),

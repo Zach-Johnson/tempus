@@ -28,7 +28,7 @@ const (
 // Category represents a drumming category
 type Category struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -67,7 +67,7 @@ func (*Category) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Category) GetId() int64 {
+func (x *Category) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -105,10 +105,10 @@ func (x *Category) GetUpdatedAt() *timestamppb.Timestamp {
 // Tag represents a tag used for categorizing exercises
 type Tag struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	CategoryIds   []int64                `protobuf:"varint,4,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
+	CategoryIds   []int32                `protobuf:"varint,4,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -143,7 +143,7 @@ func (*Tag) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *Tag) GetId() int64 {
+func (x *Tag) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -164,7 +164,7 @@ func (x *Tag) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Tag) GetCategoryIds() []int64 {
+func (x *Tag) GetCategoryIds() []int32 {
 	if x != nil {
 		return x.CategoryIds
 	}
@@ -174,13 +174,13 @@ func (x *Tag) GetCategoryIds() []int64 {
 // Exercise represents a drumming exercise
 type Exercise struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	TagIds        []int64                `protobuf:"varint,6,rep,packed,name=tag_ids,json=tagIds,proto3" json:"tag_ids,omitempty"`                // Related tag IDs
-	CategoryIds   []int64                `protobuf:"varint,7,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
+	TagIds        []int32                `protobuf:"varint,6,rep,packed,name=tag_ids,json=tagIds,proto3" json:"tag_ids,omitempty"`                // Related tag IDs
+	CategoryIds   []int32                `protobuf:"varint,7,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
 	Images        []*ExerciseImage       `protobuf:"bytes,8,rep,name=images,proto3" json:"images,omitempty"`
 	Links         []*ExerciseLink        `protobuf:"bytes,9,rep,name=links,proto3" json:"links,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -217,7 +217,7 @@ func (*Exercise) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Exercise) GetId() int64 {
+func (x *Exercise) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -252,14 +252,14 @@ func (x *Exercise) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Exercise) GetTagIds() []int64 {
+func (x *Exercise) GetTagIds() []int32 {
 	if x != nil {
 		return x.TagIds
 	}
 	return nil
 }
 
-func (x *Exercise) GetCategoryIds() []int64 {
+func (x *Exercise) GetCategoryIds() []int32 {
 	if x != nil {
 		return x.CategoryIds
 	}
@@ -283,8 +283,8 @@ func (x *Exercise) GetLinks() []*ExerciseLink {
 // ExerciseImage represents an image associated with an exercise
 type ExerciseImage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	ImageData     []byte                 `protobuf:"bytes,3,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"`
 	Filename      string                 `protobuf:"bytes,4,opt,name=filename,proto3" json:"filename,omitempty"`
 	MimeType      string                 `protobuf:"bytes,5,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
@@ -324,14 +324,14 @@ func (*ExerciseImage) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *ExerciseImage) GetId() int64 {
+func (x *ExerciseImage) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *ExerciseImage) GetExerciseId() int64 {
+func (x *ExerciseImage) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -376,8 +376,8 @@ func (x *ExerciseImage) GetCreatedAt() *timestamppb.Timestamp {
 // ExerciseLink represents an external link for an exercise
 type ExerciseLink struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	Url           string                 `protobuf:"bytes,3,opt,name=url,proto3" json:"url,omitempty"`
 	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -415,14 +415,14 @@ func (*ExerciseLink) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ExerciseLink) GetId() int64 {
+func (x *ExerciseLink) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *ExerciseLink) GetExerciseId() int64 {
+func (x *ExerciseLink) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -453,7 +453,7 @@ func (x *ExerciseLink) GetCreatedAt() *timestamppb.Timestamp {
 // PracticeSession represents a drumming practice session
 type PracticeSession struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Notes         string                 `protobuf:"bytes,4,opt,name=notes,proto3" json:"notes,omitempty"`
@@ -494,7 +494,7 @@ func (*PracticeSession) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *PracticeSession) GetId() int64 {
+func (x *PracticeSession) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -546,9 +546,9 @@ func (x *PracticeSession) GetExercises() []*SessionExercise {
 // SessionExercise represents an exercise performed during a practice session
 type SessionExercise struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SessionId     int64                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,3,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	SessionId     int32                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,3,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Bpm           int32                  `protobuf:"varint,6,opt,name=bpm,proto3" json:"bpm,omitempty"`
@@ -589,21 +589,21 @@ func (*SessionExercise) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *SessionExercise) GetId() int64 {
+func (x *SessionExercise) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *SessionExercise) GetSessionId() int64 {
+func (x *SessionExercise) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
 	return 0
 }
 
-func (x *SessionExercise) GetExerciseId() int64 {
+func (x *SessionExercise) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -655,8 +655,8 @@ func (x *SessionExercise) GetExercise() *Exercise {
 // ExerciseHistory represents a historical record of exercise performance
 type ExerciseHistory struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Bpm           int32                  `protobuf:"varint,5,opt,name=bpm,proto3" json:"bpm,omitempty"`
@@ -664,7 +664,7 @@ type ExerciseHistory struct {
 	Notes         string                 `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
 	Rating        int32                  `protobuf:"varint,8,opt,name=rating,proto3" json:"rating,omitempty"`    // User rating (1-5)
 	Exercise      *Exercise              `protobuf:"bytes,9,opt,name=exercise,proto3" json:"exercise,omitempty"` // Full exercise details
-	SessionId     int64                  `protobuf:"varint,10,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId     int32                  `protobuf:"varint,10,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -699,14 +699,14 @@ func (*ExerciseHistory) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ExerciseHistory) GetId() int64 {
+func (x *ExerciseHistory) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *ExerciseHistory) GetExerciseId() int64 {
+func (x *ExerciseHistory) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -762,7 +762,7 @@ func (x *ExerciseHistory) GetExercise() *Exercise {
 	return nil
 }
 
-func (x *ExerciseHistory) GetSessionId() int64 {
+func (x *ExerciseHistory) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
@@ -825,7 +825,7 @@ func (x *CreateCategoryRequest) GetDescription() string {
 // GetCategoryRequest is used to retrieve a specific category
 type GetCategoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -860,7 +860,7 @@ func (*GetCategoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *GetCategoryRequest) GetId() int64 {
+func (x *GetCategoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -984,7 +984,7 @@ func (x *ListCategoriesResponse) GetTotalCount() int32 {
 // UpdateCategoryRequest is used to update a category
 type UpdateCategoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Category      *Category              `protobuf:"bytes,2,opt,name=category,proto3" json:"category,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1021,7 +1021,7 @@ func (*UpdateCategoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *UpdateCategoryRequest) GetId() int64 {
+func (x *UpdateCategoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1045,7 +1045,7 @@ func (x *UpdateCategoryRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeleteCategoryRequest is used to delete a category
 type DeleteCategoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1080,7 +1080,7 @@ func (*DeleteCategoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *DeleteCategoryRequest) GetId() int64 {
+func (x *DeleteCategoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1091,7 +1091,7 @@ func (x *DeleteCategoryRequest) GetId() int64 {
 type CreateTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	CategoryIds   []int64                `protobuf:"varint,2,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
+	CategoryIds   []int32                `protobuf:"varint,2,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1133,7 +1133,7 @@ func (x *CreateTagRequest) GetName() string {
 	return ""
 }
 
-func (x *CreateTagRequest) GetCategoryIds() []int64 {
+func (x *CreateTagRequest) GetCategoryIds() []int32 {
 	if x != nil {
 		return x.CategoryIds
 	}
@@ -1143,7 +1143,7 @@ func (x *CreateTagRequest) GetCategoryIds() []int64 {
 // GetTagRequest is used to retrieve a specific tag
 type GetTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1178,7 +1178,7 @@ func (*GetTagRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{15}
 }
 
-func (x *GetTagRequest) GetId() int64 {
+func (x *GetTagRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1190,7 +1190,7 @@ type ListTagsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	CategoryId    int64                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
+	CategoryId    int32                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1239,7 +1239,7 @@ func (x *ListTagsRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListTagsRequest) GetCategoryId() int64 {
+func (x *ListTagsRequest) GetCategoryId() int32 {
 	if x != nil {
 		return x.CategoryId
 	}
@@ -1310,7 +1310,7 @@ func (x *ListTagsResponse) GetTotalCount() int32 {
 // UpdateTagRequest is used to update a tag
 type UpdateTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Tag           *Tag                   `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1347,7 +1347,7 @@ func (*UpdateTagRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *UpdateTagRequest) GetId() int64 {
+func (x *UpdateTagRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1371,7 +1371,7 @@ func (x *UpdateTagRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeleteTagRequest is used to delete a tag
 type DeleteTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1406,7 +1406,7 @@ func (*DeleteTagRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *DeleteTagRequest) GetId() int64 {
+func (x *DeleteTagRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1418,8 +1418,8 @@ type CreateExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	TagIds        []int64                `protobuf:"varint,3,rep,packed,name=tag_ids,json=tagIds,proto3" json:"tag_ids,omitempty"`
-	CategoryIds   []int64                `protobuf:"varint,4,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
+	TagIds        []int32                `protobuf:"varint,3,rep,packed,name=tag_ids,json=tagIds,proto3" json:"tag_ids,omitempty"`
+	CategoryIds   []int32                `protobuf:"varint,4,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
 	Images        []*ExerciseImage       `protobuf:"bytes,5,rep,name=images,proto3" json:"images,omitempty"`
 	Links         []*ExerciseLink        `protobuf:"bytes,6,rep,name=links,proto3" json:"links,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1470,14 +1470,14 @@ func (x *CreateExerciseRequest) GetDescription() string {
 	return ""
 }
 
-func (x *CreateExerciseRequest) GetTagIds() []int64 {
+func (x *CreateExerciseRequest) GetTagIds() []int32 {
 	if x != nil {
 		return x.TagIds
 	}
 	return nil
 }
 
-func (x *CreateExerciseRequest) GetCategoryIds() []int64 {
+func (x *CreateExerciseRequest) GetCategoryIds() []int32 {
 	if x != nil {
 		return x.CategoryIds
 	}
@@ -1501,7 +1501,7 @@ func (x *CreateExerciseRequest) GetLinks() []*ExerciseLink {
 // GetExerciseRequest is used to retrieve a specific exercise
 type GetExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1536,7 +1536,7 @@ func (*GetExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *GetExerciseRequest) GetId() int64 {
+func (x *GetExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1548,8 +1548,8 @@ type ListExercisesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	CategoryId    int64                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
-	TagId         int64                  `protobuf:"varint,4,opt,name=tag_id,json=tagId,proto3" json:"tag_id,omitempty"`                // Optional: filter by tag
+	CategoryId    int32                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
+	TagId         int32                  `protobuf:"varint,4,opt,name=tag_id,json=tagId,proto3" json:"tag_id,omitempty"`                // Optional: filter by tag
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1598,14 +1598,14 @@ func (x *ListExercisesRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListExercisesRequest) GetCategoryId() int64 {
+func (x *ListExercisesRequest) GetCategoryId() int32 {
 	if x != nil {
 		return x.CategoryId
 	}
 	return 0
 }
 
-func (x *ListExercisesRequest) GetTagId() int64 {
+func (x *ListExercisesRequest) GetTagId() int32 {
 	if x != nil {
 		return x.TagId
 	}
@@ -1676,7 +1676,7 @@ func (x *ListExercisesResponse) GetTotalCount() int32 {
 // UpdateExerciseRequest is used to update an exercise
 type UpdateExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Exercise      *Exercise              `protobuf:"bytes,2,opt,name=exercise,proto3" json:"exercise,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1713,7 +1713,7 @@ func (*UpdateExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{24}
 }
 
-func (x *UpdateExerciseRequest) GetId() int64 {
+func (x *UpdateExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1737,7 +1737,7 @@ func (x *UpdateExerciseRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeleteExerciseRequest is used to delete an exercise
 type DeleteExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1772,7 +1772,7 @@ func (*DeleteExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{25}
 }
 
-func (x *DeleteExerciseRequest) GetId() int64 {
+func (x *DeleteExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1782,7 +1782,7 @@ func (x *DeleteExerciseRequest) GetId() int64 {
 // AddExerciseImageRequest is used to add an image to an exercise
 type AddExerciseImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	ImageData     []byte                 `protobuf:"bytes,2,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"`
 	Filename      string                 `protobuf:"bytes,3,opt,name=filename,proto3" json:"filename,omitempty"`
 	MimeType      string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
@@ -1821,7 +1821,7 @@ func (*AddExerciseImageRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{26}
 }
 
-func (x *AddExerciseImageRequest) GetExerciseId() int64 {
+func (x *AddExerciseImageRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -1859,7 +1859,7 @@ func (x *AddExerciseImageRequest) GetDescription() string {
 // DeleteExerciseImageRequest is used to delete an image from an exercise
 type DeleteExerciseImageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1894,7 +1894,7 @@ func (*DeleteExerciseImageRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{27}
 }
 
-func (x *DeleteExerciseImageRequest) GetId() int64 {
+func (x *DeleteExerciseImageRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -1904,7 +1904,7 @@ func (x *DeleteExerciseImageRequest) GetId() int64 {
 // AddExerciseLinkRequest is used to add a link to an exercise
 type AddExerciseLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1941,7 +1941,7 @@ func (*AddExerciseLinkRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{28}
 }
 
-func (x *AddExerciseLinkRequest) GetExerciseId() int64 {
+func (x *AddExerciseLinkRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -1965,7 +1965,7 @@ func (x *AddExerciseLinkRequest) GetDescription() string {
 // DeleteExerciseLinkRequest is used to delete a link from an exercise
 type DeleteExerciseLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2000,7 +2000,7 @@ func (*DeleteExerciseLinkRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{29}
 }
 
-func (x *DeleteExerciseLinkRequest) GetId() int64 {
+func (x *DeleteExerciseLinkRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2079,7 +2079,7 @@ func (x *CreatePracticeSessionRequest) GetExercises() []*SessionExerciseInput {
 // SessionExerciseInput is used for creating session exercises
 type SessionExerciseInput struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Bpm           int32                  `protobuf:"varint,4,opt,name=bpm,proto3" json:"bpm,omitempty"`
@@ -2119,7 +2119,7 @@ func (*SessionExerciseInput) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{31}
 }
 
-func (x *SessionExerciseInput) GetExerciseId() int64 {
+func (x *SessionExerciseInput) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -2164,7 +2164,7 @@ func (x *SessionExerciseInput) GetNotes() string {
 // GetPracticeSessionRequest is used to retrieve a specific practice session
 type GetPracticeSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2199,7 +2199,7 @@ func (*GetPracticeSessionRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{32}
 }
 
-func (x *GetPracticeSessionRequest) GetId() int64 {
+func (x *GetPracticeSessionRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2213,7 +2213,7 @@ type ListPracticeSessionsRequest struct {
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`     // Optional: filter by date range
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`           // Optional: filter by date range
-	ExerciseId    int64                  `protobuf:"varint,5,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"` // Optional: filter by exercise
+	ExerciseId    int32                  `protobuf:"varint,5,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"` // Optional: filter by exercise
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2276,7 +2276,7 @@ func (x *ListPracticeSessionsRequest) GetEndDate() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *ListPracticeSessionsRequest) GetExerciseId() int64 {
+func (x *ListPracticeSessionsRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -2348,7 +2348,7 @@ func (x *ListPracticeSessionsResponse) GetTotalCount() int32 {
 // UpdatePracticeSessionRequest is used to update a practice session
 type UpdatePracticeSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Session       *PracticeSession       `protobuf:"bytes,2,opt,name=session,proto3" json:"session,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2385,7 +2385,7 @@ func (*UpdatePracticeSessionRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{35}
 }
 
-func (x *UpdatePracticeSessionRequest) GetId() int64 {
+func (x *UpdatePracticeSessionRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2409,7 +2409,7 @@ func (x *UpdatePracticeSessionRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeletePracticeSessionRequest is used to delete a practice session
 type DeletePracticeSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2444,7 +2444,7 @@ func (*DeletePracticeSessionRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{36}
 }
 
-func (x *DeletePracticeSessionRequest) GetId() int64 {
+func (x *DeletePracticeSessionRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2454,8 +2454,8 @@ func (x *DeletePracticeSessionRequest) GetId() int64 {
 // AddSessionExerciseRequest is used to add an exercise to a session
 type AddSessionExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     int64                  `protobuf:"varint,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	SessionId     int32                  `protobuf:"varint,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Bpm           int32                  `protobuf:"varint,5,opt,name=bpm,proto3" json:"bpm,omitempty"`
@@ -2495,14 +2495,14 @@ func (*AddSessionExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{37}
 }
 
-func (x *AddSessionExerciseRequest) GetSessionId() int64 {
+func (x *AddSessionExerciseRequest) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
 	return 0
 }
 
-func (x *AddSessionExerciseRequest) GetExerciseId() int64 {
+func (x *AddSessionExerciseRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -2547,8 +2547,8 @@ func (x *AddSessionExerciseRequest) GetNotes() string {
 // UpdateSessionExerciseRequest is used to update a session exercise
 type UpdateSessionExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SessionId     int64                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	SessionId     int32                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	Exercise      *SessionExercise       `protobuf:"bytes,3,opt,name=exercise,proto3" json:"exercise,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2585,14 +2585,14 @@ func (*UpdateSessionExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{38}
 }
 
-func (x *UpdateSessionExerciseRequest) GetId() int64 {
+func (x *UpdateSessionExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *UpdateSessionExerciseRequest) GetSessionId() int64 {
+func (x *UpdateSessionExerciseRequest) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
@@ -2616,7 +2616,7 @@ func (x *UpdateSessionExerciseRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeleteSessionExerciseRequest is used to delete a session exercise
 type DeleteSessionExerciseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2651,7 +2651,7 @@ func (*DeleteSessionExerciseRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{39}
 }
 
-func (x *DeleteSessionExerciseRequest) GetId() int64 {
+func (x *DeleteSessionExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2661,14 +2661,14 @@ func (x *DeleteSessionExerciseRequest) GetId() int64 {
 // CreateExerciseHistoryRequest is used to create a new exercise history entry
 type CreateExerciseHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	Bpm           int32                  `protobuf:"varint,4,opt,name=bpm,proto3" json:"bpm,omitempty"`
 	TimeSignature string                 `protobuf:"bytes,5,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
 	Notes         string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
 	Rating        int32                  `protobuf:"varint,7,opt,name=rating,proto3" json:"rating,omitempty"`
-	SessionId     int64                  `protobuf:"varint,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SessionId     int32                  `protobuf:"varint,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2703,7 +2703,7 @@ func (*CreateExerciseHistoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{40}
 }
 
-func (x *CreateExerciseHistoryRequest) GetExerciseId() int64 {
+func (x *CreateExerciseHistoryRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -2752,7 +2752,7 @@ func (x *CreateExerciseHistoryRequest) GetRating() int32 {
 	return 0
 }
 
-func (x *CreateExerciseHistoryRequest) GetSessionId() int64 {
+func (x *CreateExerciseHistoryRequest) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
@@ -2763,7 +2763,7 @@ func (x *CreateExerciseHistoryRequest) GetSessionId() int64 {
 // entry
 type GetExerciseHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2798,7 +2798,7 @@ func (*GetExerciseHistoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{41}
 }
 
-func (x *GetExerciseHistoryRequest) GetId() int64 {
+func (x *GetExerciseHistoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2811,10 +2811,10 @@ type ListExerciseHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	ExerciseId    int64                  `protobuf:"varint,3,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"` // Optional: filter by exercise
+	ExerciseId    int32                  `protobuf:"varint,3,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"` // Optional: filter by exercise
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`     // Optional: filter by date range
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`           // Optional: filter by date range
-	SessionId     int64                  `protobuf:"varint,6,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`    // Optional: filter by session
+	SessionId     int32                  `protobuf:"varint,6,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`    // Optional: filter by session
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2863,7 +2863,7 @@ func (x *ListExerciseHistoryRequest) GetPageToken() string {
 	return ""
 }
 
-func (x *ListExerciseHistoryRequest) GetExerciseId() int64 {
+func (x *ListExerciseHistoryRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -2884,7 +2884,7 @@ func (x *ListExerciseHistoryRequest) GetEndDate() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *ListExerciseHistoryRequest) GetSessionId() int64 {
+func (x *ListExerciseHistoryRequest) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
 	}
@@ -2956,7 +2956,7 @@ func (x *ListExerciseHistoryResponse) GetTotalCount() int32 {
 // UpdateExerciseHistoryRequest is used to update an exercise history entry
 type UpdateExerciseHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	History       *ExerciseHistory       `protobuf:"bytes,2,opt,name=history,proto3" json:"history,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2993,7 +2993,7 @@ func (*UpdateExerciseHistoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{44}
 }
 
-func (x *UpdateExerciseHistoryRequest) GetId() int64 {
+func (x *UpdateExerciseHistoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -3017,7 +3017,7 @@ func (x *UpdateExerciseHistoryRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 // DeleteExerciseHistoryRequest is used to delete an exercise history entry
 type DeleteExerciseHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3052,7 +3052,7 @@ func (*DeleteExerciseHistoryRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{45}
 }
 
-func (x *DeleteExerciseHistoryRequest) GetId() int64 {
+func (x *DeleteExerciseHistoryRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -3062,7 +3062,7 @@ func (x *DeleteExerciseHistoryRequest) GetId() int64 {
 // GetExerciseStatsRequest is used to get statistics for an exercise
 type GetExerciseStatsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"` // Optional: filter by date range
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`       // Optional: filter by date range
 	unknownFields protoimpl.UnknownFields
@@ -3099,7 +3099,7 @@ func (*GetExerciseStatsRequest) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{46}
 }
 
-func (x *GetExerciseStatsRequest) GetExerciseId() int64 {
+func (x *GetExerciseStatsRequest) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -3123,10 +3123,10 @@ func (x *GetExerciseStatsRequest) GetEndDate() *timestamppb.Timestamp {
 // ExerciseStats contains statistics for an exercise
 type ExerciseStats struct {
 	state                        protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId                   int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId                   int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	ExerciseName                 string                 `protobuf:"bytes,2,opt,name=exercise_name,json=exerciseName,proto3" json:"exercise_name,omitempty"`
 	PracticeCount                int32                  `protobuf:"varint,3,opt,name=practice_count,json=practiceCount,proto3" json:"practice_count,omitempty"`
-	TotalPracticeDurationSeconds int64                  `protobuf:"varint,4,opt,name=total_practice_duration_seconds,json=totalPracticeDurationSeconds,proto3" json:"total_practice_duration_seconds,omitempty"`
+	TotalPracticeDurationSeconds int32                  `protobuf:"varint,4,opt,name=total_practice_duration_seconds,json=totalPracticeDurationSeconds,proto3" json:"total_practice_duration_seconds,omitempty"`
 	AvgRating                    float64                `protobuf:"fixed64,5,opt,name=avg_rating,json=avgRating,proto3" json:"avg_rating,omitempty"`
 	MaxBpm                       int32                  `protobuf:"varint,6,opt,name=max_bpm,json=maxBpm,proto3" json:"max_bpm,omitempty"`
 	MinBpm                       int32                  `protobuf:"varint,7,opt,name=min_bpm,json=minBpm,proto3" json:"min_bpm,omitempty"`
@@ -3166,7 +3166,7 @@ func (*ExerciseStats) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{47}
 }
 
-func (x *ExerciseStats) GetExerciseId() int64 {
+func (x *ExerciseStats) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -3187,7 +3187,7 @@ func (x *ExerciseStats) GetPracticeCount() int32 {
 	return 0
 }
 
-func (x *ExerciseStats) GetTotalPracticeDurationSeconds() int64 {
+func (x *ExerciseStats) GetTotalPracticeDurationSeconds() int32 {
 	if x != nil {
 		return x.TotalPracticeDurationSeconds
 	}
@@ -3287,7 +3287,7 @@ type GetPracticeStatsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`     // Optional: filter by date range
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`           // Optional: filter by date range
-	CategoryId    int64                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
+	CategoryId    int32                  `protobuf:"varint,3,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"` // Optional: filter by category
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3336,7 +3336,7 @@ func (x *GetPracticeStatsRequest) GetEndDate() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *GetPracticeStatsRequest) GetCategoryId() int64 {
+func (x *GetPracticeStatsRequest) GetCategoryId() int32 {
 	if x != nil {
 		return x.CategoryId
 	}
@@ -3346,8 +3346,8 @@ func (x *GetPracticeStatsRequest) GetCategoryId() int64 {
 // PracticeStats contains statistics for practice sessions
 type PracticeStats struct {
 	state                     protoimpl.MessageState      `protogen:"open.v1"`
-	TotalSessions             int64                       `protobuf:"varint,1,opt,name=total_sessions,json=totalSessions,proto3" json:"total_sessions,omitempty"`
-	TotalDurationSeconds      int64                       `protobuf:"varint,2,opt,name=total_duration_seconds,json=totalDurationSeconds,proto3" json:"total_duration_seconds,omitempty"`
+	TotalSessions             int32                       `protobuf:"varint,1,opt,name=total_sessions,json=totalSessions,proto3" json:"total_sessions,omitempty"`
+	TotalDurationSeconds      int32                       `protobuf:"varint,2,opt,name=total_duration_seconds,json=totalDurationSeconds,proto3" json:"total_duration_seconds,omitempty"`
 	AvgSessionDurationSeconds float64                     `protobuf:"fixed64,3,opt,name=avg_session_duration_seconds,json=avgSessionDurationSeconds,proto3" json:"avg_session_duration_seconds,omitempty"`
 	ExerciseDistribution      []*ExerciseTimeDistribution `protobuf:"bytes,4,rep,name=exercise_distribution,json=exerciseDistribution,proto3" json:"exercise_distribution,omitempty"`
 	CategoryDistribution      []*CategoryTimeDistribution `protobuf:"bytes,5,rep,name=category_distribution,json=categoryDistribution,proto3" json:"category_distribution,omitempty"`
@@ -3386,14 +3386,14 @@ func (*PracticeStats) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{50}
 }
 
-func (x *PracticeStats) GetTotalSessions() int64 {
+func (x *PracticeStats) GetTotalSessions() int32 {
 	if x != nil {
 		return x.TotalSessions
 	}
 	return 0
 }
 
-func (x *PracticeStats) GetTotalDurationSeconds() int64 {
+func (x *PracticeStats) GetTotalDurationSeconds() int32 {
 	if x != nil {
 		return x.TotalDurationSeconds
 	}
@@ -3431,9 +3431,9 @@ func (x *PracticeStats) GetPracticeFrequency() []*PracticeTimePoint {
 // ExerciseTimeDistribution shows how much time was spent on each exercise
 type ExerciseTimeDistribution struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId      int64                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	ExerciseId      int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	ExerciseName    string                 `protobuf:"bytes,2,opt,name=exercise_name,json=exerciseName,proto3" json:"exercise_name,omitempty"`
-	DurationSeconds int64                  `protobuf:"varint,3,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,3,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	Percentage      float64                `protobuf:"fixed64,4,opt,name=percentage,proto3" json:"percentage,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -3469,7 +3469,7 @@ func (*ExerciseTimeDistribution) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{51}
 }
 
-func (x *ExerciseTimeDistribution) GetExerciseId() int64 {
+func (x *ExerciseTimeDistribution) GetExerciseId() int32 {
 	if x != nil {
 		return x.ExerciseId
 	}
@@ -3483,7 +3483,7 @@ func (x *ExerciseTimeDistribution) GetExerciseName() string {
 	return ""
 }
 
-func (x *ExerciseTimeDistribution) GetDurationSeconds() int64 {
+func (x *ExerciseTimeDistribution) GetDurationSeconds() int32 {
 	if x != nil {
 		return x.DurationSeconds
 	}
@@ -3500,9 +3500,9 @@ func (x *ExerciseTimeDistribution) GetPercentage() float64 {
 // CategoryTimeDistribution shows how much time was spent on each category
 type CategoryTimeDistribution struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	CategoryId      int64                  `protobuf:"varint,1,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
+	CategoryId      int32                  `protobuf:"varint,1,opt,name=category_id,json=categoryId,proto3" json:"category_id,omitempty"`
 	CategoryName    string                 `protobuf:"bytes,2,opt,name=category_name,json=categoryName,proto3" json:"category_name,omitempty"`
-	DurationSeconds int64                  `protobuf:"varint,3,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,3,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	Percentage      float64                `protobuf:"fixed64,4,opt,name=percentage,proto3" json:"percentage,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -3538,7 +3538,7 @@ func (*CategoryTimeDistribution) Descriptor() ([]byte, []int) {
 	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{52}
 }
 
-func (x *CategoryTimeDistribution) GetCategoryId() int64 {
+func (x *CategoryTimeDistribution) GetCategoryId() int32 {
 	if x != nil {
 		return x.CategoryId
 	}
@@ -3552,7 +3552,7 @@ func (x *CategoryTimeDistribution) GetCategoryName() string {
 	return ""
 }
 
-func (x *CategoryTimeDistribution) GetDurationSeconds() int64 {
+func (x *CategoryTimeDistribution) GetDurationSeconds() int32 {
 	if x != nil {
 		return x.DurationSeconds
 	}
@@ -3570,7 +3570,7 @@ func (x *CategoryTimeDistribution) GetPercentage() float64 {
 type PracticeTimePoint struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Date            *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	DurationSeconds int64                  `protobuf:"varint,2,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,2,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -3612,7 +3612,7 @@ func (x *PracticeTimePoint) GetDate() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *PracticeTimePoint) GetDurationSeconds() int64 {
+func (x *PracticeTimePoint) GetDurationSeconds() int32 {
 	if x != nil {
 		return x.DurationSeconds
 	}
@@ -3626,7 +3626,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x1aapi/v1/tempus/tempus.proto\x12\n" +
 	"drummer.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\xc6\x01\n" +
 	"\bCategory\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x129\n" +
 	"\n" +
@@ -3634,26 +3634,26 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x87\x01\n" +
 	"\x03Tag\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12!\n" +
-	"\fcategory_ids\x18\x04 \x03(\x03R\vcategoryIds\"\xe5\x02\n" +
+	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\"\xe5\x02\n" +
 	"\bExercise\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x129\n" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x17\n" +
-	"\atag_ids\x18\x06 \x03(\x03R\x06tagIds\x12!\n" +
-	"\fcategory_ids\x18\a \x03(\x03R\vcategoryIds\x121\n" +
+	"\atag_ids\x18\x06 \x03(\x05R\x06tagIds\x12!\n" +
+	"\fcategory_ids\x18\a \x03(\x05R\vcategoryIds\x121\n" +
 	"\x06images\x18\b \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
 	"\x05links\x18\t \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\"\xf5\x01\n" +
 	"\rExerciseImage\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1f\n" +
-	"\vexercise_id\x18\x02 \x01(\x03R\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
+	"\vexercise_id\x18\x02 \x01(\x05R\n" +
 	"exerciseId\x12\x1d\n" +
 	"\n" +
 	"image_data\x18\x03 \x01(\fR\timageData\x12\x1a\n" +
@@ -3663,15 +3663,15 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xae\x01\n" +
 	"\fExerciseLink\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1f\n" +
-	"\vexercise_id\x18\x02 \x01(\x03R\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
+	"\vexercise_id\x18\x02 \x01(\x05R\n" +
 	"exerciseId\x12\x10\n" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x129\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xda\x02\n" +
 	"\x0fPracticeSession\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x129\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x129\n" +
 	"\n" +
 	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
 	"\bend_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x14\n" +
@@ -3682,10 +3682,10 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.SessionExerciseR\texercises\"\xd4\x02\n" +
 	"\x0fSessionExercise\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x02 \x01(\x03R\tsessionId\x12\x1f\n" +
-	"\vexercise_id\x18\x03 \x01(\x03R\n" +
+	"session_id\x18\x02 \x01(\x05R\tsessionId\x12\x1f\n" +
+	"\vexercise_id\x18\x03 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3695,8 +3695,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x05notes\x18\b \x01(\tR\x05notes\x120\n" +
 	"\bexercise\x18\t \x01(\v2\x14.drummer.v1.ExerciseR\bexercise\"\xec\x02\n" +
 	"\x0fExerciseHistory\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1f\n" +
-	"\vexercise_id\x18\x02 \x01(\x03R\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
+	"\vexercise_id\x18\x02 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3708,12 +3708,12 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\bexercise\x18\t \x01(\v2\x14.drummer.v1.ExerciseR\bexercise\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\n" +
-	" \x01(\x03R\tsessionId\"M\n" +
+	" \x01(\x05R\tsessionId\"M\n" +
 	"\x15CreateCategoryRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"$\n" +
 	"\x12GetCategoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"S\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"S\n" +
 	"\x15ListCategoriesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
@@ -3726,22 +3726,22 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
 	"totalCount\"\x96\x01\n" +
 	"\x15UpdateCategoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x120\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x120\n" +
 	"\bcategory\x18\x02 \x01(\v2\x14.drummer.v1.CategoryR\bcategory\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\"'\n" +
 	"\x15DeleteCategoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"I\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"I\n" +
 	"\x10CreateTagRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12!\n" +
-	"\fcategory_ids\x18\x02 \x03(\x03R\vcategoryIds\"\x1f\n" +
+	"\fcategory_ids\x18\x02 \x03(\x05R\vcategoryIds\"\x1f\n" +
 	"\rGetTagRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"n\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"n\n" +
 	"\x0fListTagsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1f\n" +
-	"\vcategory_id\x18\x03 \x01(\x03R\n" +
+	"\vcategory_id\x18\x03 \x01(\x05R\n" +
 	"categoryId\"\x80\x01\n" +
 	"\x10ListTagsResponse\x12#\n" +
 	"\x04tags\x18\x01 \x03(\v2\x0f.drummer.v1.TagR\x04tags\x12&\n" +
@@ -3749,42 +3749,42 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
 	"totalCount\"\x82\x01\n" +
 	"\x10UpdateTagRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12!\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12!\n" +
 	"\x03tag\x18\x02 \x01(\v2\x0f.drummer.v1.TagR\x03tag\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\"\"\n" +
 	"\x10DeleteTagRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xec\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xec\x01\n" +
 	"\x15CreateExerciseRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x17\n" +
-	"\atag_ids\x18\x03 \x03(\x03R\x06tagIds\x12!\n" +
-	"\fcategory_ids\x18\x04 \x03(\x03R\vcategoryIds\x121\n" +
+	"\atag_ids\x18\x03 \x03(\x05R\x06tagIds\x12!\n" +
+	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\x121\n" +
 	"\x06images\x18\x05 \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
 	"\x05links\x18\x06 \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\"$\n" +
 	"\x12GetExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\x8a\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x8a\x01\n" +
 	"\x14ListExercisesRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1f\n" +
-	"\vcategory_id\x18\x03 \x01(\x03R\n" +
+	"\vcategory_id\x18\x03 \x01(\x05R\n" +
 	"categoryId\x12\x15\n" +
-	"\x06tag_id\x18\x04 \x01(\x03R\x05tagId\"\x94\x01\n" +
+	"\x06tag_id\x18\x04 \x01(\x05R\x05tagId\"\x94\x01\n" +
 	"\x15ListExercisesResponse\x122\n" +
 	"\texercises\x18\x01 \x03(\v2\x14.drummer.v1.ExerciseR\texercises\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
 	"totalCount\"\x96\x01\n" +
 	"\x15UpdateExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x120\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x120\n" +
 	"\bexercise\x18\x02 \x01(\v2\x14.drummer.v1.ExerciseR\bexercise\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\"'\n" +
 	"\x15DeleteExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xb4\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xb4\x01\n" +
 	"\x17AddExerciseImageRequest\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x12\x1d\n" +
 	"\n" +
 	"image_data\x18\x02 \x01(\fR\timageData\x12\x1a\n" +
@@ -3792,14 +3792,14 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x12 \n" +
 	"\vdescription\x18\x05 \x01(\tR\vdescription\",\n" +
 	"\x1aDeleteExerciseImageRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"m\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"m\n" +
 	"\x16AddExerciseLinkRequest\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x12\x10\n" +
 	"\x03url\x18\x02 \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\"+\n" +
 	"\x19DeleteExerciseLinkRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xe6\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xe6\x01\n" +
 	"\x1cCreatePracticeSessionRequest\x129\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3807,7 +3807,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x05notes\x18\x03 \x01(\tR\x05notes\x12>\n" +
 	"\texercises\x18\x04 \x03(\v2 .drummer.v1.SessionExerciseInputR\texercises\"\xf8\x01\n" +
 	"\x14SessionExerciseInput\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3816,7 +3816,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x0etime_signature\x18\x05 \x01(\tR\rtimeSignature\x12\x14\n" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\"+\n" +
 	"\x19GetPracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xec\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xec\x01\n" +
 	"\x1bListPracticeSessionsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
@@ -3824,7 +3824,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\n" +
 	"start_date\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
 	"\bend_date\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\x12\x1f\n" +
-	"\vexercise_id\x18\x05 \x01(\x03R\n" +
+	"\vexercise_id\x18\x05 \x01(\x05R\n" +
 	"exerciseId\"\xa0\x01\n" +
 	"\x1cListPracticeSessionsResponse\x127\n" +
 	"\bsessions\x18\x01 \x03(\v2\x1b.drummer.v1.PracticeSessionR\bsessions\x12&\n" +
@@ -3832,16 +3832,16 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
 	"totalCount\"\xa2\x01\n" +
 	"\x1cUpdatePracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x125\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x125\n" +
 	"\asession\x18\x02 \x01(\v2\x1b.drummer.v1.PracticeSessionR\asession\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\".\n" +
 	"\x1cDeletePracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\x9c\x02\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x9c\x02\n" +
 	"\x19AddSessionExerciseRequest\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\x03R\tsessionId\x12\x1f\n" +
-	"\vexercise_id\x18\x02 \x01(\x03R\n" +
+	"session_id\x18\x01 \x01(\x05R\tsessionId\x12\x1f\n" +
+	"\vexercise_id\x18\x02 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3850,16 +3850,16 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x0etime_signature\x18\x06 \x01(\tR\rtimeSignature\x12\x14\n" +
 	"\x05notes\x18\a \x01(\tR\x05notes\"\xc3\x01\n" +
 	"\x1cUpdateSessionExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x02 \x01(\x03R\tsessionId\x127\n" +
+	"session_id\x18\x02 \x01(\x05R\tsessionId\x127\n" +
 	"\bexercise\x18\x03 \x01(\v2\x1b.drummer.v1.SessionExerciseR\bexercise\x12;\n" +
 	"\vupdate_mask\x18\x04 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\".\n" +
 	"\x1cDeleteSessionExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xb7\x02\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xb7\x02\n" +
 	"\x1cCreateExerciseHistoryRequest\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -3869,44 +3869,44 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x16\n" +
 	"\x06rating\x18\a \x01(\x05R\x06rating\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\b \x01(\x03R\tsessionId\"+\n" +
+	"session_id\x18\b \x01(\x05R\tsessionId\"+\n" +
 	"\x19GetExerciseHistoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\x8a\x02\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x8a\x02\n" +
 	"\x1aListExerciseHistoryRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1f\n" +
-	"\vexercise_id\x18\x03 \x01(\x03R\n" +
+	"\vexercise_id\x18\x03 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_date\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
 	"\bend_date\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x06 \x01(\x03R\tsessionId\"\xac\x01\n" +
+	"session_id\x18\x06 \x01(\x05R\tsessionId\"\xac\x01\n" +
 	"\x1bListExerciseHistoryResponse\x12D\n" +
 	"\x0fhistory_entries\x18\x01 \x03(\v2\x1b.drummer.v1.ExerciseHistoryR\x0ehistoryEntries\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
 	"totalCount\"\xa2\x01\n" +
 	"\x1cUpdateExerciseHistoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x125\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x125\n" +
 	"\ahistory\x18\x02 \x01(\v2\x1b.drummer.v1.ExerciseHistoryR\ahistory\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\".\n" +
 	"\x1cDeleteExerciseHistoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\"\xac\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xac\x01\n" +
 	"\x17GetExerciseStatsRequest\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_date\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
 	"\bend_date\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\"\xee\x02\n" +
 	"\rExerciseStats\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x12#\n" +
 	"\rexercise_name\x18\x02 \x01(\tR\fexerciseName\x12%\n" +
 	"\x0epractice_count\x18\x03 \x01(\x05R\rpracticeCount\x12E\n" +
-	"\x1ftotal_practice_duration_seconds\x18\x04 \x01(\x03R\x1ctotalPracticeDurationSeconds\x12\x1d\n" +
+	"\x1ftotal_practice_duration_seconds\x18\x04 \x01(\x05R\x1ctotalPracticeDurationSeconds\x12\x1d\n" +
 	"\n" +
 	"avg_rating\x18\x05 \x01(\x01R\tavgRating\x12\x17\n" +
 	"\amax_bpm\x18\x06 \x01(\x05R\x06maxBpm\x12\x17\n" +
@@ -3920,34 +3920,34 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\n" +
 	"start_date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
 	"\bend_date\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\x12\x1f\n" +
-	"\vcategory_id\x18\x03 \x01(\x03R\n" +
+	"\vcategory_id\x18\x03 \x01(\x05R\n" +
 	"categoryId\"\xb1\x03\n" +
 	"\rPracticeStats\x12%\n" +
-	"\x0etotal_sessions\x18\x01 \x01(\x03R\rtotalSessions\x124\n" +
-	"\x16total_duration_seconds\x18\x02 \x01(\x03R\x14totalDurationSeconds\x12?\n" +
+	"\x0etotal_sessions\x18\x01 \x01(\x05R\rtotalSessions\x124\n" +
+	"\x16total_duration_seconds\x18\x02 \x01(\x05R\x14totalDurationSeconds\x12?\n" +
 	"\x1cavg_session_duration_seconds\x18\x03 \x01(\x01R\x19avgSessionDurationSeconds\x12Y\n" +
 	"\x15exercise_distribution\x18\x04 \x03(\v2$.drummer.v1.ExerciseTimeDistributionR\x14exerciseDistribution\x12Y\n" +
 	"\x15category_distribution\x18\x05 \x03(\v2$.drummer.v1.CategoryTimeDistributionR\x14categoryDistribution\x12L\n" +
 	"\x12practice_frequency\x18\x06 \x03(\v2\x1d.drummer.v1.PracticeTimePointR\x11practiceFrequency\"\xab\x01\n" +
 	"\x18ExerciseTimeDistribution\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x03R\n" +
+	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x12#\n" +
 	"\rexercise_name\x18\x02 \x01(\tR\fexerciseName\x12)\n" +
-	"\x10duration_seconds\x18\x03 \x01(\x03R\x0fdurationSeconds\x12\x1e\n" +
+	"\x10duration_seconds\x18\x03 \x01(\x05R\x0fdurationSeconds\x12\x1e\n" +
 	"\n" +
 	"percentage\x18\x04 \x01(\x01R\n" +
 	"percentage\"\xab\x01\n" +
 	"\x18CategoryTimeDistribution\x12\x1f\n" +
-	"\vcategory_id\x18\x01 \x01(\x03R\n" +
+	"\vcategory_id\x18\x01 \x01(\x05R\n" +
 	"categoryId\x12#\n" +
 	"\rcategory_name\x18\x02 \x01(\tR\fcategoryName\x12)\n" +
-	"\x10duration_seconds\x18\x03 \x01(\x03R\x0fdurationSeconds\x12\x1e\n" +
+	"\x10duration_seconds\x18\x03 \x01(\x05R\x0fdurationSeconds\x12\x1e\n" +
 	"\n" +
 	"percentage\x18\x04 \x01(\x01R\n" +
 	"percentage\"n\n" +
 	"\x11PracticeTimePoint\x12.\n" +
 	"\x04date\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x04date\x12)\n" +
-	"\x10duration_seconds\x18\x02 \x01(\x03R\x0fdurationSeconds2\x9f\x04\n" +
+	"\x10duration_seconds\x18\x02 \x01(\x05R\x0fdurationSeconds2\x9f\x04\n" +
 	"\x0fCategoryService\x12d\n" +
 	"\x0eCreateCategory\x12!.drummer.v1.CreateCategoryRequest\x1a\x14.drummer.v1.Category\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/categories\x12`\n" +
 	"\vGetCategory\x12\x1e.drummer.v1.GetCategoryRequest\x1a\x14.drummer.v1.Category\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/categories/{id}\x12o\n" +

@@ -82,7 +82,7 @@ func (h *PracticeSessionHandler) CreatePracticeSession(ctx context.Context, req 
 
 	// Return the created session (without exercises for now)
 	return &pb.PracticeSession{
-		Id:        sessionID,
+		Id:        int32(sessionID),
 		StartTime: req.StartTime,
 		EndTime:   req.EndTime,
 		Notes:     req.Notes,
@@ -142,11 +142,11 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 
 	// Parse exercises
 	var exercises []*pb.SessionExercise
-	exerciseIDMap := make(map[int64]int) // Maps exercise ID to index in exercises slice
+	exerciseIDMap := make(map[int32]int) // Maps exercise ID to index in exercises slice
 
 	for exerciseRows.Next() {
 		var sessionExercise pb.SessionExercise
-		var exerciseId int64
+		var exerciseId int32
 		var startTime, endTime time.Time
 
 		err := exerciseRows.Scan(
@@ -544,7 +544,7 @@ func (h *PracticeSessionHandler) AddSessionExercise(ctx context.Context, req *pb
 
 	// Return the created session exercise
 	return &pb.SessionExercise{
-		Id:            sessionExerciseId,
+		Id:            int32(sessionExerciseId),
 		SessionId:     req.SessionId,
 		ExerciseId:    req.ExerciseId,
 		StartTime:     req.StartTime,
@@ -730,7 +730,7 @@ func (h *PracticeSessionHandler) UpdateSessionExercise(ctx context.Context, req 
 
 	// Get the updated session exercise
 	var sessionExercise pb.SessionExercise
-	var exerciseId int64
+	var exerciseId int32
 	var startTime, endTime time.Time
 
 	err = tx.QueryRowContext(
@@ -798,7 +798,7 @@ func (h *PracticeSessionHandler) DeleteSessionExercise(ctx context.Context, req 
 }
 
 // Helper method to get exercise details
-func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql.Tx, exerciseId int64) (*pb.Exercise, error) {
+func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql.Tx, exerciseId int32) (*pb.Exercise, error) {
 	// Get basic exercise info
 	var exercise pb.Exercise
 	var createdAt, updatedAt time.Time
@@ -829,9 +829,9 @@ func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql
 	}
 	defer tagRows.Close()
 
-	var tagIDs []int64
+	var tagIDs []int32
 	for tagRows.Next() {
-		var tagID int64
+		var tagID int32
 		if err := tagRows.Scan(&tagID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse tag ID: %v", err)
 		}
@@ -853,9 +853,9 @@ func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql
 	}
 	defer categoryRows.Close()
 
-	var categoryIDs []int64
+	var categoryIDs []int32
 	for categoryRows.Next() {
-		var categoryID int64
+		var categoryID int32
 		if err := categoryRows.Scan(&categoryID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse category ID: %v", err)
 		}

@@ -60,12 +60,15 @@
           :headers="headers"
           :items="filteredTags"
           :items-per-page="10"
-          class="elevation-1"
+          class="elevation-1            "
         >
+        <template #item.createdAt="{ item }">
+            {{ appStore.formatDate(item.createdAt) }}
+        </template>
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
               <v-chip
-                v-for="categoryId in item.category_ids"
+                v-for="categoryId in item.categoryIds"
                 :key="categoryId"
                 size="small"
                 color="primary"
@@ -170,7 +173,7 @@ const deleteLoading = ref(false)
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Categories', key: 'categories' },
-  { title: 'Created', key: 'created_at', formatter: value => appStore.formatDate(value) },
+  { title: 'Created', key: 'createdAt' },
   { title: 'Actions', key: 'actions', sortable: false }
 ]
 
@@ -189,7 +192,7 @@ const filteredTags = computed(() => {
   // Category filter
   if (categoryFilter.value) {
     result = result.filter(tag => 
-      tag.category_ids && tag.category_ids.includes(parseInt(categoryFilter.value))
+      tag.categoryIds && tag.categoryIds.includes(parseInt(categoryFilter.value))
     )
   }
   
@@ -212,7 +215,7 @@ function getCategoryName(categoryId) {
 function openCreateDialog() {
   selectedTag.value = {
     name: '',
-    category_ids: []
+    categoryIds: []
   }
   isEdit.value = false
   dialogVisible.value = true
@@ -228,7 +231,7 @@ async function saveTag(tagData) {
   try {
     if (isEdit.value) {
       const id = selectedTag.value.id
-      await tagsStore.updateTag(id, tagData, 'name,category_ids')
+      await tagsStore.updateTag(id, tagData, 'name,categoryIds')
       appStore.showSuccessMessage(`Tag "${tagData.name}" updated successfully`)
     } else {
       await tagsStore.createTag(tagData)

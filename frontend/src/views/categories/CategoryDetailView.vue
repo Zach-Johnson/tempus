@@ -118,8 +118,9 @@
             <v-btn 
               color="primary" 
               prepend-icon="mdi-plus" 
-              :to="{ name: 'exercises', query: { create: true, category: categoryId } }"
             >
+                <!-- TODO -->
+              <!-- :to="{ name: 'exercises', query: { category: categoryId.value } }" -->
               Create Exercise
             </v-btn>
           </v-card-text>
@@ -136,19 +137,19 @@
                   variant="text"
                   size="small"
                   color="primary"
-                  :to="{ name: 'exercise-detail', params: { id: item.id }}"
+                  :to="{ name: 'exercise-detail', params: { id: item.raw.id }}"
                 >
                   <v-icon>mdi-eye</v-icon>
                 </v-btn>
               </template>
             </v-data-table>
-            
+
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn 
                 color="primary" 
                 variant="text"
-                :to="{ name: 'exercises', query: { category: categoryId } }"
+                :to="{ name: 'exercises', query: { category: categoryId.value } }"
               >
                 View All Exercises
               </v-btn>
@@ -300,19 +301,19 @@ async function loadData() {
   error.value = null
   
   try {
-    console.log(`Loading category with ID: ${categoryId.value}`)
+    // console.log(`Loading category with ID: ${categoryId.value}`)
     
     // Always fetch the category to ensure we have the latest data
     const fetchedCategory = await categoriesStore.fetchCategory(categoryId.value)
-    console.log('Fetched category:', fetchedCategory)
-    console.log('Current category from store:', categoriesStore.currentCategory)
+    // console.log('Fetched category:', fetchedCategory)
+    // console.log('Current category from store:', categoriesStore.currentCategory)
     
     // If the category is still not found after fetching, show an error
     if (!categoriesStore.currentCategory) {
       console.warn(`Category with ID ${categoryId.value} not found after fetching`)
       error.value = `Category with ID ${categoryId.value} could not be found`
     } else {
-      console.log('Category found:', categoriesStore.currentCategory)
+      // console.log('Category found:', categoriesStore.currentCategory)
     }
     
     if (tagsStore.tags.length === 0) {
@@ -335,6 +336,7 @@ async function loadData() {
   } finally {
     loadingExercises.value = false
   }
+  // console.log("finished loading data")
 }
 
 // Watch for route param changes to reload data

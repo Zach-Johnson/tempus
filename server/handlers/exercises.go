@@ -128,8 +128,8 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 		}
 
 		images = append(images, &pb.ExerciseImage{
-			Id:          imageID,
-			ExerciseId:  id,
+			Id:          int32(imageID),
+			ExerciseId:  int32(id),
 			ImageData:   imageReq.ImageData,
 			Filename:    imageReq.Filename,
 			MimeType:    imageReq.MimeType,
@@ -167,8 +167,8 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 		}
 
 		links = append(links, &pb.ExerciseLink{
-			Id:          linkID,
-			ExerciseId:  id,
+			Id:          int32(linkID),
+			ExerciseId:  int32(id),
 			Url:         linkReq.Url,
 			Description: linkReq.Description,
 			CreatedAt:   timestamppb.New(linkCreatedAt),
@@ -193,7 +193,7 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 
 	// Return the created exercise
 	return &pb.Exercise{
-		Id:          id,
+		Id:          int32(id),
 		Name:        req.Name,
 		Description: req.Description,
 		CreatedAt:   timestamppb.New(createdAt),
@@ -241,9 +241,9 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 	}
 	defer tagRows.Close()
 
-	var tagIDs []int64
+	var tagIDs []int32
 	for tagRows.Next() {
-		var tagID int64
+		var tagID int32
 		if err := tagRows.Scan(&tagID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse tag ID: %v", err)
 		}
@@ -265,9 +265,9 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 	}
 	defer categoryRows.Close()
 
-	var categoryIDs []int64
+	var categoryIDs []int32
 	for categoryRows.Next() {
-		var categoryID int64
+		var categoryID int32
 		if err := categoryRows.Scan(&categoryID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse category ID: %v", err)
 		}
@@ -430,7 +430,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 	exercises := make([]*pb.Exercise, 0, pageSize)
 	count := 0
 	hasMorePages := false
-	var exerciseIDs []int64
+	var exerciseIDs []int32
 
 	for rows.Next() {
 		if count >= pageSize {
@@ -480,7 +480,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 // addRelatedData adds tags, categories, images, and links to the exercises
 func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Exercise) error {
 	// Map for quick lookup of exercises by ID
-	exerciseMap := make(map[int64]*pb.Exercise)
+	exerciseMap := make(map[int32]*pb.Exercise)
 	exerciseIDs := make([]interface{}, 0, len(exercises))
 
 	// Build query params and map
@@ -504,7 +504,7 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	defer tagRows.Close()
 
 	for tagRows.Next() {
-		var exerciseID, tagID int64
+		var exerciseID, tagID int32
 		if err := tagRows.Scan(&exerciseID, &tagID); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise tag: %v", err)
 		}
@@ -526,7 +526,7 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	defer catRows.Close()
 
 	for catRows.Next() {
-		var exerciseID, categoryID int64
+		var exerciseID, categoryID int32
 		if err := catRows.Scan(&exerciseID, &categoryID); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise category: %v", err)
 		}
@@ -805,7 +805,7 @@ func (h *ExerciseHandler) AddExerciseImage(ctx context.Context, req *pb.AddExerc
 
 	// Return the created image
 	return &pb.ExerciseImage{
-		Id:          imageID,
+		Id:          int32(imageID),
 		ExerciseId:  req.ExerciseId,
 		ImageData:   req.ImageData,
 		Filename:    req.Filename,
@@ -889,7 +889,7 @@ func (h *ExerciseHandler) AddExerciseLink(ctx context.Context, req *pb.AddExerci
 
 	// Return the created link
 	return &pb.ExerciseLink{
-		Id:          linkID,
+		Id:          int32(linkID),
 		ExerciseId:  req.ExerciseId,
 		Url:         req.Url,
 		Description: req.Description,
@@ -966,7 +966,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 	}
 
 	// Get total duration
-	var totalDurationSeconds int64
+	var totalDurationSeconds int32
 	durationQuery := `
 		SELECT COALESCE(SUM(strftime('%s', end_time) - strftime('%s', start_time)), 0) 
 		FROM session_exercises 

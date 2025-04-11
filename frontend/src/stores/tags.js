@@ -26,8 +26,8 @@ export const useTagsStore = defineStore("tags", () => {
             return (categoryId) =>
                 tags.value.filter(
                     (tag) =>
-                        tag.category_ids &&
-                        tag.category_ids.includes(categoryId),
+                        tag.categoryIds &&
+                        tag.categoryIds.includes(categoryId),
                 );
         },
     );
@@ -98,7 +98,8 @@ export const useTagsStore = defineStore("tags", () => {
             // format
             let formattedUpdateMask = updateMask;
             if (
-                updateMask && typeof updateMask === "object" && updateMask.paths
+                updateMask && typeof updateMask === "object" &&
+                updateMask.paths
             ) {
                 formattedUpdateMask = updateMask.paths.join(",");
             }

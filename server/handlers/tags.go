@@ -39,7 +39,7 @@ func (s *TagService) CreateTag(ctx context.Context, req *pb.CreateTagRequest) (*
 	defer tx.Rollback() // Rollback if not committed
 
 	// Insert the tag
-	var id int64
+	var id int32
 	var createdAt time.Time
 
 	err = tx.QueryRowContext(
@@ -124,9 +124,9 @@ func (s *TagService) GetTag(ctx context.Context, req *pb.GetTagRequest) (*pb.Tag
 	}
 	defer rows.Close()
 
-	var categoryIDs []int64
+	var categoryIDs []int32
 	for rows.Next() {
-		var categoryID int64
+		var categoryID int32
 		if err := rows.Scan(&categoryID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse category ID: %v", err)
 		}
@@ -214,7 +214,7 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
 	tags := make([]*pb.Tag, 0, pageSize)
 	count := 0
 	hasMorePages := false
-	var tagIDs []int64
+	var tagIDs []int32
 
 	for rows.Next() {
 		if count >= pageSize {
@@ -264,9 +264,9 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
 		defer categoryRows.Close()
 
 		// Map tag_id to slice of category_ids
-		tagToCategoryMap := make(map[int64][]int64)
+		tagToCategoryMap := make(map[int32][]int32)
 		for categoryRows.Next() {
-			var tagID, categoryID int64
+			var tagID, categoryID int32
 			if err := categoryRows.Scan(&tagID, &categoryID); err != nil {
 				return nil, status.Errorf(codes.Internal, "failed to parse tag category: %v", err)
 			}

@@ -120,8 +120,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -151,8 +151,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -181,8 +181,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -222,8 +222,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -255,8 +255,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -301,16 +301,16 @@
             "description": "Optional: filter by category",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "tagId",
             "description": "Optional: filter by tag",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -372,8 +372,8 @@
             "name": "exerciseId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -412,8 +412,8 @@
             "name": "exerciseId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -452,8 +452,8 @@
             "name": "exerciseId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "startDate",
@@ -500,8 +500,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -531,8 +531,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -561,8 +561,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -615,8 +615,8 @@
             "description": "Optional: filter by exercise",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "startDate",
@@ -639,8 +639,8 @@
             "description": "Optional: filter by session",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -702,8 +702,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -733,8 +733,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -763,8 +763,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -804,8 +804,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -866,8 +866,8 @@
             "description": "Optional: filter by exercise",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -946,8 +946,8 @@
             "description": "Optional: filter by category",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -978,8 +978,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1009,8 +1009,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1039,8 +1039,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -1079,8 +1079,8 @@
             "name": "sessionId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -1119,15 +1119,15 @@
             "name": "sessionId",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -1180,8 +1180,8 @@
             "description": "Optional: filter by category",
             "in": "query",
             "required": false,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1243,8 +1243,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1274,8 +1274,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1304,8 +1304,8 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           {
             "name": "body",
@@ -1394,8 +1394,8 @@
       "type": "object",
       "properties": {
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -1500,8 +1500,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "name": {
           "type": "string"
@@ -1524,15 +1524,15 @@
       "type": "object",
       "properties": {
         "categoryId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "categoryName": {
           "type": "string"
         },
         "durationSeconds": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "percentage": {
           "type": "number",
@@ -1557,8 +1557,8 @@
       "type": "object",
       "properties": {
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -1583,8 +1583,8 @@
           "format": "int32"
         },
         "sessionId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         }
       },
       "title": "CreateExerciseHistoryRequest is used to create a new exercise history entry"
@@ -1601,15 +1601,15 @@
         "tagIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         },
         "categoryIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           }
         },
         "images": {
@@ -1662,8 +1662,8 @@
         "categoryIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           "title": "Related category IDs"
         }
@@ -1674,8 +1674,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "name": {
           "type": "string"
@@ -1694,16 +1694,16 @@
         "tagIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           "title": "Related tag IDs"
         },
         "categoryIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           "title": "Related category IDs"
         },
@@ -1728,12 +1728,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -1763,8 +1763,8 @@
           "title": "Full exercise details"
         },
         "sessionId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         }
       },
       "title": "ExerciseHistory represents a historical record of exercise performance"
@@ -1773,12 +1773,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "imageData": {
           "type": "string",
@@ -1804,12 +1804,12 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "url": {
           "type": "string"
@@ -1828,8 +1828,8 @@
       "type": "object",
       "properties": {
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseName": {
           "type": "string"
@@ -1839,8 +1839,8 @@
           "format": "int32"
         },
         "totalPracticeDurationSeconds": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "avgRating": {
           "type": "number",
@@ -1872,15 +1872,15 @@
       "type": "object",
       "properties": {
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseName": {
           "type": "string"
         },
         "durationSeconds": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "percentage": {
           "type": "number",
@@ -1993,8 +1993,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -2029,12 +2029,12 @@
       "type": "object",
       "properties": {
         "totalSessions": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "totalDurationSeconds": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "avgSessionDurationSeconds": {
           "type": "number",
@@ -2072,8 +2072,8 @@
           "format": "date-time"
         },
         "durationSeconds": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         }
       },
       "title": "PracticeTimePoint represents a point in the practice frequency chart"
@@ -2082,16 +2082,16 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "sessionId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -2122,8 +2122,8 @@
       "type": "object",
       "properties": {
         "exerciseId": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "startTime": {
           "type": "string",
@@ -2150,8 +2150,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "name": {
           "type": "string"
@@ -2163,8 +2163,8 @@
         "categoryIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "format": "int64"
+            "type": "integer",
+            "format": "int32"
           },
           "title": "Related category IDs"
         }

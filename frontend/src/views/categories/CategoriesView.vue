@@ -56,8 +56,8 @@
             <span v-else class="text-grey">No description</span>
           </template>
           
-          <template v-slot:item.created_at="{ item }">
-            {{ formatDate(item.created_at) }}
+          <template v-slot:item.createdAt="{ item }">
+            {{ formatDate(item.createdAt) }}
           </template>
 
           <template v-slot:item.actions="{ item }">
@@ -161,7 +161,7 @@ const deleteLoading = ref(false)
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Description', key: 'description' },
-  { title: 'Created', key: 'created_at' },
+  { title: 'Created', key: 'createdAt' },
   { title: 'Actions', key: 'actions', sortable: false }
 ]
 

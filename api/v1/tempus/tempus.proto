@@ -11,7 +11,7 @@ import "google/protobuf/field_mask.proto";
 
 // Category represents a drumming category
 message Category {
-    int64 id = 1;
+    int32 id = 1;
     string name = 2;
     string description = 3;
     google.protobuf.Timestamp created_at = 4;
@@ -20,29 +20,29 @@ message Category {
 
 // Tag represents a tag used for categorizing exercises
 message Tag {
-    int64 id = 1;
+    int32 id = 1;
     string name = 2;
     google.protobuf.Timestamp created_at = 3;
-    repeated int64 category_ids = 4;  // Related category IDs
+    repeated int32 category_ids = 4;  // Related category IDs
 }
 
 // Exercise represents a drumming exercise
 message Exercise {
-    int64 id = 1;
+    int32 id = 1;
     string name = 2;
     string description = 3;
     google.protobuf.Timestamp created_at = 4;
     google.protobuf.Timestamp updated_at = 5;
-    repeated int64 tag_ids = 6;       // Related tag IDs
-    repeated int64 category_ids = 7;  // Related category IDs
+    repeated int32 tag_ids = 6;       // Related tag IDs
+    repeated int32 category_ids = 7;  // Related category IDs
     repeated ExerciseImage images = 8;
     repeated ExerciseLink links = 9;
 }
 
 // ExerciseImage represents an image associated with an exercise
 message ExerciseImage {
-    int64 id = 1;
-    int64 exercise_id = 2;
+    int32 id = 1;
+    int32 exercise_id = 2;
     bytes image_data = 3;
     string filename = 4;
     string mime_type = 5;
@@ -52,8 +52,8 @@ message ExerciseImage {
 
 // ExerciseLink represents an external link for an exercise
 message ExerciseLink {
-    int64 id = 1;
-    int64 exercise_id = 2;
+    int32 id = 1;
+    int32 exercise_id = 2;
     string url = 3;
     string description = 4;
     google.protobuf.Timestamp created_at = 5;
@@ -61,7 +61,7 @@ message ExerciseLink {
 
 // PracticeSession represents a drumming practice session
 message PracticeSession {
-    int64 id = 1;
+    int32 id = 1;
     google.protobuf.Timestamp start_time = 2;
     google.protobuf.Timestamp end_time = 3;
     string notes = 4;
@@ -72,9 +72,9 @@ message PracticeSession {
 
 // SessionExercise represents an exercise performed during a practice session
 message SessionExercise {
-    int64 id = 1;
-    int64 session_id = 2;
-    int64 exercise_id = 3;
+    int32 id = 1;
+    int32 session_id = 2;
+    int32 exercise_id = 3;
     google.protobuf.Timestamp start_time = 4;
     google.protobuf.Timestamp end_time = 5;
     int32 bpm = 6;
@@ -85,8 +85,8 @@ message SessionExercise {
 
 // ExerciseHistory represents a historical record of exercise performance
 message ExerciseHistory {
-    int64 id = 1;
-    int64 exercise_id = 2;
+    int32 id = 1;
+    int32 exercise_id = 2;
     google.protobuf.Timestamp start_time = 3;
     google.protobuf.Timestamp end_time = 4;
     int32 bpm = 5;
@@ -94,7 +94,7 @@ message ExerciseHistory {
     string notes = 7;
     int32 rating = 8;       // User rating (1-5)
     Exercise exercise = 9;  // Full exercise details
-    int64 session_id = 10;
+    int32 session_id = 10;
 }
 
 // ========== Category Service ==========
@@ -107,7 +107,7 @@ message CreateCategoryRequest {
 
 // GetCategoryRequest is used to retrieve a specific category
 message GetCategoryRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ListCategoriesRequest is used to list categories with pagination
@@ -125,14 +125,14 @@ message ListCategoriesResponse {
 
 // UpdateCategoryRequest is used to update a category
 message UpdateCategoryRequest {
-    int64 id = 1;
+    int32 id = 1;
     Category category = 2;
     google.protobuf.FieldMask update_mask = 3;
 }
 
 // DeleteCategoryRequest is used to delete a category
 message DeleteCategoryRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ========== Tag Service ==========
@@ -140,19 +140,19 @@ message DeleteCategoryRequest {
 // CreateTagRequest is used to create a new tag
 message CreateTagRequest {
     string name = 1;
-    repeated int64 category_ids = 2;  // Related category IDs
+    repeated int32 category_ids = 2;  // Related category IDs
 }
 
 // GetTagRequest is used to retrieve a specific tag
 message GetTagRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ListTagsRequest is used to list tags with pagination
 message ListTagsRequest {
     int32 page_size = 1;
     string page_token = 2;
-    int64 category_id = 3;  // Optional: filter by category
+    int32 category_id = 3;  // Optional: filter by category
 }
 
 // ListTagsResponse contains a list of tags and pagination info
@@ -164,14 +164,14 @@ message ListTagsResponse {
 
 // UpdateTagRequest is used to update a tag
 message UpdateTagRequest {
-    int64 id = 1;
+    int32 id = 1;
     Tag tag = 2;
     google.protobuf.FieldMask update_mask = 3;
 }
 
 // DeleteTagRequest is used to delete a tag
 message DeleteTagRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ========== Exercise Service ==========
@@ -180,23 +180,23 @@ message DeleteTagRequest {
 message CreateExerciseRequest {
     string name = 1;
     string description = 2;
-    repeated int64 tag_ids = 3;
-    repeated int64 category_ids = 4;
+    repeated int32 tag_ids = 3;
+    repeated int32 category_ids = 4;
     repeated ExerciseImage images = 5;
     repeated ExerciseLink links = 6;
 }
 
 // GetExerciseRequest is used to retrieve a specific exercise
 message GetExerciseRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ListExercisesRequest is used to list exercises with pagination and filters
 message ListExercisesRequest {
     int32 page_size = 1;
     string page_token = 2;
-    int64 category_id = 3;  // Optional: filter by category
-    int64 tag_id = 4;       // Optional: filter by tag
+    int32 category_id = 3;  // Optional: filter by category
+    int32 tag_id = 4;       // Optional: filter by tag
 }
 
 // ListExercisesResponse contains a list of exercises and pagination info
@@ -208,19 +208,19 @@ message ListExercisesResponse {
 
 // UpdateExerciseRequest is used to update an exercise
 message UpdateExerciseRequest {
-    int64 id = 1;
+    int32 id = 1;
     Exercise exercise = 2;
     google.protobuf.FieldMask update_mask = 3;
 }
 
 // DeleteExerciseRequest is used to delete an exercise
 message DeleteExerciseRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // AddExerciseImageRequest is used to add an image to an exercise
 message AddExerciseImageRequest {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     bytes image_data = 2;
     string filename = 3;
     string mime_type = 4;
@@ -229,19 +229,19 @@ message AddExerciseImageRequest {
 
 // DeleteExerciseImageRequest is used to delete an image from an exercise
 message DeleteExerciseImageRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // AddExerciseLinkRequest is used to add a link to an exercise
 message AddExerciseLinkRequest {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     string url = 2;
     string description = 3;
 }
 
 // DeleteExerciseLinkRequest is used to delete a link from an exercise
 message DeleteExerciseLinkRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ========== Practice Session Service ==========
@@ -256,7 +256,7 @@ message CreatePracticeSessionRequest {
 
 // SessionExerciseInput is used for creating session exercises
 message SessionExerciseInput {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     google.protobuf.Timestamp start_time = 2;
     google.protobuf.Timestamp end_time = 3;
     int32 bpm = 4;
@@ -266,7 +266,7 @@ message SessionExerciseInput {
 
 // GetPracticeSessionRequest is used to retrieve a specific practice session
 message GetPracticeSessionRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ListPracticeSessionsRequest is used to list practice sessions with pagination
@@ -275,7 +275,7 @@ message ListPracticeSessionsRequest {
     string page_token = 2;
     google.protobuf.Timestamp start_date = 3;  // Optional: filter by date range
     google.protobuf.Timestamp end_date = 4;    // Optional: filter by date range
-    int64 exercise_id = 5;                     // Optional: filter by exercise
+    int32 exercise_id = 5;                     // Optional: filter by exercise
 }
 
 // ListPracticeSessionsResponse contains a list of practice sessions and
@@ -288,20 +288,20 @@ message ListPracticeSessionsResponse {
 
 // UpdatePracticeSessionRequest is used to update a practice session
 message UpdatePracticeSessionRequest {
-    int64 id = 1;
+    int32 id = 1;
     PracticeSession session = 2;
     google.protobuf.FieldMask update_mask = 3;
 }
 
 // DeletePracticeSessionRequest is used to delete a practice session
 message DeletePracticeSessionRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // AddSessionExerciseRequest is used to add an exercise to a session
 message AddSessionExerciseRequest {
-    int64 session_id = 1;
-    int64 exercise_id = 2;
+    int32 session_id = 1;
+    int32 exercise_id = 2;
     google.protobuf.Timestamp start_time = 3;
     google.protobuf.Timestamp end_time = 4;
     int32 bpm = 5;
@@ -311,35 +311,35 @@ message AddSessionExerciseRequest {
 
 // UpdateSessionExerciseRequest is used to update a session exercise
 message UpdateSessionExerciseRequest {
-    int64 id = 1;
-    int64 session_id = 2;
+    int32 id = 1;
+    int32 session_id = 2;
     SessionExercise exercise = 3;
     google.protobuf.FieldMask update_mask = 4;
 }
 
 // DeleteSessionExerciseRequest is used to delete a session exercise
 message DeleteSessionExerciseRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ========== Exercise History Service ==========
 
 // CreateExerciseHistoryRequest is used to create a new exercise history entry
 message CreateExerciseHistoryRequest {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     google.protobuf.Timestamp start_time = 2;
     google.protobuf.Timestamp end_time = 3;
     int32 bpm = 4;
     string time_signature = 5;
     string notes = 6;
     int32 rating = 7;
-    int64 session_id = 8;
+    int32 session_id = 8;
 }
 
 // GetExerciseHistoryRequest is used to retrieve a specific exercise history
 // entry
 message GetExerciseHistoryRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ListExerciseHistoryRequest is used to list exercise history entries with
@@ -347,10 +347,10 @@ message GetExerciseHistoryRequest {
 message ListExerciseHistoryRequest {
     int32 page_size = 1;
     string page_token = 2;
-    int64 exercise_id = 3;                     // Optional: filter by exercise
+    int32 exercise_id = 3;                     // Optional: filter by exercise
     google.protobuf.Timestamp start_date = 4;  // Optional: filter by date range
     google.protobuf.Timestamp end_date = 5;    // Optional: filter by date range
-    int64 session_id = 6;                      // Optional: filter by session
+    int32 session_id = 6;                      // Optional: filter by session
 }
 
 // ListExerciseHistoryResponse contains a list of exercise history entries and
@@ -363,31 +363,31 @@ message ListExerciseHistoryResponse {
 
 // UpdateExerciseHistoryRequest is used to update an exercise history entry
 message UpdateExerciseHistoryRequest {
-    int64 id = 1;
+    int32 id = 1;
     ExerciseHistory history = 2;
     google.protobuf.FieldMask update_mask = 3;
 }
 
 // DeleteExerciseHistoryRequest is used to delete an exercise history entry
 message DeleteExerciseHistoryRequest {
-    int64 id = 1;
+    int32 id = 1;
 }
 
 // ========== Stats Request/Response Messages ==========
 
 // GetExerciseStatsRequest is used to get statistics for an exercise
 message GetExerciseStatsRequest {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     google.protobuf.Timestamp start_date = 2;  // Optional: filter by date range
     google.protobuf.Timestamp end_date = 3;    // Optional: filter by date range
 }
 
 // ExerciseStats contains statistics for an exercise
 message ExerciseStats {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     string exercise_name = 2;
     int32 practice_count = 3;
-    int64 total_practice_duration_seconds = 4;
+    int32 total_practice_duration_seconds = 4;
     double avg_rating = 5;
     int32 max_bpm = 6;
     int32 min_bpm = 7;
@@ -405,13 +405,13 @@ message BpmProgressPoint {
 message GetPracticeStatsRequest {
     google.protobuf.Timestamp start_date = 1;  // Optional: filter by date range
     google.protobuf.Timestamp end_date = 2;    // Optional: filter by date range
-    int64 category_id = 3;                     // Optional: filter by category
+    int32 category_id = 3;                     // Optional: filter by category
 }
 
 // PracticeStats contains statistics for practice sessions
 message PracticeStats {
-    int64 total_sessions = 1;
-    int64 total_duration_seconds = 2;
+    int32 total_sessions = 1;
+    int32 total_duration_seconds = 2;
     double avg_session_duration_seconds = 3;
     repeated ExerciseTimeDistribution exercise_distribution = 4;
     repeated CategoryTimeDistribution category_distribution = 5;
@@ -420,24 +420,24 @@ message PracticeStats {
 
 // ExerciseTimeDistribution shows how much time was spent on each exercise
 message ExerciseTimeDistribution {
-    int64 exercise_id = 1;
+    int32 exercise_id = 1;
     string exercise_name = 2;
-    int64 duration_seconds = 3;
+    int32 duration_seconds = 3;
     double percentage = 4;
 }
 
 // CategoryTimeDistribution shows how much time was spent on each category
 message CategoryTimeDistribution {
-    int64 category_id = 1;
+    int32 category_id = 1;
     string category_name = 2;
-    int64 duration_seconds = 3;
+    int32 duration_seconds = 3;
     double percentage = 4;
 }
 
 // PracticeTimePoint represents a point in the practice frequency chart
 message PracticeTimePoint {
     google.protobuf.Timestamp date = 1;
-    int64 duration_seconds = 2;
+    int32 duration_seconds = 2;
 }
 
 // ========== Services ==========

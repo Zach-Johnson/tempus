@@ -107,7 +107,7 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 
 	// Return the created history entry
 	return &pb.ExerciseHistory{
-		Id:            historyId,
+		Id:            int32(historyId),
 		ExerciseId:    req.ExerciseId,
 		StartTime:     req.StartTime,
 		EndTime:       req.EndTime,
@@ -134,7 +134,7 @@ func (h *ExerciseHistoryHandler) GetExerciseHistory(ctx context.Context, req *pb
 
 	// Query the history entry
 	var history pb.ExerciseHistory
-	var exerciseId int64
+	var exerciseId int32
 	var startTime, endTime time.Time
 
 	err = tx.QueryRowContext(
@@ -280,7 +280,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 	historyEntries := make([]*pb.ExerciseHistory, 0, pageSize)
 	count := 0
 	hasMorePages := false
-	exerciseIDs := make(map[int64]bool)
+	exerciseIDs := make(map[int32]bool)
 
 	for rows.Next() {
 		if count >= pageSize {
@@ -289,8 +289,8 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 		}
 
 		var history pb.ExerciseHistory
-		var exerciseId int64
-		var sessionID int64
+		var exerciseId int32
+		var sessionID int32
 		var startTime, endTime time.Time
 
 		err := rows.Scan(
@@ -587,7 +587,7 @@ func (h *ExerciseHistoryHandler) DeleteExerciseHistory(ctx context.Context, req 
 }
 
 // Helper method to get exercise details
-func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql.Tx, exerciseId int64) (*pb.Exercise, error) {
+func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql.Tx, exerciseId int32) (*pb.Exercise, error) {
 	// Get basic exercise info
 	var exercise pb.Exercise
 	var createdAt, updatedAt time.Time
@@ -618,9 +618,9 @@ func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql
 	}
 	defer tagRows.Close()
 
-	var tagIDs []int64
+	var tagIDs []int32
 	for tagRows.Next() {
-		var tagID int64
+		var tagID int32
 		if err := tagRows.Scan(&tagID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse tag ID: %v", err)
 		}
@@ -642,9 +642,9 @@ func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql
 	}
 	defer categoryRows.Close()
 
-	var categoryIDs []int64
+	var categoryIDs []int32
 	for categoryRows.Next() {
-		var categoryID int64
+		var categoryID int32
 		if err := categoryRows.Scan(&categoryID); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse category ID: %v", err)
 		}
@@ -659,9 +659,9 @@ func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql
 }
 
 // Helper method to fetch multiple exercises
-func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx, exerciseIDs map[int64]bool) (map[int64]*pb.Exercise, error) {
+func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx, exerciseIDs map[int32]bool) (map[int32]*pb.Exercise, error) {
 	// Convert map keys to slice
-	ids := make([]int64, 0, len(exerciseIDs))
+	ids := make([]int32, 0, len(exerciseIDs))
 	for id := range exerciseIDs {
 		ids = append(ids, id)
 	}
@@ -689,7 +689,7 @@ func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx,
 	defer rows.Close()
 
 	// Parse exercises
-	result := make(map[int64]*pb.Exercise)
+	result := make(map[int32]*pb.Exercise)
 	for rows.Next() {
 		var exercise pb.Exercise
 		var createdAt, updatedAt time.Time
@@ -725,7 +725,7 @@ func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx,
 }
 
 // Helper to fetch tags and categories for exercises
-func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx *sql.Tx, exercises map[int64]*pb.Exercise, exerciseIDs []int64) error {
+func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx *sql.Tx, exercises map[int32]*pb.Exercise, exerciseIDs []int32) error {
 	// Build placeholders for the IN clause
 	placeholders := make([]string, len(exerciseIDs))
 	args := make([]interface{}, len(exerciseIDs))
@@ -746,7 +746,7 @@ func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx 
 	defer tagRows.Close()
 
 	for tagRows.Next() {
-		var exerciseID, tagID int64
+		var exerciseID, tagID int32
 		if err := tagRows.Scan(&exerciseID, &tagID); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise tag: %v", err)
 		}
@@ -770,7 +770,7 @@ func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx 
 	defer catRows.Close()
 
 	for catRows.Next() {
-		var exerciseID, categoryID int64
+		var exerciseID, categoryID int32
 		if err := catRows.Scan(&exerciseID, &categoryID); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise category: %v", err)
 		}
