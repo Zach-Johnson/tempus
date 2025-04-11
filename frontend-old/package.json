@@ -1,0 +1,39 @@
+{
+  "name": "drum-practice",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "axios": "^1.6.2",
+    "bootstrap": "^5.3.2",
+    "bootstrap-icons": "^1.11.1",
+    "chart.js": "^4.4.0",
+    "core-js": "^3.33.3",
+    "date-fns": "^2.30.0",
+    "pinia": "^2.1.7",
+    "vue": "^3.3.8",
+    "vue-chartjs": "^5.2.0",
+    "vue-router": "^4.2.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/eslint-parser": "^7.27.0",
+    "@vue/cli-plugin-babel": "~5.0.8",
+    "@vue/cli-plugin-eslint": "~5.0.8",
+    "@vue/cli-plugin-router": "~5.0.8",
+    "@vue/cli-service": "~5.0.8",
+    "@vue/compiler-sfc": "^3.3.8",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.54.0",
+    "eslint-plugin-vue": "^9.33.0",
+    "sass": "^1.69.5",
+    "sass-loader": "^13.3.2",
+    "vite": "^6.2.6"
+  }
+}

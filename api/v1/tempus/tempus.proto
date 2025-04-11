@@ -1,0 +1,720 @@
+syntax = "proto3";
+
+package drummer.v1;
+
+option go_package = "github.com/Zach-Johnson/drum-practice/proto/tempus/v1;tempusv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+// Category represents a drumming category
+message Category {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+// Tag represents a tag used for categorizing exercises
+message Tag {
+    int64 id = 1;
+    string name = 2;
+    google.protobuf.Timestamp created_at = 3;
+    repeated int64 category_ids = 4;  // Related category IDs
+}
+
+// Exercise represents a drumming exercise
+message Exercise {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+    repeated int64 tag_ids = 6;       // Related tag IDs
+    repeated int64 category_ids = 7;  // Related category IDs
+    repeated ExerciseImage images = 8;
+    repeated ExerciseLink links = 9;
+}
+
+// ExerciseImage represents an image associated with an exercise
+message ExerciseImage {
+    int64 id = 1;
+    int64 exercise_id = 2;
+    bytes image_data = 3;
+    string filename = 4;
+    string mime_type = 5;
+    string description = 6;
+    google.protobuf.Timestamp created_at = 7;
+}
+
+// ExerciseLink represents an external link for an exercise
+message ExerciseLink {
+    int64 id = 1;
+    int64 exercise_id = 2;
+    string url = 3;
+    string description = 4;
+    google.protobuf.Timestamp created_at = 5;
+}
+
+// PracticeSession represents a drumming practice session
+message PracticeSession {
+    int64 id = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+    string notes = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+    repeated SessionExercise exercises = 7;
+}
+
+// SessionExercise represents an exercise performed during a practice session
+message SessionExercise {
+    int64 id = 1;
+    int64 session_id = 2;
+    int64 exercise_id = 3;
+    google.protobuf.Timestamp start_time = 4;
+    google.protobuf.Timestamp end_time = 5;
+    int32 bpm = 6;
+    string time_signature = 7;
+    string notes = 8;
+    Exercise exercise = 9;  // Full exercise details
+}
+
+// ExerciseHistory represents a historical record of exercise performance
+message ExerciseHistory {
+    int64 id = 1;
+    int64 exercise_id = 2;
+    google.protobuf.Timestamp start_time = 3;
+    google.protobuf.Timestamp end_time = 4;
+    int32 bpm = 5;
+    string time_signature = 6;
+    string notes = 7;
+    int32 rating = 8;       // User rating (1-5)
+    Exercise exercise = 9;  // Full exercise details
+    int64 session_id = 10;
+}
+
+// ========== Category Service ==========
+
+// CreateCategoryRequest is used to create a new category
+message CreateCategoryRequest {
+    string name = 1;
+    string description = 2;
+}
+
+// GetCategoryRequest is used to retrieve a specific category
+message GetCategoryRequest {
+    int64 id = 1;
+}
+
+// ListCategoriesRequest is used to list categories with pagination
+message ListCategoriesRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+}
+
+// ListCategoriesResponse contains a list of categories and pagination info
+message ListCategoriesResponse {
+    repeated Category categories = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// UpdateCategoryRequest is used to update a category
+message UpdateCategoryRequest {
+    int64 id = 1;
+    Category category = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// DeleteCategoryRequest is used to delete a category
+message DeleteCategoryRequest {
+    int64 id = 1;
+}
+
+// ========== Tag Service ==========
+
+// CreateTagRequest is used to create a new tag
+message CreateTagRequest {
+    string name = 1;
+    repeated int64 category_ids = 2;  // Related category IDs
+}
+
+// GetTagRequest is used to retrieve a specific tag
+message GetTagRequest {
+    int64 id = 1;
+}
+
+// ListTagsRequest is used to list tags with pagination
+message ListTagsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    int64 category_id = 3;  // Optional: filter by category
+}
+
+// ListTagsResponse contains a list of tags and pagination info
+message ListTagsResponse {
+    repeated Tag tags = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// UpdateTagRequest is used to update a tag
+message UpdateTagRequest {
+    int64 id = 1;
+    Tag tag = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// DeleteTagRequest is used to delete a tag
+message DeleteTagRequest {
+    int64 id = 1;
+}
+
+// ========== Exercise Service ==========
+
+// CreateExerciseRequest is used to create a new exercise
+message CreateExerciseRequest {
+    string name = 1;
+    string description = 2;
+    repeated int64 tag_ids = 3;
+    repeated int64 category_ids = 4;
+    repeated ExerciseImage images = 5;
+    repeated ExerciseLink links = 6;
+}
+
+// GetExerciseRequest is used to retrieve a specific exercise
+message GetExerciseRequest {
+    int64 id = 1;
+}
+
+// ListExercisesRequest is used to list exercises with pagination and filters
+message ListExercisesRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    int64 category_id = 3;  // Optional: filter by category
+    int64 tag_id = 4;       // Optional: filter by tag
+}
+
+// ListExercisesResponse contains a list of exercises and pagination info
+message ListExercisesResponse {
+    repeated Exercise exercises = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// UpdateExerciseRequest is used to update an exercise
+message UpdateExerciseRequest {
+    int64 id = 1;
+    Exercise exercise = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// DeleteExerciseRequest is used to delete an exercise
+message DeleteExerciseRequest {
+    int64 id = 1;
+}
+
+// AddExerciseImageRequest is used to add an image to an exercise
+message AddExerciseImageRequest {
+    int64 exercise_id = 1;
+    bytes image_data = 2;
+    string filename = 3;
+    string mime_type = 4;
+    string description = 5;
+}
+
+// DeleteExerciseImageRequest is used to delete an image from an exercise
+message DeleteExerciseImageRequest {
+    int64 id = 1;
+}
+
+// AddExerciseLinkRequest is used to add a link to an exercise
+message AddExerciseLinkRequest {
+    int64 exercise_id = 1;
+    string url = 2;
+    string description = 3;
+}
+
+// DeleteExerciseLinkRequest is used to delete a link from an exercise
+message DeleteExerciseLinkRequest {
+    int64 id = 1;
+}
+
+// ========== Practice Session Service ==========
+
+// CreatePracticeSessionRequest is used to create a new practice session
+message CreatePracticeSessionRequest {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp end_time = 2;
+    string notes = 3;
+    repeated SessionExerciseInput exercises = 4;
+}
+
+// SessionExerciseInput is used for creating session exercises
+message SessionExerciseInput {
+    int64 exercise_id = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+    int32 bpm = 4;
+    string time_signature = 5;
+    string notes = 6;
+}
+
+// GetPracticeSessionRequest is used to retrieve a specific practice session
+message GetPracticeSessionRequest {
+    int64 id = 1;
+}
+
+// ListPracticeSessionsRequest is used to list practice sessions with pagination
+message ListPracticeSessionsRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    google.protobuf.Timestamp start_date = 3;  // Optional: filter by date range
+    google.protobuf.Timestamp end_date = 4;    // Optional: filter by date range
+    int64 exercise_id = 5;                     // Optional: filter by exercise
+}
+
+// ListPracticeSessionsResponse contains a list of practice sessions and
+// pagination info
+message ListPracticeSessionsResponse {
+    repeated PracticeSession sessions = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// UpdatePracticeSessionRequest is used to update a practice session
+message UpdatePracticeSessionRequest {
+    int64 id = 1;
+    PracticeSession session = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// DeletePracticeSessionRequest is used to delete a practice session
+message DeletePracticeSessionRequest {
+    int64 id = 1;
+}
+
+// AddSessionExerciseRequest is used to add an exercise to a session
+message AddSessionExerciseRequest {
+    int64 session_id = 1;
+    int64 exercise_id = 2;
+    google.protobuf.Timestamp start_time = 3;
+    google.protobuf.Timestamp end_time = 4;
+    int32 bpm = 5;
+    string time_signature = 6;
+    string notes = 7;
+}
+
+// UpdateSessionExerciseRequest is used to update a session exercise
+message UpdateSessionExerciseRequest {
+    int64 id = 1;
+    int64 session_id = 2;
+    SessionExercise exercise = 3;
+    google.protobuf.FieldMask update_mask = 4;
+}
+
+// DeleteSessionExerciseRequest is used to delete a session exercise
+message DeleteSessionExerciseRequest {
+    int64 id = 1;
+}
+
+// ========== Exercise History Service ==========
+
+// CreateExerciseHistoryRequest is used to create a new exercise history entry
+message CreateExerciseHistoryRequest {
+    int64 exercise_id = 1;
+    google.protobuf.Timestamp start_time = 2;
+    google.protobuf.Timestamp end_time = 3;
+    int32 bpm = 4;
+    string time_signature = 5;
+    string notes = 6;
+    int32 rating = 7;
+    int64 session_id = 8;
+}
+
+// GetExerciseHistoryRequest is used to retrieve a specific exercise history
+// entry
+message GetExerciseHistoryRequest {
+    int64 id = 1;
+}
+
+// ListExerciseHistoryRequest is used to list exercise history entries with
+// pagination
+message ListExerciseHistoryRequest {
+    int32 page_size = 1;
+    string page_token = 2;
+    int64 exercise_id = 3;                     // Optional: filter by exercise
+    google.protobuf.Timestamp start_date = 4;  // Optional: filter by date range
+    google.protobuf.Timestamp end_date = 5;    // Optional: filter by date range
+    int64 session_id = 6;                      // Optional: filter by session
+}
+
+// ListExerciseHistoryResponse contains a list of exercise history entries and
+// pagination info
+message ListExerciseHistoryResponse {
+    repeated ExerciseHistory history_entries = 1;
+    string next_page_token = 2;
+    int32 total_count = 3;
+}
+
+// UpdateExerciseHistoryRequest is used to update an exercise history entry
+message UpdateExerciseHistoryRequest {
+    int64 id = 1;
+    ExerciseHistory history = 2;
+    google.protobuf.FieldMask update_mask = 3;
+}
+
+// DeleteExerciseHistoryRequest is used to delete an exercise history entry
+message DeleteExerciseHistoryRequest {
+    int64 id = 1;
+}
+
+// ========== Stats Request/Response Messages ==========
+
+// GetExerciseStatsRequest is used to get statistics for an exercise
+message GetExerciseStatsRequest {
+    int64 exercise_id = 1;
+    google.protobuf.Timestamp start_date = 2;  // Optional: filter by date range
+    google.protobuf.Timestamp end_date = 3;    // Optional: filter by date range
+}
+
+// ExerciseStats contains statistics for an exercise
+message ExerciseStats {
+    int64 exercise_id = 1;
+    string exercise_name = 2;
+    int32 practice_count = 3;
+    int64 total_practice_duration_seconds = 4;
+    double avg_rating = 5;
+    int32 max_bpm = 6;
+    int32 min_bpm = 7;
+    double avg_bpm = 8;
+    repeated BpmProgressPoint bpm_progress = 9;
+}
+
+// BpmProgressPoint represents a point in the BPM progress chart
+message BpmProgressPoint {
+    google.protobuf.Timestamp date = 1;
+    int32 bpm = 2;
+}
+
+// GetPracticeStatsRequest is used to get statistics for practice sessions
+message GetPracticeStatsRequest {
+    google.protobuf.Timestamp start_date = 1;  // Optional: filter by date range
+    google.protobuf.Timestamp end_date = 2;    // Optional: filter by date range
+    int64 category_id = 3;                     // Optional: filter by category
+}
+
+// PracticeStats contains statistics for practice sessions
+message PracticeStats {
+    int64 total_sessions = 1;
+    int64 total_duration_seconds = 2;
+    double avg_session_duration_seconds = 3;
+    repeated ExerciseTimeDistribution exercise_distribution = 4;
+    repeated CategoryTimeDistribution category_distribution = 5;
+    repeated PracticeTimePoint practice_frequency = 6;
+}
+
+// ExerciseTimeDistribution shows how much time was spent on each exercise
+message ExerciseTimeDistribution {
+    int64 exercise_id = 1;
+    string exercise_name = 2;
+    int64 duration_seconds = 3;
+    double percentage = 4;
+}
+
+// CategoryTimeDistribution shows how much time was spent on each category
+message CategoryTimeDistribution {
+    int64 category_id = 1;
+    string category_name = 2;
+    int64 duration_seconds = 3;
+    double percentage = 4;
+}
+
+// PracticeTimePoint represents a point in the practice frequency chart
+message PracticeTimePoint {
+    google.protobuf.Timestamp date = 1;
+    int64 duration_seconds = 2;
+}
+
+// ========== Services ==========
+
+service CategoryService {
+    // Create a new category
+    rpc CreateCategory(CreateCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            post: "/v1/categories"
+            body: "*"
+        };
+    }
+
+    // Get a category by ID
+    rpc GetCategory(GetCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            get: "/v1/categories/{id}"
+        };
+    }
+
+    // List categories with optional pagination
+    rpc ListCategories(ListCategoriesRequest) returns (ListCategoriesResponse) {
+        option (google.api.http) = {
+            get: "/v1/categories"
+        };
+    }
+
+    // Update a category
+    rpc UpdateCategory(UpdateCategoryRequest) returns (Category) {
+        option (google.api.http) = {
+            patch: "/v1/categories/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete a category
+    rpc DeleteCategory(DeleteCategoryRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/categories/{id}"
+        };
+    }
+}
+
+service TagService {
+    // Create a new tag
+    rpc CreateTag(CreateTagRequest) returns (Tag) {
+        option (google.api.http) = {
+            post: "/v1/tags"
+            body: "*"
+        };
+    }
+
+    // Get a tag by ID
+    rpc GetTag(GetTagRequest) returns (Tag) {
+        option (google.api.http) = {
+            get: "/v1/tags/{id}"
+        };
+    }
+
+    // List tags with optional pagination and filtering
+    rpc ListTags(ListTagsRequest) returns (ListTagsResponse) {
+        option (google.api.http) = {
+            get: "/v1/tags"
+        };
+    }
+
+    // Update a tag
+    rpc UpdateTag(UpdateTagRequest) returns (Tag) {
+        option (google.api.http) = {
+            patch: "/v1/tags/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete a tag
+    rpc DeleteTag(DeleteTagRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/tags/{id}"
+        };
+    }
+}
+
+service ExerciseService {
+    // Create a new exercise
+    rpc CreateExercise(CreateExerciseRequest) returns (Exercise) {
+        option (google.api.http) = {
+            post: "/v1/exercises"
+            body: "*"
+        };
+    }
+
+    // Get an exercise by ID
+    rpc GetExercise(GetExerciseRequest) returns (Exercise) {
+        option (google.api.http) = {
+            get: "/v1/exercises/{id}"
+        };
+    }
+
+    // List exercises with optional pagination and filtering
+    rpc ListExercises(ListExercisesRequest) returns (ListExercisesResponse) {
+        option (google.api.http) = {
+            get: "/v1/exercises"
+        };
+    }
+
+    // Update an exercise
+    rpc UpdateExercise(UpdateExerciseRequest) returns (Exercise) {
+        option (google.api.http) = {
+            patch: "/v1/exercises/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete an exercise
+    rpc DeleteExercise(DeleteExerciseRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/exercises/{id}"
+        };
+    }
+
+    // Add an image to an exercise
+    rpc AddExerciseImage(AddExerciseImageRequest) returns (ExerciseImage) {
+        option (google.api.http) = {
+            post: "/v1/exercises/{exercise_id}/images"
+            body: "*"
+        };
+    }
+
+    // Delete an image from an exercise
+    rpc DeleteExerciseImage(DeleteExerciseImageRequest)
+        returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/exercise-images/{id}"
+        };
+    }
+
+    // Add a link to an exercise
+    rpc AddExerciseLink(AddExerciseLinkRequest) returns (ExerciseLink) {
+        option (google.api.http) = {
+            post: "/v1/exercises/{exercise_id}/links"
+            body: "*"
+        };
+    }
+
+    // Delete a link from an exercise
+    rpc DeleteExerciseLink(DeleteExerciseLinkRequest)
+        returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/exercise-links/{id}"
+        };
+    }
+
+    // Get statistics for an exercise
+    rpc GetExerciseStats(GetExerciseStatsRequest) returns (ExerciseStats) {
+        option (google.api.http) = {
+            get: "/v1/exercises/{exercise_id}/stats"
+        };
+    }
+}
+
+service PracticeSessionService {
+    // Create a new practice session
+    rpc CreatePracticeSession(CreatePracticeSessionRequest)
+        returns (PracticeSession) {
+        option (google.api.http) = {
+            post: "/v1/sessions"
+            body: "*"
+        };
+    }
+
+    // Get a practice session by ID
+    rpc GetPracticeSession(GetPracticeSessionRequest)
+        returns (PracticeSession) {
+        option (google.api.http) = {
+            get: "/v1/sessions/{id}"
+        };
+    }
+
+    // List practice sessions with optional pagination and filtering
+    rpc ListPracticeSessions(ListPracticeSessionsRequest)
+        returns (ListPracticeSessionsResponse) {
+        option (google.api.http) = {
+            get: "/v1/sessions"
+        };
+    }
+
+    // Update a practice session
+    rpc UpdatePracticeSession(UpdatePracticeSessionRequest)
+        returns (PracticeSession) {
+        option (google.api.http) = {
+            patch: "/v1/sessions/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete a practice session
+    rpc DeletePracticeSession(DeletePracticeSessionRequest)
+        returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/sessions/{id}"
+        };
+    }
+
+    // Add an exercise to a session
+    rpc AddSessionExercise(AddSessionExerciseRequest)
+        returns (SessionExercise) {
+        option (google.api.http) = {
+            post: "/v1/sessions/{session_id}/exercises"
+            body: "*"
+        };
+    }
+
+    // Update a session exercise
+    rpc UpdateSessionExercise(UpdateSessionExerciseRequest)
+        returns (SessionExercise) {
+        option (google.api.http) = {
+            patch: "/v1/sessions/{session_id}/exercises/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete a session exercise
+    rpc DeleteSessionExercise(DeleteSessionExerciseRequest)
+        returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/session-exercises/{id}"
+        };
+    }
+
+    // Get practice statistics
+    rpc GetPracticeStats(GetPracticeStatsRequest) returns (PracticeStats) {
+        option (google.api.http) = {
+            get: "/v1/sessions/stats"
+        };
+    }
+}
+
+service ExerciseHistoryService {
+    // Create a new exercise history entry
+    rpc CreateExerciseHistory(CreateExerciseHistoryRequest)
+        returns (ExerciseHistory) {
+        option (google.api.http) = {
+            post: "/v1/history"
+            body: "*"
+        };
+    }
+
+    // Get an exercise history entry by ID
+    rpc GetExerciseHistory(GetExerciseHistoryRequest)
+        returns (ExerciseHistory) {
+        option (google.api.http) = {
+            get: "/v1/history/{id}"
+        };
+    }
+
+    // List exercise history entries with optional pagination and filtering
+    rpc ListExerciseHistory(ListExerciseHistoryRequest)
+        returns (ListExerciseHistoryResponse) {
+        option (google.api.http) = {
+            get: "/v1/history"
+        };
+    }
+
+    // Update an exercise history entry
+    rpc UpdateExerciseHistory(UpdateExerciseHistoryRequest)
+        returns (ExerciseHistory) {
+        option (google.api.http) = {
+            patch: "/v1/history/{id}"
+            body: "*"
+        };
+    }
+
+    // Delete an exercise history entry
+    rpc DeleteExerciseHistory(DeleteExerciseHistoryRequest)
+        returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/history/{id}"
+        };
+    }
+}
