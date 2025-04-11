@@ -80,25 +80,27 @@
           
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
-              <category-chip
-                v-for="categoryId in item.categoryIds"
-                :key="categoryId"
-                :category="getCategoryById(categoryId)"
-                size="small"
-                class="mr-1"
-              ></category-chip>
+              <template v-for="categoryId in item.categoryIds || []" :key="categoryId">
+                <category-chip
+                  v-if="getCategoryById(categoryId)"
+                  :category="getCategoryById(categoryId)"
+                  size="small"
+                  class="mr-1"
+                ></category-chip>
+              </template>
             </v-chip-group>
           </template>
           
           <template v-slot:item.tags="{ item }">
             <v-chip-group>
-              <tag-chip
-                v-for="tagId in item.tagIds"
-                :key="tagId"
-                :tag="getTagById(tagId)"
-                size="small"
-                class="mr-1"
-              ></tag-chip>
+              <template v-for="tagId in item.tagIds || []" :key="tagId">
+                <tag-chip
+                  v-if="getTagById(tagId)"
+                  :tag="getTagById(tagId)"
+                  size="small"
+                  class="mr-1"
+                ></tag-chip>
+              </template>
             </v-chip-group>
           </template>
           

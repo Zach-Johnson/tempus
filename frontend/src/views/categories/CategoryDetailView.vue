@@ -118,9 +118,8 @@
             <v-btn 
               color="primary" 
               prepend-icon="mdi-plus" 
+              :to="{ name: 'exercises', query: { category: categoryId.value } }"
             >
-                <!-- TODO -->
-              <!-- :to="{ name: 'exercises', query: { category: categoryId.value } }" -->
               Create Exercise
             </v-btn>
           </v-card-text>
@@ -137,7 +136,7 @@
                   variant="text"
                   size="small"
                   color="primary"
-                  :to="{ name: 'exercise-detail', params: { id: item.raw.id }}"
+                  :to="{ name: 'exercise-detail', params: { id: item.id }}"
                 >
                   <v-icon>mdi-eye</v-icon>
                 </v-btn>
@@ -329,7 +328,7 @@ async function loadData() {
   loadingExercises.value = true
   try {
     if (exercisesStore.exercises.length === 0) {
-      await exercisesStore.fetchExercises({ category_id: categoryId.value })
+      await exercisesStore.fetchExercises({ categoryId: categoryId.value })
     }
   } catch (err) {
     console.error('Error loading exercises:', err)

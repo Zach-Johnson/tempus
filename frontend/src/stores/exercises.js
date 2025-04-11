@@ -30,8 +30,8 @@ export const useExercisesStore = defineStore("exercises", () => {
             return (categoryId) =>
                 exercises.value.filter(
                     (ex) =>
-                        ex.category_ids &&
-                        ex.category_ids.includes(categoryId),
+                        ex.categoryIds &&
+                        ex.categoryIds.includes(categoryId),
                 );
         },
     );
@@ -112,7 +112,8 @@ export const useExercisesStore = defineStore("exercises", () => {
             // format
             let formattedUpdateMask = updateMask;
             if (
-                updateMask && typeof updateMask === "object" && updateMask.paths
+                updateMask && typeof updateMask === "object" &&
+                updateMask.paths
             ) {
                 formattedUpdateMask = updateMask.paths.join(",");
             }
@@ -188,7 +189,8 @@ export const useExercisesStore = defineStore("exercises", () => {
 
             // Update currentExercise if it's the relevant exercise
             if (
-                currentExercise.value && currentExercise.value.id === exerciseId
+                currentExercise.value &&
+                currentExercise.value.id === exerciseId
             ) {
                 if (!currentExercise.value.images) {
                     currentExercise.value.images = [];
@@ -226,7 +228,9 @@ export const useExercisesStore = defineStore("exercises", () => {
             // Remove image from currentExercise if applicable
             if (currentExercise.value && currentExercise.value.images) {
                 currentExercise.value.images = currentExercise.value.images
-                    .filter((img) => img.id !== imageId);
+                    .filter(
+                        (img) => img.id !== imageId,
+                    );
             }
         } catch (err) {
             error.value = err.message ||
@@ -256,7 +260,8 @@ export const useExercisesStore = defineStore("exercises", () => {
 
             // Update currentExercise if it's the relevant exercise
             if (
-                currentExercise.value && currentExercise.value.id === exerciseId
+                currentExercise.value &&
+                currentExercise.value.id === exerciseId
             ) {
                 if (!currentExercise.value.links) {
                     currentExercise.value.links = [];
@@ -294,7 +299,9 @@ export const useExercisesStore = defineStore("exercises", () => {
             // Remove link from currentExercise if applicable
             if (currentExercise.value && currentExercise.value.links) {
                 currentExercise.value.links = currentExercise.value.links
-                    .filter((link) => link.id !== linkId);
+                    .filter(
+                        (link) => link.id !== linkId,
+                    );
             }
         } catch (err) {
             error.value = err.message ||
