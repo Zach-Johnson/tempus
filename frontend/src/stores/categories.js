@@ -1,6 +1,6 @@
-import { categoriesAPI } from "@/services/api.js";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { categoriesAPI } from "@/services/api.js";
 
 export const useCategoriesStore = defineStore("categories", () => {
     // State
@@ -11,13 +11,11 @@ export const useCategoriesStore = defineStore("categories", () => {
     const currentCategoryLoading = ref(false);
 
     // Getters
-    const categoriesSorted = computed(
-        () => {
-            return [...categories.value].sort(
-                (a, b) => a.name.localeCompare(b.name),
-            );
-        },
-    );
+    const categoriesSorted = computed(() => {
+        return [...categories.value].sort((a, b) =>
+            a.name.localeCompare(b.name)
+        );
+    });
 
     const categoryById = computed(() => {
         return (id) => categories.value.find((cat) => cat.id === id);
@@ -30,6 +28,7 @@ export const useCategoriesStore = defineStore("categories", () => {
 
         try {
             const response = await categoriesAPI.getAll();
+            // Replace the entire categories array to avoid duplicates
             categories.value = response.data.categories || [];
         } catch (err) {
             error.value = err.message || "Failed to fetch categories";
@@ -45,19 +44,26 @@ export const useCategoriesStore = defineStore("categories", () => {
 
         try {
             const response = await categoriesAPI.get(id);
-            currentCategory.value = response.data;
+            const fetchedCategory = response.data;
+
+            // Set the current category
+            currentCategory.value = fetchedCategory;
 
             // Also update the category in the categories array if it exists
             const index = categories.value.findIndex((c) => c.id === id);
             if (index !== -1) {
-                categories.value[index] = response.data;
+                categories.value[index] = fetchedCategory;
             } else {
-                categories.value.push(response.data);
+                categories.value.push(fetchedCategory);
             }
+
+            return fetchedCategory;
         } catch (err) {
             error.value = err.message ||
                 `Failed to fetch category with ID ${id}`;
             console.error(`Error fetching category ${id}:`, err);
+            currentCategory.value = null;
+            return null;
         } finally {
             currentCategoryLoading.value = false;
         }
@@ -70,7 +76,19 @@ export const useCategoriesStore = defineStore("categories", () => {
         try {
             const response = await categoriesAPI.create(categoryData);
             const newCategory = response.data;
-            categories.value.push(newCategory);
+
+            // Check if this category already exists in our array
+            const existingIndex = categories.value.findIndex((c) =>
+                c.id === newCategory.id
+            );
+            if (existingIndex === -1) {
+                // Only add if it doesn't exist
+                categories.value.push(newCategory);
+            } else {
+                // Update existing entry
+                categories.value[existingIndex] = newCategory;
+            }
+
             return newCategory;
         } catch (err) {
             error.value = err.message || "Failed to create category";

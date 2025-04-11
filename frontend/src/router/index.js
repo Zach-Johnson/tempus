@@ -7,19 +7,19 @@ const routes = [
         component: () => import("@/views/HomeView.vue"),
         meta: { title: "Home" },
     },
-    // {
-    //     path: "/categories",
-    //     name: "categories",
-    //     component: () => import("@/views/categories/CategoriesView.vue"),
-    //     meta: { title: "Categories" },
-    // },
-    // {
-    //     path: "/categories/:id",
-    //     name: "category-detail",
-    //     component: () => import("@/views/categories/CategoryDetailView.vue"),
-    //     meta: { title: "Category Detail" },
-    //     props: true,
-    // },
+    {
+        path: "/categories",
+        name: "categories",
+        component: () => import("@/views/categories/CategoriesView.vue"),
+        meta: { title: "Categories" },
+    },
+    {
+        path: "/categories/:id",
+        name: "category-detail",
+        component: () => import("@/views/categories/CategoryDetailView.vue"),
+        meta: { title: "Category Detail" },
+        props: true,
+    },
     {
         path: "/tags",
         name: "tags",
