@@ -459,7 +459,7 @@ type PracticeSession struct {
 	Notes         string                 `protobuf:"bytes,4,opt,name=notes,proto3" json:"notes,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Exercises     []*SessionExercise     `protobuf:"bytes,7,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	Exercises     []*ExerciseHistory     `protobuf:"bytes,7,rep,name=exercises,proto3" json:"exercises,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -536,118 +536,9 @@ func (x *PracticeSession) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *PracticeSession) GetExercises() []*SessionExercise {
+func (x *PracticeSession) GetExercises() []*ExerciseHistory {
 	if x != nil {
 		return x.Exercises
-	}
-	return nil
-}
-
-// SessionExercise represents an exercise performed during a practice session
-type SessionExercise struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SessionId     int32                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	ExerciseId    int32                  `protobuf:"varint,3,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpm           int32                  `protobuf:"varint,6,opt,name=bpm,proto3" json:"bpm,omitempty"`
-	TimeSignature string                 `protobuf:"bytes,7,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
-	Notes         string                 `protobuf:"bytes,8,opt,name=notes,proto3" json:"notes,omitempty"`
-	Exercise      *Exercise              `protobuf:"bytes,9,opt,name=exercise,proto3" json:"exercise,omitempty"` // Full exercise details
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SessionExercise) Reset() {
-	*x = SessionExercise{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SessionExercise) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SessionExercise) ProtoMessage() {}
-
-func (x *SessionExercise) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SessionExercise.ProtoReflect.Descriptor instead.
-func (*SessionExercise) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SessionExercise) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *SessionExercise) GetSessionId() int32 {
-	if x != nil {
-		return x.SessionId
-	}
-	return 0
-}
-
-func (x *SessionExercise) GetExerciseId() int32 {
-	if x != nil {
-		return x.ExerciseId
-	}
-	return 0
-}
-
-func (x *SessionExercise) GetStartTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartTime
-	}
-	return nil
-}
-
-func (x *SessionExercise) GetEndTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EndTime
-	}
-	return nil
-}
-
-func (x *SessionExercise) GetBpm() int32 {
-	if x != nil {
-		return x.Bpm
-	}
-	return 0
-}
-
-func (x *SessionExercise) GetTimeSignature() string {
-	if x != nil {
-		return x.TimeSignature
-	}
-	return ""
-}
-
-func (x *SessionExercise) GetNotes() string {
-	if x != nil {
-		return x.Notes
-	}
-	return ""
-}
-
-func (x *SessionExercise) GetExercise() *Exercise {
-	if x != nil {
-		return x.Exercise
 	}
 	return nil
 }
@@ -659,7 +550,7 @@ type ExerciseHistory struct {
 	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpm           int32                  `protobuf:"varint,5,opt,name=bpm,proto3" json:"bpm,omitempty"`
+	Bpms          []int32                `protobuf:"varint,5,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
 	TimeSignature string                 `protobuf:"bytes,6,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
 	Notes         string                 `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
 	Rating        int32                  `protobuf:"varint,8,opt,name=rating,proto3" json:"rating,omitempty"`    // User rating (1-5)
@@ -671,7 +562,7 @@ type ExerciseHistory struct {
 
 func (x *ExerciseHistory) Reset() {
 	*x = ExerciseHistory{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[7]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -683,7 +574,7 @@ func (x *ExerciseHistory) String() string {
 func (*ExerciseHistory) ProtoMessage() {}
 
 func (x *ExerciseHistory) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[7]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -696,7 +587,7 @@ func (x *ExerciseHistory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExerciseHistory.ProtoReflect.Descriptor instead.
 func (*ExerciseHistory) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{7}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ExerciseHistory) GetId() int32 {
@@ -727,11 +618,11 @@ func (x *ExerciseHistory) GetEndTime() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *ExerciseHistory) GetBpm() int32 {
+func (x *ExerciseHistory) GetBpms() []int32 {
 	if x != nil {
-		return x.Bpm
+		return x.Bpms
 	}
-	return 0
+	return nil
 }
 
 func (x *ExerciseHistory) GetTimeSignature() string {
@@ -780,7 +671,7 @@ type CreateCategoryRequest struct {
 
 func (x *CreateCategoryRequest) Reset() {
 	*x = CreateCategoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[8]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -792,7 +683,7 @@ func (x *CreateCategoryRequest) String() string {
 func (*CreateCategoryRequest) ProtoMessage() {}
 
 func (x *CreateCategoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[8]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -805,7 +696,7 @@ func (x *CreateCategoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateCategoryRequest.ProtoReflect.Descriptor instead.
 func (*CreateCategoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{8}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *CreateCategoryRequest) GetName() string {
@@ -832,7 +723,7 @@ type GetCategoryRequest struct {
 
 func (x *GetCategoryRequest) Reset() {
 	*x = GetCategoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[9]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -844,7 +735,7 @@ func (x *GetCategoryRequest) String() string {
 func (*GetCategoryRequest) ProtoMessage() {}
 
 func (x *GetCategoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[9]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -857,7 +748,7 @@ func (x *GetCategoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCategoryRequest.ProtoReflect.Descriptor instead.
 func (*GetCategoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{9}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetCategoryRequest) GetId() int32 {
@@ -878,7 +769,7 @@ type ListCategoriesRequest struct {
 
 func (x *ListCategoriesRequest) Reset() {
 	*x = ListCategoriesRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[10]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -890,7 +781,7 @@ func (x *ListCategoriesRequest) String() string {
 func (*ListCategoriesRequest) ProtoMessage() {}
 
 func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[10]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -903,7 +794,7 @@ func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesRequest.ProtoReflect.Descriptor instead.
 func (*ListCategoriesRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{10}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListCategoriesRequest) GetPageSize() int32 {
@@ -932,7 +823,7 @@ type ListCategoriesResponse struct {
 
 func (x *ListCategoriesResponse) Reset() {
 	*x = ListCategoriesResponse{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[11]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -944,7 +835,7 @@ func (x *ListCategoriesResponse) String() string {
 func (*ListCategoriesResponse) ProtoMessage() {}
 
 func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[11]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -957,7 +848,7 @@ func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesResponse.ProtoReflect.Descriptor instead.
 func (*ListCategoriesResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{11}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListCategoriesResponse) GetCategories() []*Category {
@@ -993,7 +884,7 @@ type UpdateCategoryRequest struct {
 
 func (x *UpdateCategoryRequest) Reset() {
 	*x = UpdateCategoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[12]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1005,7 +896,7 @@ func (x *UpdateCategoryRequest) String() string {
 func (*UpdateCategoryRequest) ProtoMessage() {}
 
 func (x *UpdateCategoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[12]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1018,7 +909,7 @@ func (x *UpdateCategoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCategoryRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCategoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{12}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateCategoryRequest) GetId() int32 {
@@ -1052,7 +943,7 @@ type DeleteCategoryRequest struct {
 
 func (x *DeleteCategoryRequest) Reset() {
 	*x = DeleteCategoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[13]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1064,7 +955,7 @@ func (x *DeleteCategoryRequest) String() string {
 func (*DeleteCategoryRequest) ProtoMessage() {}
 
 func (x *DeleteCategoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[13]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1077,7 +968,7 @@ func (x *DeleteCategoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteCategoryRequest.ProtoReflect.Descriptor instead.
 func (*DeleteCategoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{13}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DeleteCategoryRequest) GetId() int32 {
@@ -1098,7 +989,7 @@ type CreateTagRequest struct {
 
 func (x *CreateTagRequest) Reset() {
 	*x = CreateTagRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[14]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1110,7 +1001,7 @@ func (x *CreateTagRequest) String() string {
 func (*CreateTagRequest) ProtoMessage() {}
 
 func (x *CreateTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[14]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1123,7 +1014,7 @@ func (x *CreateTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTagRequest.ProtoReflect.Descriptor instead.
 func (*CreateTagRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{14}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CreateTagRequest) GetName() string {
@@ -1150,7 +1041,7 @@ type GetTagRequest struct {
 
 func (x *GetTagRequest) Reset() {
 	*x = GetTagRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[15]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1162,7 +1053,7 @@ func (x *GetTagRequest) String() string {
 func (*GetTagRequest) ProtoMessage() {}
 
 func (x *GetTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[15]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1175,7 +1066,7 @@ func (x *GetTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTagRequest.ProtoReflect.Descriptor instead.
 func (*GetTagRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{15}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetTagRequest) GetId() int32 {
@@ -1197,7 +1088,7 @@ type ListTagsRequest struct {
 
 func (x *ListTagsRequest) Reset() {
 	*x = ListTagsRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[16]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1209,7 +1100,7 @@ func (x *ListTagsRequest) String() string {
 func (*ListTagsRequest) ProtoMessage() {}
 
 func (x *ListTagsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[16]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1222,7 +1113,7 @@ func (x *ListTagsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTagsRequest.ProtoReflect.Descriptor instead.
 func (*ListTagsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{16}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListTagsRequest) GetPageSize() int32 {
@@ -1258,7 +1149,7 @@ type ListTagsResponse struct {
 
 func (x *ListTagsResponse) Reset() {
 	*x = ListTagsResponse{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[17]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1270,7 +1161,7 @@ func (x *ListTagsResponse) String() string {
 func (*ListTagsResponse) ProtoMessage() {}
 
 func (x *ListTagsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[17]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1283,7 +1174,7 @@ func (x *ListTagsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTagsResponse.ProtoReflect.Descriptor instead.
 func (*ListTagsResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{17}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ListTagsResponse) GetTags() []*Tag {
@@ -1319,7 +1210,7 @@ type UpdateTagRequest struct {
 
 func (x *UpdateTagRequest) Reset() {
 	*x = UpdateTagRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[18]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1331,7 +1222,7 @@ func (x *UpdateTagRequest) String() string {
 func (*UpdateTagRequest) ProtoMessage() {}
 
 func (x *UpdateTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[18]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1344,7 +1235,7 @@ func (x *UpdateTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTagRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTagRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{18}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateTagRequest) GetId() int32 {
@@ -1378,7 +1269,7 @@ type DeleteTagRequest struct {
 
 func (x *DeleteTagRequest) Reset() {
 	*x = DeleteTagRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[19]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1390,7 +1281,7 @@ func (x *DeleteTagRequest) String() string {
 func (*DeleteTagRequest) ProtoMessage() {}
 
 func (x *DeleteTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[19]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1403,7 +1294,7 @@ func (x *DeleteTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTagRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTagRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{19}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *DeleteTagRequest) GetId() int32 {
@@ -1428,7 +1319,7 @@ type CreateExerciseRequest struct {
 
 func (x *CreateExerciseRequest) Reset() {
 	*x = CreateExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[20]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1440,7 +1331,7 @@ func (x *CreateExerciseRequest) String() string {
 func (*CreateExerciseRequest) ProtoMessage() {}
 
 func (x *CreateExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[20]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1453,7 +1344,7 @@ func (x *CreateExerciseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateExerciseRequest.ProtoReflect.Descriptor instead.
 func (*CreateExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{20}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CreateExerciseRequest) GetName() string {
@@ -1508,7 +1399,7 @@ type GetExerciseRequest struct {
 
 func (x *GetExerciseRequest) Reset() {
 	*x = GetExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[21]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1520,7 +1411,7 @@ func (x *GetExerciseRequest) String() string {
 func (*GetExerciseRequest) ProtoMessage() {}
 
 func (x *GetExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[21]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1533,7 +1424,7 @@ func (x *GetExerciseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExerciseRequest.ProtoReflect.Descriptor instead.
 func (*GetExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{21}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetExerciseRequest) GetId() int32 {
@@ -1556,7 +1447,7 @@ type ListExercisesRequest struct {
 
 func (x *ListExercisesRequest) Reset() {
 	*x = ListExercisesRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[22]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1568,7 +1459,7 @@ func (x *ListExercisesRequest) String() string {
 func (*ListExercisesRequest) ProtoMessage() {}
 
 func (x *ListExercisesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[22]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1581,7 +1472,7 @@ func (x *ListExercisesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExercisesRequest.ProtoReflect.Descriptor instead.
 func (*ListExercisesRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{22}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ListExercisesRequest) GetPageSize() int32 {
@@ -1624,7 +1515,7 @@ type ListExercisesResponse struct {
 
 func (x *ListExercisesResponse) Reset() {
 	*x = ListExercisesResponse{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[23]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1636,7 +1527,7 @@ func (x *ListExercisesResponse) String() string {
 func (*ListExercisesResponse) ProtoMessage() {}
 
 func (x *ListExercisesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[23]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1649,7 +1540,7 @@ func (x *ListExercisesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExercisesResponse.ProtoReflect.Descriptor instead.
 func (*ListExercisesResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{23}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ListExercisesResponse) GetExercises() []*Exercise {
@@ -1685,7 +1576,7 @@ type UpdateExerciseRequest struct {
 
 func (x *UpdateExerciseRequest) Reset() {
 	*x = UpdateExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[24]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1697,7 +1588,7 @@ func (x *UpdateExerciseRequest) String() string {
 func (*UpdateExerciseRequest) ProtoMessage() {}
 
 func (x *UpdateExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[24]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1710,7 +1601,7 @@ func (x *UpdateExerciseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateExerciseRequest.ProtoReflect.Descriptor instead.
 func (*UpdateExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{24}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UpdateExerciseRequest) GetId() int32 {
@@ -1744,7 +1635,7 @@ type DeleteExerciseRequest struct {
 
 func (x *DeleteExerciseRequest) Reset() {
 	*x = DeleteExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[25]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1756,7 +1647,7 @@ func (x *DeleteExerciseRequest) String() string {
 func (*DeleteExerciseRequest) ProtoMessage() {}
 
 func (x *DeleteExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[25]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1769,7 +1660,7 @@ func (x *DeleteExerciseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteExerciseRequest.ProtoReflect.Descriptor instead.
 func (*DeleteExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{25}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeleteExerciseRequest) GetId() int32 {
@@ -1793,7 +1684,7 @@ type AddExerciseImageRequest struct {
 
 func (x *AddExerciseImageRequest) Reset() {
 	*x = AddExerciseImageRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[26]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1805,7 +1696,7 @@ func (x *AddExerciseImageRequest) String() string {
 func (*AddExerciseImageRequest) ProtoMessage() {}
 
 func (x *AddExerciseImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[26]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1818,7 +1709,7 @@ func (x *AddExerciseImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddExerciseImageRequest.ProtoReflect.Descriptor instead.
 func (*AddExerciseImageRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{26}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *AddExerciseImageRequest) GetExerciseId() int32 {
@@ -1866,7 +1757,7 @@ type DeleteExerciseImageRequest struct {
 
 func (x *DeleteExerciseImageRequest) Reset() {
 	*x = DeleteExerciseImageRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[27]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1878,7 +1769,7 @@ func (x *DeleteExerciseImageRequest) String() string {
 func (*DeleteExerciseImageRequest) ProtoMessage() {}
 
 func (x *DeleteExerciseImageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[27]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1891,7 +1782,7 @@ func (x *DeleteExerciseImageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteExerciseImageRequest.ProtoReflect.Descriptor instead.
 func (*DeleteExerciseImageRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{27}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeleteExerciseImageRequest) GetId() int32 {
@@ -1913,7 +1804,7 @@ type AddExerciseLinkRequest struct {
 
 func (x *AddExerciseLinkRequest) Reset() {
 	*x = AddExerciseLinkRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[28]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1925,7 +1816,7 @@ func (x *AddExerciseLinkRequest) String() string {
 func (*AddExerciseLinkRequest) ProtoMessage() {}
 
 func (x *AddExerciseLinkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[28]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1938,7 +1829,7 @@ func (x *AddExerciseLinkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddExerciseLinkRequest.ProtoReflect.Descriptor instead.
 func (*AddExerciseLinkRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{28}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *AddExerciseLinkRequest) GetExerciseId() int32 {
@@ -1972,7 +1863,7 @@ type DeleteExerciseLinkRequest struct {
 
 func (x *DeleteExerciseLinkRequest) Reset() {
 	*x = DeleteExerciseLinkRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[29]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1984,7 +1875,7 @@ func (x *DeleteExerciseLinkRequest) String() string {
 func (*DeleteExerciseLinkRequest) ProtoMessage() {}
 
 func (x *DeleteExerciseLinkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[29]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1997,7 +1888,7 @@ func (x *DeleteExerciseLinkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteExerciseLinkRequest.ProtoReflect.Descriptor instead.
 func (*DeleteExerciseLinkRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{29}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *DeleteExerciseLinkRequest) GetId() int32 {
@@ -2009,18 +1900,17 @@ func (x *DeleteExerciseLinkRequest) GetId() int32 {
 
 // CreatePracticeSessionRequest is used to create a new practice session
 type CreatePracticeSessionRequest struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	StartTime     *timestamppb.Timestamp  `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp  `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Notes         string                  `protobuf:"bytes,3,opt,name=notes,proto3" json:"notes,omitempty"`
-	Exercises     []*SessionExerciseInput `protobuf:"bytes,4,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StartTime     *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Notes         string                 `protobuf:"bytes,3,opt,name=notes,proto3" json:"notes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreatePracticeSessionRequest) Reset() {
 	*x = CreatePracticeSessionRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[30]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2032,7 +1922,7 @@ func (x *CreatePracticeSessionRequest) String() string {
 func (*CreatePracticeSessionRequest) ProtoMessage() {}
 
 func (x *CreatePracticeSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[30]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2045,7 +1935,7 @@ func (x *CreatePracticeSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePracticeSessionRequest.ProtoReflect.Descriptor instead.
 func (*CreatePracticeSessionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{30}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreatePracticeSessionRequest) GetStartTime() *timestamppb.Timestamp {
@@ -2069,98 +1959,6 @@ func (x *CreatePracticeSessionRequest) GetNotes() string {
 	return ""
 }
 
-func (x *CreatePracticeSessionRequest) GetExercises() []*SessionExerciseInput {
-	if x != nil {
-		return x.Exercises
-	}
-	return nil
-}
-
-// SessionExerciseInput is used for creating session exercises
-type SessionExerciseInput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpm           int32                  `protobuf:"varint,4,opt,name=bpm,proto3" json:"bpm,omitempty"`
-	TimeSignature string                 `protobuf:"bytes,5,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
-	Notes         string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SessionExerciseInput) Reset() {
-	*x = SessionExerciseInput{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[31]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SessionExerciseInput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SessionExerciseInput) ProtoMessage() {}
-
-func (x *SessionExerciseInput) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[31]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SessionExerciseInput.ProtoReflect.Descriptor instead.
-func (*SessionExerciseInput) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{31}
-}
-
-func (x *SessionExerciseInput) GetExerciseId() int32 {
-	if x != nil {
-		return x.ExerciseId
-	}
-	return 0
-}
-
-func (x *SessionExerciseInput) GetStartTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartTime
-	}
-	return nil
-}
-
-func (x *SessionExerciseInput) GetEndTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EndTime
-	}
-	return nil
-}
-
-func (x *SessionExerciseInput) GetBpm() int32 {
-	if x != nil {
-		return x.Bpm
-	}
-	return 0
-}
-
-func (x *SessionExerciseInput) GetTimeSignature() string {
-	if x != nil {
-		return x.TimeSignature
-	}
-	return ""
-}
-
-func (x *SessionExerciseInput) GetNotes() string {
-	if x != nil {
-		return x.Notes
-	}
-	return ""
-}
-
 // GetPracticeSessionRequest is used to retrieve a specific practice session
 type GetPracticeSessionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -2171,7 +1969,7 @@ type GetPracticeSessionRequest struct {
 
 func (x *GetPracticeSessionRequest) Reset() {
 	*x = GetPracticeSessionRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[32]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2183,7 +1981,7 @@ func (x *GetPracticeSessionRequest) String() string {
 func (*GetPracticeSessionRequest) ProtoMessage() {}
 
 func (x *GetPracticeSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[32]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2196,7 +1994,7 @@ func (x *GetPracticeSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPracticeSessionRequest.ProtoReflect.Descriptor instead.
 func (*GetPracticeSessionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{32}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetPracticeSessionRequest) GetId() int32 {
@@ -2220,7 +2018,7 @@ type ListPracticeSessionsRequest struct {
 
 func (x *ListPracticeSessionsRequest) Reset() {
 	*x = ListPracticeSessionsRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[33]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2232,7 +2030,7 @@ func (x *ListPracticeSessionsRequest) String() string {
 func (*ListPracticeSessionsRequest) ProtoMessage() {}
 
 func (x *ListPracticeSessionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[33]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2245,7 +2043,7 @@ func (x *ListPracticeSessionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPracticeSessionsRequest.ProtoReflect.Descriptor instead.
 func (*ListPracticeSessionsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{33}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ListPracticeSessionsRequest) GetPageSize() int32 {
@@ -2296,7 +2094,7 @@ type ListPracticeSessionsResponse struct {
 
 func (x *ListPracticeSessionsResponse) Reset() {
 	*x = ListPracticeSessionsResponse{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[34]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2308,7 +2106,7 @@ func (x *ListPracticeSessionsResponse) String() string {
 func (*ListPracticeSessionsResponse) ProtoMessage() {}
 
 func (x *ListPracticeSessionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[34]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2321,7 +2119,7 @@ func (x *ListPracticeSessionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPracticeSessionsResponse.ProtoReflect.Descriptor instead.
 func (*ListPracticeSessionsResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{34}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *ListPracticeSessionsResponse) GetSessions() []*PracticeSession {
@@ -2357,7 +2155,7 @@ type UpdatePracticeSessionRequest struct {
 
 func (x *UpdatePracticeSessionRequest) Reset() {
 	*x = UpdatePracticeSessionRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[35]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2369,7 +2167,7 @@ func (x *UpdatePracticeSessionRequest) String() string {
 func (*UpdatePracticeSessionRequest) ProtoMessage() {}
 
 func (x *UpdatePracticeSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[35]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2382,7 +2180,7 @@ func (x *UpdatePracticeSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePracticeSessionRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePracticeSessionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{35}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *UpdatePracticeSessionRequest) GetId() int32 {
@@ -2416,7 +2214,7 @@ type DeletePracticeSessionRequest struct {
 
 func (x *DeletePracticeSessionRequest) Reset() {
 	*x = DeletePracticeSessionRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[36]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2428,7 +2226,7 @@ func (x *DeletePracticeSessionRequest) String() string {
 func (*DeletePracticeSessionRequest) ProtoMessage() {}
 
 func (x *DeletePracticeSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[36]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2441,217 +2239,10 @@ func (x *DeletePracticeSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePracticeSessionRequest.ProtoReflect.Descriptor instead.
 func (*DeletePracticeSessionRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{36}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeletePracticeSessionRequest) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-// AddSessionExerciseRequest is used to add an exercise to a session
-type AddSessionExerciseRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     int32                  `protobuf:"varint,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpm           int32                  `protobuf:"varint,5,opt,name=bpm,proto3" json:"bpm,omitempty"`
-	TimeSignature string                 `protobuf:"bytes,6,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
-	Notes         string                 `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AddSessionExerciseRequest) Reset() {
-	*x = AddSessionExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[37]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AddSessionExerciseRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AddSessionExerciseRequest) ProtoMessage() {}
-
-func (x *AddSessionExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[37]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AddSessionExerciseRequest.ProtoReflect.Descriptor instead.
-func (*AddSessionExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{37}
-}
-
-func (x *AddSessionExerciseRequest) GetSessionId() int32 {
-	if x != nil {
-		return x.SessionId
-	}
-	return 0
-}
-
-func (x *AddSessionExerciseRequest) GetExerciseId() int32 {
-	if x != nil {
-		return x.ExerciseId
-	}
-	return 0
-}
-
-func (x *AddSessionExerciseRequest) GetStartTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartTime
-	}
-	return nil
-}
-
-func (x *AddSessionExerciseRequest) GetEndTime() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EndTime
-	}
-	return nil
-}
-
-func (x *AddSessionExerciseRequest) GetBpm() int32 {
-	if x != nil {
-		return x.Bpm
-	}
-	return 0
-}
-
-func (x *AddSessionExerciseRequest) GetTimeSignature() string {
-	if x != nil {
-		return x.TimeSignature
-	}
-	return ""
-}
-
-func (x *AddSessionExerciseRequest) GetNotes() string {
-	if x != nil {
-		return x.Notes
-	}
-	return ""
-}
-
-// UpdateSessionExerciseRequest is used to update a session exercise
-type UpdateSessionExerciseRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	SessionId     int32                  `protobuf:"varint,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	Exercise      *SessionExercise       `protobuf:"bytes,3,opt,name=exercise,proto3" json:"exercise,omitempty"`
-	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateSessionExerciseRequest) Reset() {
-	*x = UpdateSessionExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[38]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateSessionExerciseRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateSessionExerciseRequest) ProtoMessage() {}
-
-func (x *UpdateSessionExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[38]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateSessionExerciseRequest.ProtoReflect.Descriptor instead.
-func (*UpdateSessionExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{38}
-}
-
-func (x *UpdateSessionExerciseRequest) GetId() int32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
-func (x *UpdateSessionExerciseRequest) GetSessionId() int32 {
-	if x != nil {
-		return x.SessionId
-	}
-	return 0
-}
-
-func (x *UpdateSessionExerciseRequest) GetExercise() *SessionExercise {
-	if x != nil {
-		return x.Exercise
-	}
-	return nil
-}
-
-func (x *UpdateSessionExerciseRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
-	if x != nil {
-		return x.UpdateMask
-	}
-	return nil
-}
-
-// DeleteSessionExerciseRequest is used to delete a session exercise
-type DeleteSessionExerciseRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteSessionExerciseRequest) Reset() {
-	*x = DeleteSessionExerciseRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[39]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteSessionExerciseRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteSessionExerciseRequest) ProtoMessage() {}
-
-func (x *DeleteSessionExerciseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[39]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteSessionExerciseRequest.ProtoReflect.Descriptor instead.
-func (*DeleteSessionExerciseRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{39}
-}
-
-func (x *DeleteSessionExerciseRequest) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2664,7 +2255,7 @@ type CreateExerciseHistoryRequest struct {
 	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpm           int32                  `protobuf:"varint,4,opt,name=bpm,proto3" json:"bpm,omitempty"`
+	Bpms          []int32                `protobuf:"varint,4,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
 	TimeSignature string                 `protobuf:"bytes,5,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
 	Notes         string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
 	Rating        int32                  `protobuf:"varint,7,opt,name=rating,proto3" json:"rating,omitempty"`
@@ -2675,7 +2266,7 @@ type CreateExerciseHistoryRequest struct {
 
 func (x *CreateExerciseHistoryRequest) Reset() {
 	*x = CreateExerciseHistoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[40]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2687,7 +2278,7 @@ func (x *CreateExerciseHistoryRequest) String() string {
 func (*CreateExerciseHistoryRequest) ProtoMessage() {}
 
 func (x *CreateExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[40]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2700,7 +2291,7 @@ func (x *CreateExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateExerciseHistoryRequest.ProtoReflect.Descriptor instead.
 func (*CreateExerciseHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{40}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *CreateExerciseHistoryRequest) GetExerciseId() int32 {
@@ -2724,11 +2315,11 @@ func (x *CreateExerciseHistoryRequest) GetEndTime() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *CreateExerciseHistoryRequest) GetBpm() int32 {
+func (x *CreateExerciseHistoryRequest) GetBpms() []int32 {
 	if x != nil {
-		return x.Bpm
+		return x.Bpms
 	}
-	return 0
+	return nil
 }
 
 func (x *CreateExerciseHistoryRequest) GetTimeSignature() string {
@@ -2770,7 +2361,7 @@ type GetExerciseHistoryRequest struct {
 
 func (x *GetExerciseHistoryRequest) Reset() {
 	*x = GetExerciseHistoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[41]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2782,7 +2373,7 @@ func (x *GetExerciseHistoryRequest) String() string {
 func (*GetExerciseHistoryRequest) ProtoMessage() {}
 
 func (x *GetExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[41]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2795,7 +2386,7 @@ func (x *GetExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExerciseHistoryRequest.ProtoReflect.Descriptor instead.
 func (*GetExerciseHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{41}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetExerciseHistoryRequest) GetId() int32 {
@@ -2821,7 +2412,7 @@ type ListExerciseHistoryRequest struct {
 
 func (x *ListExerciseHistoryRequest) Reset() {
 	*x = ListExerciseHistoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[42]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2833,7 +2424,7 @@ func (x *ListExerciseHistoryRequest) String() string {
 func (*ListExerciseHistoryRequest) ProtoMessage() {}
 
 func (x *ListExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[42]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2846,7 +2437,7 @@ func (x *ListExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExerciseHistoryRequest.ProtoReflect.Descriptor instead.
 func (*ListExerciseHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{42}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListExerciseHistoryRequest) GetPageSize() int32 {
@@ -2904,7 +2495,7 @@ type ListExerciseHistoryResponse struct {
 
 func (x *ListExerciseHistoryResponse) Reset() {
 	*x = ListExerciseHistoryResponse{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[43]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2916,7 +2507,7 @@ func (x *ListExerciseHistoryResponse) String() string {
 func (*ListExerciseHistoryResponse) ProtoMessage() {}
 
 func (x *ListExerciseHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[43]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2929,7 +2520,7 @@ func (x *ListExerciseHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExerciseHistoryResponse.ProtoReflect.Descriptor instead.
 func (*ListExerciseHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{43}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ListExerciseHistoryResponse) GetHistoryEntries() []*ExerciseHistory {
@@ -2965,7 +2556,7 @@ type UpdateExerciseHistoryRequest struct {
 
 func (x *UpdateExerciseHistoryRequest) Reset() {
 	*x = UpdateExerciseHistoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[44]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2977,7 +2568,7 @@ func (x *UpdateExerciseHistoryRequest) String() string {
 func (*UpdateExerciseHistoryRequest) ProtoMessage() {}
 
 func (x *UpdateExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[44]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2990,7 +2581,7 @@ func (x *UpdateExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateExerciseHistoryRequest.ProtoReflect.Descriptor instead.
 func (*UpdateExerciseHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{44}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *UpdateExerciseHistoryRequest) GetId() int32 {
@@ -3024,7 +2615,7 @@ type DeleteExerciseHistoryRequest struct {
 
 func (x *DeleteExerciseHistoryRequest) Reset() {
 	*x = DeleteExerciseHistoryRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[45]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3036,7 +2627,7 @@ func (x *DeleteExerciseHistoryRequest) String() string {
 func (*DeleteExerciseHistoryRequest) ProtoMessage() {}
 
 func (x *DeleteExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[45]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3049,7 +2640,7 @@ func (x *DeleteExerciseHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteExerciseHistoryRequest.ProtoReflect.Descriptor instead.
 func (*DeleteExerciseHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{45}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *DeleteExerciseHistoryRequest) GetId() int32 {
@@ -3071,7 +2662,7 @@ type GetExerciseStatsRequest struct {
 
 func (x *GetExerciseStatsRequest) Reset() {
 	*x = GetExerciseStatsRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[46]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3083,7 +2674,7 @@ func (x *GetExerciseStatsRequest) String() string {
 func (*GetExerciseStatsRequest) ProtoMessage() {}
 
 func (x *GetExerciseStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[46]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3096,7 +2687,7 @@ func (x *GetExerciseStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExerciseStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetExerciseStatsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{46}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *GetExerciseStatsRequest) GetExerciseId() int32 {
@@ -3138,7 +2729,7 @@ type ExerciseStats struct {
 
 func (x *ExerciseStats) Reset() {
 	*x = ExerciseStats{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[47]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3150,7 +2741,7 @@ func (x *ExerciseStats) String() string {
 func (*ExerciseStats) ProtoMessage() {}
 
 func (x *ExerciseStats) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[47]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3163,7 +2754,7 @@ func (x *ExerciseStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExerciseStats.ProtoReflect.Descriptor instead.
 func (*ExerciseStats) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{47}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ExerciseStats) GetExerciseId() int32 {
@@ -3240,7 +2831,7 @@ type BpmProgressPoint struct {
 
 func (x *BpmProgressPoint) Reset() {
 	*x = BpmProgressPoint{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[48]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3252,7 +2843,7 @@ func (x *BpmProgressPoint) String() string {
 func (*BpmProgressPoint) ProtoMessage() {}
 
 func (x *BpmProgressPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[48]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3265,7 +2856,7 @@ func (x *BpmProgressPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BpmProgressPoint.ProtoReflect.Descriptor instead.
 func (*BpmProgressPoint) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{48}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *BpmProgressPoint) GetDate() *timestamppb.Timestamp {
@@ -3294,7 +2885,7 @@ type GetPracticeStatsRequest struct {
 
 func (x *GetPracticeStatsRequest) Reset() {
 	*x = GetPracticeStatsRequest{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[49]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3306,7 +2897,7 @@ func (x *GetPracticeStatsRequest) String() string {
 func (*GetPracticeStatsRequest) ProtoMessage() {}
 
 func (x *GetPracticeStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[49]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3319,7 +2910,7 @@ func (x *GetPracticeStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPracticeStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetPracticeStatsRequest) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{49}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *GetPracticeStatsRequest) GetStartDate() *timestamppb.Timestamp {
@@ -3358,7 +2949,7 @@ type PracticeStats struct {
 
 func (x *PracticeStats) Reset() {
 	*x = PracticeStats{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[50]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3370,7 +2961,7 @@ func (x *PracticeStats) String() string {
 func (*PracticeStats) ProtoMessage() {}
 
 func (x *PracticeStats) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[50]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3383,7 +2974,7 @@ func (x *PracticeStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PracticeStats.ProtoReflect.Descriptor instead.
 func (*PracticeStats) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{50}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *PracticeStats) GetTotalSessions() int32 {
@@ -3441,7 +3032,7 @@ type ExerciseTimeDistribution struct {
 
 func (x *ExerciseTimeDistribution) Reset() {
 	*x = ExerciseTimeDistribution{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[51]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3453,7 +3044,7 @@ func (x *ExerciseTimeDistribution) String() string {
 func (*ExerciseTimeDistribution) ProtoMessage() {}
 
 func (x *ExerciseTimeDistribution) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[51]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3466,7 +3057,7 @@ func (x *ExerciseTimeDistribution) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExerciseTimeDistribution.ProtoReflect.Descriptor instead.
 func (*ExerciseTimeDistribution) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{51}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *ExerciseTimeDistribution) GetExerciseId() int32 {
@@ -3510,7 +3101,7 @@ type CategoryTimeDistribution struct {
 
 func (x *CategoryTimeDistribution) Reset() {
 	*x = CategoryTimeDistribution{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[52]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3522,7 +3113,7 @@ func (x *CategoryTimeDistribution) String() string {
 func (*CategoryTimeDistribution) ProtoMessage() {}
 
 func (x *CategoryTimeDistribution) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[52]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3535,7 +3126,7 @@ func (x *CategoryTimeDistribution) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CategoryTimeDistribution.ProtoReflect.Descriptor instead.
 func (*CategoryTimeDistribution) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{52}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *CategoryTimeDistribution) GetCategoryId() int32 {
@@ -3577,7 +3168,7 @@ type PracticeTimePoint struct {
 
 func (x *PracticeTimePoint) Reset() {
 	*x = PracticeTimePoint{}
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[53]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3589,7 +3180,7 @@ func (x *PracticeTimePoint) String() string {
 func (*PracticeTimePoint) ProtoMessage() {}
 
 func (x *PracticeTimePoint) ProtoReflect() protoreflect.Message {
-	mi := &file_api_v1_tempus_tempus_proto_msgTypes[53]
+	mi := &file_api_v1_tempus_tempus_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3602,7 +3193,7 @@ func (x *PracticeTimePoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PracticeTimePoint.ProtoReflect.Descriptor instead.
 func (*PracticeTimePoint) Descriptor() ([]byte, []int) {
-	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{53}
+	return file_api_v1_tempus_tempus_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *PracticeTimePoint) GetDate() *timestamppb.Timestamp {
@@ -3680,28 +3271,15 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
-	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.SessionExerciseR\texercises\"\xd4\x02\n" +
-	"\x0fSessionExercise\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x02 \x01(\x05R\tsessionId\x12\x1f\n" +
-	"\vexercise_id\x18\x03 \x01(\x05R\n" +
-	"exerciseId\x129\n" +
-	"\n" +
-	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
-	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x10\n" +
-	"\x03bpm\x18\x06 \x01(\x05R\x03bpm\x12%\n" +
-	"\x0etime_signature\x18\a \x01(\tR\rtimeSignature\x12\x14\n" +
-	"\x05notes\x18\b \x01(\tR\x05notes\x120\n" +
-	"\bexercise\x18\t \x01(\v2\x14.drummer.v1.ExerciseR\bexercise\"\xec\x02\n" +
+	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.ExerciseHistoryR\texercises\"\xee\x02\n" +
 	"\x0fExerciseHistory\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
 	"\vexercise_id\x18\x02 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
-	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x10\n" +
-	"\x03bpm\x18\x05 \x01(\x05R\x03bpm\x12%\n" +
+	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x12\n" +
+	"\x04bpms\x18\x05 \x03(\x05R\x04bpms\x12%\n" +
 	"\x0etime_signature\x18\x06 \x01(\tR\rtimeSignature\x12\x14\n" +
 	"\x05notes\x18\a \x01(\tR\x05notes\x12\x16\n" +
 	"\x06rating\x18\b \x01(\x05R\x06rating\x120\n" +
@@ -3799,22 +3377,12 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x03url\x18\x02 \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\"+\n" +
 	"\x19DeleteExerciseLinkRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xe6\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xa6\x01\n" +
 	"\x1cCreatePracticeSessionRequest\x129\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
 	"\bend_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x14\n" +
-	"\x05notes\x18\x03 \x01(\tR\x05notes\x12>\n" +
-	"\texercises\x18\x04 \x03(\v2 .drummer.v1.SessionExerciseInputR\texercises\"\xf8\x01\n" +
-	"\x14SessionExerciseInput\x12\x1f\n" +
-	"\vexercise_id\x18\x01 \x01(\x05R\n" +
-	"exerciseId\x129\n" +
-	"\n" +
-	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
-	"\bend_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x10\n" +
-	"\x03bpm\x18\x04 \x01(\x05R\x03bpm\x12%\n" +
-	"\x0etime_signature\x18\x05 \x01(\tR\rtimeSignature\x12\x14\n" +
-	"\x05notes\x18\x06 \x01(\tR\x05notes\"+\n" +
+	"\x05notes\x18\x03 \x01(\tR\x05notes\"+\n" +
 	"\x19GetPracticeSessionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"\xec\x01\n" +
 	"\x1bListPracticeSessionsRequest\x12\x1b\n" +
@@ -3837,34 +3405,14 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\".\n" +
 	"\x1cDeletePracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\x9c\x02\n" +
-	"\x19AddSessionExerciseRequest\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\x05R\tsessionId\x12\x1f\n" +
-	"\vexercise_id\x18\x02 \x01(\x05R\n" +
-	"exerciseId\x129\n" +
-	"\n" +
-	"start_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
-	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x10\n" +
-	"\x03bpm\x18\x05 \x01(\x05R\x03bpm\x12%\n" +
-	"\x0etime_signature\x18\x06 \x01(\tR\rtimeSignature\x12\x14\n" +
-	"\x05notes\x18\a \x01(\tR\x05notes\"\xc3\x01\n" +
-	"\x1cUpdateSessionExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x02 \x01(\x05R\tsessionId\x127\n" +
-	"\bexercise\x18\x03 \x01(\v2\x1b.drummer.v1.SessionExerciseR\bexercise\x12;\n" +
-	"\vupdate_mask\x18\x04 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\".\n" +
-	"\x1cDeleteSessionExerciseRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xb7\x02\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xb9\x02\n" +
 	"\x1cCreateExerciseHistoryRequest\x12\x1f\n" +
 	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
 	"\n" +
 	"start_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
-	"\bend_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x10\n" +
-	"\x03bpm\x18\x04 \x01(\x05R\x03bpm\x12%\n" +
+	"\bend_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x12\n" +
+	"\x04bpms\x18\x04 \x03(\x05R\x04bpms\x12%\n" +
 	"\x0etime_signature\x18\x05 \x01(\tR\rtimeSignature\x12\x14\n" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x16\n" +
 	"\x06rating\x18\a \x01(\x05R\x06rating\x12\x1d\n" +
@@ -3972,16 +3520,13 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x13DeleteExerciseImage\x12&.drummer.v1.DeleteExerciseImageRequest\x1a\x16.google.protobuf.Empty\" \x82\xd3\xe4\x93\x02\x1a*\x18/v1/exercise-images/{id}\x12}\n" +
 	"\x0fAddExerciseLink\x12\".drummer.v1.AddExerciseLinkRequest\x1a\x18.drummer.v1.ExerciseLink\",\x82\xd3\xe4\x93\x02&:\x01*\"!/v1/exercises/{exercise_id}/links\x12t\n" +
 	"\x12DeleteExerciseLink\x12%.drummer.v1.DeleteExerciseLinkRequest\x1a\x16.google.protobuf.Empty\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/v1/exercise-links/{id}\x12}\n" +
-	"\x10GetExerciseStats\x12#.drummer.v1.GetExerciseStatsRequest\x1a\x19.drummer.v1.ExerciseStats\")\x82\xd3\xe4\x93\x02#\x12!/v1/exercises/{exercise_id}/stats2\x8b\t\n" +
+	"\x10GetExerciseStats\x12#.drummer.v1.GetExerciseStatsRequest\x1a\x19.drummer.v1.ExerciseStats\")\x82\xd3\xe4\x93\x02#\x12!/v1/exercises/{exercise_id}/stats2\xeb\x05\n" +
 	"\x16PracticeSessionService\x12w\n" +
 	"\x15CreatePracticeSession\x12(.drummer.v1.CreatePracticeSessionRequest\x1a\x1b.drummer.v1.PracticeSession\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/v1/sessions\x12s\n" +
 	"\x12GetPracticeSession\x12%.drummer.v1.GetPracticeSessionRequest\x1a\x1b.drummer.v1.PracticeSession\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/sessions/{id}\x12\x7f\n" +
 	"\x14ListPracticeSessions\x12'.drummer.v1.ListPracticeSessionsRequest\x1a(.drummer.v1.ListPracticeSessionsResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\f/v1/sessions\x12|\n" +
 	"\x15UpdatePracticeSession\x12(.drummer.v1.UpdatePracticeSessionRequest\x1a\x1b.drummer.v1.PracticeSession\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*2\x11/v1/sessions/{id}\x12t\n" +
-	"\x15DeletePracticeSession\x12(.drummer.v1.DeletePracticeSessionRequest\x1a\x16.google.protobuf.Empty\"\x19\x82\xd3\xe4\x93\x02\x13*\x11/v1/sessions/{id}\x12\x88\x01\n" +
-	"\x12AddSessionExercise\x12%.drummer.v1.AddSessionExerciseRequest\x1a\x1b.drummer.v1.SessionExercise\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/sessions/{session_id}/exercises\x12\x93\x01\n" +
-	"\x15UpdateSessionExercise\x12(.drummer.v1.UpdateSessionExerciseRequest\x1a\x1b.drummer.v1.SessionExercise\"3\x82\xd3\xe4\x93\x02-:\x01*2(/v1/sessions/{session_id}/exercises/{id}\x12}\n" +
-	"\x15DeleteSessionExercise\x12(.drummer.v1.DeleteSessionExerciseRequest\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/v1/session-exercises/{id}\x12n\n" +
+	"\x15DeletePracticeSession\x12(.drummer.v1.DeletePracticeSessionRequest\x1a\x16.google.protobuf.Empty\"\x19\x82\xd3\xe4\x93\x02\x13*\x11/v1/sessions/{id}\x12n\n" +
 	"\x10GetPracticeStats\x12#.drummer.v1.GetPracticeStatsRequest\x1a\x19.drummer.v1.PracticeStats\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/sessions/stats2\xf3\x04\n" +
 	"\x16ExerciseHistoryService\x12v\n" +
 	"\x15CreateExerciseHistory\x12(.drummer.v1.CreateExerciseHistoryRequest\x1a\x1b.drummer.v1.ExerciseHistory\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/history\x12r\n" +
@@ -4005,7 +3550,7 @@ func file_api_v1_tempus_tempus_proto_rawDescGZIP() []byte {
 	return file_api_v1_tempus_tempus_proto_rawDescData
 }
 
-var file_api_v1_tempus_tempus_proto_msgTypes = make([]protoimpl.MessageInfo, 54)
+var file_api_v1_tempus_tempus_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_api_v1_tempus_tempus_proto_goTypes = []any{
 	(*Category)(nil),                     // 0: drummer.v1.Category
 	(*Tag)(nil),                          // 1: drummer.v1.Tag
@@ -4013,194 +3558,173 @@ var file_api_v1_tempus_tempus_proto_goTypes = []any{
 	(*ExerciseImage)(nil),                // 3: drummer.v1.ExerciseImage
 	(*ExerciseLink)(nil),                 // 4: drummer.v1.ExerciseLink
 	(*PracticeSession)(nil),              // 5: drummer.v1.PracticeSession
-	(*SessionExercise)(nil),              // 6: drummer.v1.SessionExercise
-	(*ExerciseHistory)(nil),              // 7: drummer.v1.ExerciseHistory
-	(*CreateCategoryRequest)(nil),        // 8: drummer.v1.CreateCategoryRequest
-	(*GetCategoryRequest)(nil),           // 9: drummer.v1.GetCategoryRequest
-	(*ListCategoriesRequest)(nil),        // 10: drummer.v1.ListCategoriesRequest
-	(*ListCategoriesResponse)(nil),       // 11: drummer.v1.ListCategoriesResponse
-	(*UpdateCategoryRequest)(nil),        // 12: drummer.v1.UpdateCategoryRequest
-	(*DeleteCategoryRequest)(nil),        // 13: drummer.v1.DeleteCategoryRequest
-	(*CreateTagRequest)(nil),             // 14: drummer.v1.CreateTagRequest
-	(*GetTagRequest)(nil),                // 15: drummer.v1.GetTagRequest
-	(*ListTagsRequest)(nil),              // 16: drummer.v1.ListTagsRequest
-	(*ListTagsResponse)(nil),             // 17: drummer.v1.ListTagsResponse
-	(*UpdateTagRequest)(nil),             // 18: drummer.v1.UpdateTagRequest
-	(*DeleteTagRequest)(nil),             // 19: drummer.v1.DeleteTagRequest
-	(*CreateExerciseRequest)(nil),        // 20: drummer.v1.CreateExerciseRequest
-	(*GetExerciseRequest)(nil),           // 21: drummer.v1.GetExerciseRequest
-	(*ListExercisesRequest)(nil),         // 22: drummer.v1.ListExercisesRequest
-	(*ListExercisesResponse)(nil),        // 23: drummer.v1.ListExercisesResponse
-	(*UpdateExerciseRequest)(nil),        // 24: drummer.v1.UpdateExerciseRequest
-	(*DeleteExerciseRequest)(nil),        // 25: drummer.v1.DeleteExerciseRequest
-	(*AddExerciseImageRequest)(nil),      // 26: drummer.v1.AddExerciseImageRequest
-	(*DeleteExerciseImageRequest)(nil),   // 27: drummer.v1.DeleteExerciseImageRequest
-	(*AddExerciseLinkRequest)(nil),       // 28: drummer.v1.AddExerciseLinkRequest
-	(*DeleteExerciseLinkRequest)(nil),    // 29: drummer.v1.DeleteExerciseLinkRequest
-	(*CreatePracticeSessionRequest)(nil), // 30: drummer.v1.CreatePracticeSessionRequest
-	(*SessionExerciseInput)(nil),         // 31: drummer.v1.SessionExerciseInput
-	(*GetPracticeSessionRequest)(nil),    // 32: drummer.v1.GetPracticeSessionRequest
-	(*ListPracticeSessionsRequest)(nil),  // 33: drummer.v1.ListPracticeSessionsRequest
-	(*ListPracticeSessionsResponse)(nil), // 34: drummer.v1.ListPracticeSessionsResponse
-	(*UpdatePracticeSessionRequest)(nil), // 35: drummer.v1.UpdatePracticeSessionRequest
-	(*DeletePracticeSessionRequest)(nil), // 36: drummer.v1.DeletePracticeSessionRequest
-	(*AddSessionExerciseRequest)(nil),    // 37: drummer.v1.AddSessionExerciseRequest
-	(*UpdateSessionExerciseRequest)(nil), // 38: drummer.v1.UpdateSessionExerciseRequest
-	(*DeleteSessionExerciseRequest)(nil), // 39: drummer.v1.DeleteSessionExerciseRequest
-	(*CreateExerciseHistoryRequest)(nil), // 40: drummer.v1.CreateExerciseHistoryRequest
-	(*GetExerciseHistoryRequest)(nil),    // 41: drummer.v1.GetExerciseHistoryRequest
-	(*ListExerciseHistoryRequest)(nil),   // 42: drummer.v1.ListExerciseHistoryRequest
-	(*ListExerciseHistoryResponse)(nil),  // 43: drummer.v1.ListExerciseHistoryResponse
-	(*UpdateExerciseHistoryRequest)(nil), // 44: drummer.v1.UpdateExerciseHistoryRequest
-	(*DeleteExerciseHistoryRequest)(nil), // 45: drummer.v1.DeleteExerciseHistoryRequest
-	(*GetExerciseStatsRequest)(nil),      // 46: drummer.v1.GetExerciseStatsRequest
-	(*ExerciseStats)(nil),                // 47: drummer.v1.ExerciseStats
-	(*BpmProgressPoint)(nil),             // 48: drummer.v1.BpmProgressPoint
-	(*GetPracticeStatsRequest)(nil),      // 49: drummer.v1.GetPracticeStatsRequest
-	(*PracticeStats)(nil),                // 50: drummer.v1.PracticeStats
-	(*ExerciseTimeDistribution)(nil),     // 51: drummer.v1.ExerciseTimeDistribution
-	(*CategoryTimeDistribution)(nil),     // 52: drummer.v1.CategoryTimeDistribution
-	(*PracticeTimePoint)(nil),            // 53: drummer.v1.PracticeTimePoint
-	(*timestamppb.Timestamp)(nil),        // 54: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),        // 55: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),                // 56: google.protobuf.Empty
+	(*ExerciseHistory)(nil),              // 6: drummer.v1.ExerciseHistory
+	(*CreateCategoryRequest)(nil),        // 7: drummer.v1.CreateCategoryRequest
+	(*GetCategoryRequest)(nil),           // 8: drummer.v1.GetCategoryRequest
+	(*ListCategoriesRequest)(nil),        // 9: drummer.v1.ListCategoriesRequest
+	(*ListCategoriesResponse)(nil),       // 10: drummer.v1.ListCategoriesResponse
+	(*UpdateCategoryRequest)(nil),        // 11: drummer.v1.UpdateCategoryRequest
+	(*DeleteCategoryRequest)(nil),        // 12: drummer.v1.DeleteCategoryRequest
+	(*CreateTagRequest)(nil),             // 13: drummer.v1.CreateTagRequest
+	(*GetTagRequest)(nil),                // 14: drummer.v1.GetTagRequest
+	(*ListTagsRequest)(nil),              // 15: drummer.v1.ListTagsRequest
+	(*ListTagsResponse)(nil),             // 16: drummer.v1.ListTagsResponse
+	(*UpdateTagRequest)(nil),             // 17: drummer.v1.UpdateTagRequest
+	(*DeleteTagRequest)(nil),             // 18: drummer.v1.DeleteTagRequest
+	(*CreateExerciseRequest)(nil),        // 19: drummer.v1.CreateExerciseRequest
+	(*GetExerciseRequest)(nil),           // 20: drummer.v1.GetExerciseRequest
+	(*ListExercisesRequest)(nil),         // 21: drummer.v1.ListExercisesRequest
+	(*ListExercisesResponse)(nil),        // 22: drummer.v1.ListExercisesResponse
+	(*UpdateExerciseRequest)(nil),        // 23: drummer.v1.UpdateExerciseRequest
+	(*DeleteExerciseRequest)(nil),        // 24: drummer.v1.DeleteExerciseRequest
+	(*AddExerciseImageRequest)(nil),      // 25: drummer.v1.AddExerciseImageRequest
+	(*DeleteExerciseImageRequest)(nil),   // 26: drummer.v1.DeleteExerciseImageRequest
+	(*AddExerciseLinkRequest)(nil),       // 27: drummer.v1.AddExerciseLinkRequest
+	(*DeleteExerciseLinkRequest)(nil),    // 28: drummer.v1.DeleteExerciseLinkRequest
+	(*CreatePracticeSessionRequest)(nil), // 29: drummer.v1.CreatePracticeSessionRequest
+	(*GetPracticeSessionRequest)(nil),    // 30: drummer.v1.GetPracticeSessionRequest
+	(*ListPracticeSessionsRequest)(nil),  // 31: drummer.v1.ListPracticeSessionsRequest
+	(*ListPracticeSessionsResponse)(nil), // 32: drummer.v1.ListPracticeSessionsResponse
+	(*UpdatePracticeSessionRequest)(nil), // 33: drummer.v1.UpdatePracticeSessionRequest
+	(*DeletePracticeSessionRequest)(nil), // 34: drummer.v1.DeletePracticeSessionRequest
+	(*CreateExerciseHistoryRequest)(nil), // 35: drummer.v1.CreateExerciseHistoryRequest
+	(*GetExerciseHistoryRequest)(nil),    // 36: drummer.v1.GetExerciseHistoryRequest
+	(*ListExerciseHistoryRequest)(nil),   // 37: drummer.v1.ListExerciseHistoryRequest
+	(*ListExerciseHistoryResponse)(nil),  // 38: drummer.v1.ListExerciseHistoryResponse
+	(*UpdateExerciseHistoryRequest)(nil), // 39: drummer.v1.UpdateExerciseHistoryRequest
+	(*DeleteExerciseHistoryRequest)(nil), // 40: drummer.v1.DeleteExerciseHistoryRequest
+	(*GetExerciseStatsRequest)(nil),      // 41: drummer.v1.GetExerciseStatsRequest
+	(*ExerciseStats)(nil),                // 42: drummer.v1.ExerciseStats
+	(*BpmProgressPoint)(nil),             // 43: drummer.v1.BpmProgressPoint
+	(*GetPracticeStatsRequest)(nil),      // 44: drummer.v1.GetPracticeStatsRequest
+	(*PracticeStats)(nil),                // 45: drummer.v1.PracticeStats
+	(*ExerciseTimeDistribution)(nil),     // 46: drummer.v1.ExerciseTimeDistribution
+	(*CategoryTimeDistribution)(nil),     // 47: drummer.v1.CategoryTimeDistribution
+	(*PracticeTimePoint)(nil),            // 48: drummer.v1.PracticeTimePoint
+	(*timestamppb.Timestamp)(nil),        // 49: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),        // 50: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),                // 51: google.protobuf.Empty
 }
 var file_api_v1_tempus_tempus_proto_depIdxs = []int32{
-	54, // 0: drummer.v1.Category.created_at:type_name -> google.protobuf.Timestamp
-	54, // 1: drummer.v1.Category.updated_at:type_name -> google.protobuf.Timestamp
-	54, // 2: drummer.v1.Tag.created_at:type_name -> google.protobuf.Timestamp
-	54, // 3: drummer.v1.Exercise.created_at:type_name -> google.protobuf.Timestamp
-	54, // 4: drummer.v1.Exercise.updated_at:type_name -> google.protobuf.Timestamp
+	49, // 0: drummer.v1.Category.created_at:type_name -> google.protobuf.Timestamp
+	49, // 1: drummer.v1.Category.updated_at:type_name -> google.protobuf.Timestamp
+	49, // 2: drummer.v1.Tag.created_at:type_name -> google.protobuf.Timestamp
+	49, // 3: drummer.v1.Exercise.created_at:type_name -> google.protobuf.Timestamp
+	49, // 4: drummer.v1.Exercise.updated_at:type_name -> google.protobuf.Timestamp
 	3,  // 5: drummer.v1.Exercise.images:type_name -> drummer.v1.ExerciseImage
 	4,  // 6: drummer.v1.Exercise.links:type_name -> drummer.v1.ExerciseLink
-	54, // 7: drummer.v1.ExerciseImage.created_at:type_name -> google.protobuf.Timestamp
-	54, // 8: drummer.v1.ExerciseLink.created_at:type_name -> google.protobuf.Timestamp
-	54, // 9: drummer.v1.PracticeSession.start_time:type_name -> google.protobuf.Timestamp
-	54, // 10: drummer.v1.PracticeSession.end_time:type_name -> google.protobuf.Timestamp
-	54, // 11: drummer.v1.PracticeSession.created_at:type_name -> google.protobuf.Timestamp
-	54, // 12: drummer.v1.PracticeSession.updated_at:type_name -> google.protobuf.Timestamp
-	6,  // 13: drummer.v1.PracticeSession.exercises:type_name -> drummer.v1.SessionExercise
-	54, // 14: drummer.v1.SessionExercise.start_time:type_name -> google.protobuf.Timestamp
-	54, // 15: drummer.v1.SessionExercise.end_time:type_name -> google.protobuf.Timestamp
-	2,  // 16: drummer.v1.SessionExercise.exercise:type_name -> drummer.v1.Exercise
-	54, // 17: drummer.v1.ExerciseHistory.start_time:type_name -> google.protobuf.Timestamp
-	54, // 18: drummer.v1.ExerciseHistory.end_time:type_name -> google.protobuf.Timestamp
-	2,  // 19: drummer.v1.ExerciseHistory.exercise:type_name -> drummer.v1.Exercise
-	0,  // 20: drummer.v1.ListCategoriesResponse.categories:type_name -> drummer.v1.Category
-	0,  // 21: drummer.v1.UpdateCategoryRequest.category:type_name -> drummer.v1.Category
-	55, // 22: drummer.v1.UpdateCategoryRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 23: drummer.v1.ListTagsResponse.tags:type_name -> drummer.v1.Tag
-	1,  // 24: drummer.v1.UpdateTagRequest.tag:type_name -> drummer.v1.Tag
-	55, // 25: drummer.v1.UpdateTagRequest.update_mask:type_name -> google.protobuf.FieldMask
-	3,  // 26: drummer.v1.CreateExerciseRequest.images:type_name -> drummer.v1.ExerciseImage
-	4,  // 27: drummer.v1.CreateExerciseRequest.links:type_name -> drummer.v1.ExerciseLink
-	2,  // 28: drummer.v1.ListExercisesResponse.exercises:type_name -> drummer.v1.Exercise
-	2,  // 29: drummer.v1.UpdateExerciseRequest.exercise:type_name -> drummer.v1.Exercise
-	55, // 30: drummer.v1.UpdateExerciseRequest.update_mask:type_name -> google.protobuf.FieldMask
-	54, // 31: drummer.v1.CreatePracticeSessionRequest.start_time:type_name -> google.protobuf.Timestamp
-	54, // 32: drummer.v1.CreatePracticeSessionRequest.end_time:type_name -> google.protobuf.Timestamp
-	31, // 33: drummer.v1.CreatePracticeSessionRequest.exercises:type_name -> drummer.v1.SessionExerciseInput
-	54, // 34: drummer.v1.SessionExerciseInput.start_time:type_name -> google.protobuf.Timestamp
-	54, // 35: drummer.v1.SessionExerciseInput.end_time:type_name -> google.protobuf.Timestamp
-	54, // 36: drummer.v1.ListPracticeSessionsRequest.start_date:type_name -> google.protobuf.Timestamp
-	54, // 37: drummer.v1.ListPracticeSessionsRequest.end_date:type_name -> google.protobuf.Timestamp
-	5,  // 38: drummer.v1.ListPracticeSessionsResponse.sessions:type_name -> drummer.v1.PracticeSession
-	5,  // 39: drummer.v1.UpdatePracticeSessionRequest.session:type_name -> drummer.v1.PracticeSession
-	55, // 40: drummer.v1.UpdatePracticeSessionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	54, // 41: drummer.v1.AddSessionExerciseRequest.start_time:type_name -> google.protobuf.Timestamp
-	54, // 42: drummer.v1.AddSessionExerciseRequest.end_time:type_name -> google.protobuf.Timestamp
-	6,  // 43: drummer.v1.UpdateSessionExerciseRequest.exercise:type_name -> drummer.v1.SessionExercise
-	55, // 44: drummer.v1.UpdateSessionExerciseRequest.update_mask:type_name -> google.protobuf.FieldMask
-	54, // 45: drummer.v1.CreateExerciseHistoryRequest.start_time:type_name -> google.protobuf.Timestamp
-	54, // 46: drummer.v1.CreateExerciseHistoryRequest.end_time:type_name -> google.protobuf.Timestamp
-	54, // 47: drummer.v1.ListExerciseHistoryRequest.start_date:type_name -> google.protobuf.Timestamp
-	54, // 48: drummer.v1.ListExerciseHistoryRequest.end_date:type_name -> google.protobuf.Timestamp
-	7,  // 49: drummer.v1.ListExerciseHistoryResponse.history_entries:type_name -> drummer.v1.ExerciseHistory
-	7,  // 50: drummer.v1.UpdateExerciseHistoryRequest.history:type_name -> drummer.v1.ExerciseHistory
-	55, // 51: drummer.v1.UpdateExerciseHistoryRequest.update_mask:type_name -> google.protobuf.FieldMask
-	54, // 52: drummer.v1.GetExerciseStatsRequest.start_date:type_name -> google.protobuf.Timestamp
-	54, // 53: drummer.v1.GetExerciseStatsRequest.end_date:type_name -> google.protobuf.Timestamp
-	48, // 54: drummer.v1.ExerciseStats.bpm_progress:type_name -> drummer.v1.BpmProgressPoint
-	54, // 55: drummer.v1.BpmProgressPoint.date:type_name -> google.protobuf.Timestamp
-	54, // 56: drummer.v1.GetPracticeStatsRequest.start_date:type_name -> google.protobuf.Timestamp
-	54, // 57: drummer.v1.GetPracticeStatsRequest.end_date:type_name -> google.protobuf.Timestamp
-	51, // 58: drummer.v1.PracticeStats.exercise_distribution:type_name -> drummer.v1.ExerciseTimeDistribution
-	52, // 59: drummer.v1.PracticeStats.category_distribution:type_name -> drummer.v1.CategoryTimeDistribution
-	53, // 60: drummer.v1.PracticeStats.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
-	54, // 61: drummer.v1.PracticeTimePoint.date:type_name -> google.protobuf.Timestamp
-	8,  // 62: drummer.v1.CategoryService.CreateCategory:input_type -> drummer.v1.CreateCategoryRequest
-	9,  // 63: drummer.v1.CategoryService.GetCategory:input_type -> drummer.v1.GetCategoryRequest
-	10, // 64: drummer.v1.CategoryService.ListCategories:input_type -> drummer.v1.ListCategoriesRequest
-	12, // 65: drummer.v1.CategoryService.UpdateCategory:input_type -> drummer.v1.UpdateCategoryRequest
-	13, // 66: drummer.v1.CategoryService.DeleteCategory:input_type -> drummer.v1.DeleteCategoryRequest
-	14, // 67: drummer.v1.TagService.CreateTag:input_type -> drummer.v1.CreateTagRequest
-	15, // 68: drummer.v1.TagService.GetTag:input_type -> drummer.v1.GetTagRequest
-	16, // 69: drummer.v1.TagService.ListTags:input_type -> drummer.v1.ListTagsRequest
-	18, // 70: drummer.v1.TagService.UpdateTag:input_type -> drummer.v1.UpdateTagRequest
-	19, // 71: drummer.v1.TagService.DeleteTag:input_type -> drummer.v1.DeleteTagRequest
-	20, // 72: drummer.v1.ExerciseService.CreateExercise:input_type -> drummer.v1.CreateExerciseRequest
-	21, // 73: drummer.v1.ExerciseService.GetExercise:input_type -> drummer.v1.GetExerciseRequest
-	22, // 74: drummer.v1.ExerciseService.ListExercises:input_type -> drummer.v1.ListExercisesRequest
-	24, // 75: drummer.v1.ExerciseService.UpdateExercise:input_type -> drummer.v1.UpdateExerciseRequest
-	25, // 76: drummer.v1.ExerciseService.DeleteExercise:input_type -> drummer.v1.DeleteExerciseRequest
-	26, // 77: drummer.v1.ExerciseService.AddExerciseImage:input_type -> drummer.v1.AddExerciseImageRequest
-	27, // 78: drummer.v1.ExerciseService.DeleteExerciseImage:input_type -> drummer.v1.DeleteExerciseImageRequest
-	28, // 79: drummer.v1.ExerciseService.AddExerciseLink:input_type -> drummer.v1.AddExerciseLinkRequest
-	29, // 80: drummer.v1.ExerciseService.DeleteExerciseLink:input_type -> drummer.v1.DeleteExerciseLinkRequest
-	46, // 81: drummer.v1.ExerciseService.GetExerciseStats:input_type -> drummer.v1.GetExerciseStatsRequest
-	30, // 82: drummer.v1.PracticeSessionService.CreatePracticeSession:input_type -> drummer.v1.CreatePracticeSessionRequest
-	32, // 83: drummer.v1.PracticeSessionService.GetPracticeSession:input_type -> drummer.v1.GetPracticeSessionRequest
-	33, // 84: drummer.v1.PracticeSessionService.ListPracticeSessions:input_type -> drummer.v1.ListPracticeSessionsRequest
-	35, // 85: drummer.v1.PracticeSessionService.UpdatePracticeSession:input_type -> drummer.v1.UpdatePracticeSessionRequest
-	36, // 86: drummer.v1.PracticeSessionService.DeletePracticeSession:input_type -> drummer.v1.DeletePracticeSessionRequest
-	37, // 87: drummer.v1.PracticeSessionService.AddSessionExercise:input_type -> drummer.v1.AddSessionExerciseRequest
-	38, // 88: drummer.v1.PracticeSessionService.UpdateSessionExercise:input_type -> drummer.v1.UpdateSessionExerciseRequest
-	39, // 89: drummer.v1.PracticeSessionService.DeleteSessionExercise:input_type -> drummer.v1.DeleteSessionExerciseRequest
-	49, // 90: drummer.v1.PracticeSessionService.GetPracticeStats:input_type -> drummer.v1.GetPracticeStatsRequest
-	40, // 91: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:input_type -> drummer.v1.CreateExerciseHistoryRequest
-	41, // 92: drummer.v1.ExerciseHistoryService.GetExerciseHistory:input_type -> drummer.v1.GetExerciseHistoryRequest
-	42, // 93: drummer.v1.ExerciseHistoryService.ListExerciseHistory:input_type -> drummer.v1.ListExerciseHistoryRequest
-	44, // 94: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:input_type -> drummer.v1.UpdateExerciseHistoryRequest
-	45, // 95: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:input_type -> drummer.v1.DeleteExerciseHistoryRequest
-	0,  // 96: drummer.v1.CategoryService.CreateCategory:output_type -> drummer.v1.Category
-	0,  // 97: drummer.v1.CategoryService.GetCategory:output_type -> drummer.v1.Category
-	11, // 98: drummer.v1.CategoryService.ListCategories:output_type -> drummer.v1.ListCategoriesResponse
-	0,  // 99: drummer.v1.CategoryService.UpdateCategory:output_type -> drummer.v1.Category
-	56, // 100: drummer.v1.CategoryService.DeleteCategory:output_type -> google.protobuf.Empty
-	1,  // 101: drummer.v1.TagService.CreateTag:output_type -> drummer.v1.Tag
-	1,  // 102: drummer.v1.TagService.GetTag:output_type -> drummer.v1.Tag
-	17, // 103: drummer.v1.TagService.ListTags:output_type -> drummer.v1.ListTagsResponse
-	1,  // 104: drummer.v1.TagService.UpdateTag:output_type -> drummer.v1.Tag
-	56, // 105: drummer.v1.TagService.DeleteTag:output_type -> google.protobuf.Empty
-	2,  // 106: drummer.v1.ExerciseService.CreateExercise:output_type -> drummer.v1.Exercise
-	2,  // 107: drummer.v1.ExerciseService.GetExercise:output_type -> drummer.v1.Exercise
-	23, // 108: drummer.v1.ExerciseService.ListExercises:output_type -> drummer.v1.ListExercisesResponse
-	2,  // 109: drummer.v1.ExerciseService.UpdateExercise:output_type -> drummer.v1.Exercise
-	56, // 110: drummer.v1.ExerciseService.DeleteExercise:output_type -> google.protobuf.Empty
-	3,  // 111: drummer.v1.ExerciseService.AddExerciseImage:output_type -> drummer.v1.ExerciseImage
-	56, // 112: drummer.v1.ExerciseService.DeleteExerciseImage:output_type -> google.protobuf.Empty
-	4,  // 113: drummer.v1.ExerciseService.AddExerciseLink:output_type -> drummer.v1.ExerciseLink
-	56, // 114: drummer.v1.ExerciseService.DeleteExerciseLink:output_type -> google.protobuf.Empty
-	47, // 115: drummer.v1.ExerciseService.GetExerciseStats:output_type -> drummer.v1.ExerciseStats
-	5,  // 116: drummer.v1.PracticeSessionService.CreatePracticeSession:output_type -> drummer.v1.PracticeSession
-	5,  // 117: drummer.v1.PracticeSessionService.GetPracticeSession:output_type -> drummer.v1.PracticeSession
-	34, // 118: drummer.v1.PracticeSessionService.ListPracticeSessions:output_type -> drummer.v1.ListPracticeSessionsResponse
-	5,  // 119: drummer.v1.PracticeSessionService.UpdatePracticeSession:output_type -> drummer.v1.PracticeSession
-	56, // 120: drummer.v1.PracticeSessionService.DeletePracticeSession:output_type -> google.protobuf.Empty
-	6,  // 121: drummer.v1.PracticeSessionService.AddSessionExercise:output_type -> drummer.v1.SessionExercise
-	6,  // 122: drummer.v1.PracticeSessionService.UpdateSessionExercise:output_type -> drummer.v1.SessionExercise
-	56, // 123: drummer.v1.PracticeSessionService.DeleteSessionExercise:output_type -> google.protobuf.Empty
-	50, // 124: drummer.v1.PracticeSessionService.GetPracticeStats:output_type -> drummer.v1.PracticeStats
-	7,  // 125: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	7,  // 126: drummer.v1.ExerciseHistoryService.GetExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	43, // 127: drummer.v1.ExerciseHistoryService.ListExerciseHistory:output_type -> drummer.v1.ListExerciseHistoryResponse
-	7,  // 128: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	56, // 129: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:output_type -> google.protobuf.Empty
-	96, // [96:130] is the sub-list for method output_type
-	62, // [62:96] is the sub-list for method input_type
-	62, // [62:62] is the sub-list for extension type_name
-	62, // [62:62] is the sub-list for extension extendee
-	0,  // [0:62] is the sub-list for field type_name
+	49, // 7: drummer.v1.ExerciseImage.created_at:type_name -> google.protobuf.Timestamp
+	49, // 8: drummer.v1.ExerciseLink.created_at:type_name -> google.protobuf.Timestamp
+	49, // 9: drummer.v1.PracticeSession.start_time:type_name -> google.protobuf.Timestamp
+	49, // 10: drummer.v1.PracticeSession.end_time:type_name -> google.protobuf.Timestamp
+	49, // 11: drummer.v1.PracticeSession.created_at:type_name -> google.protobuf.Timestamp
+	49, // 12: drummer.v1.PracticeSession.updated_at:type_name -> google.protobuf.Timestamp
+	6,  // 13: drummer.v1.PracticeSession.exercises:type_name -> drummer.v1.ExerciseHistory
+	49, // 14: drummer.v1.ExerciseHistory.start_time:type_name -> google.protobuf.Timestamp
+	49, // 15: drummer.v1.ExerciseHistory.end_time:type_name -> google.protobuf.Timestamp
+	2,  // 16: drummer.v1.ExerciseHistory.exercise:type_name -> drummer.v1.Exercise
+	0,  // 17: drummer.v1.ListCategoriesResponse.categories:type_name -> drummer.v1.Category
+	0,  // 18: drummer.v1.UpdateCategoryRequest.category:type_name -> drummer.v1.Category
+	50, // 19: drummer.v1.UpdateCategoryRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 20: drummer.v1.ListTagsResponse.tags:type_name -> drummer.v1.Tag
+	1,  // 21: drummer.v1.UpdateTagRequest.tag:type_name -> drummer.v1.Tag
+	50, // 22: drummer.v1.UpdateTagRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,  // 23: drummer.v1.CreateExerciseRequest.images:type_name -> drummer.v1.ExerciseImage
+	4,  // 24: drummer.v1.CreateExerciseRequest.links:type_name -> drummer.v1.ExerciseLink
+	2,  // 25: drummer.v1.ListExercisesResponse.exercises:type_name -> drummer.v1.Exercise
+	2,  // 26: drummer.v1.UpdateExerciseRequest.exercise:type_name -> drummer.v1.Exercise
+	50, // 27: drummer.v1.UpdateExerciseRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 28: drummer.v1.CreatePracticeSessionRequest.start_time:type_name -> google.protobuf.Timestamp
+	49, // 29: drummer.v1.CreatePracticeSessionRequest.end_time:type_name -> google.protobuf.Timestamp
+	49, // 30: drummer.v1.ListPracticeSessionsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 31: drummer.v1.ListPracticeSessionsRequest.end_date:type_name -> google.protobuf.Timestamp
+	5,  // 32: drummer.v1.ListPracticeSessionsResponse.sessions:type_name -> drummer.v1.PracticeSession
+	5,  // 33: drummer.v1.UpdatePracticeSessionRequest.session:type_name -> drummer.v1.PracticeSession
+	50, // 34: drummer.v1.UpdatePracticeSessionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 35: drummer.v1.CreateExerciseHistoryRequest.start_time:type_name -> google.protobuf.Timestamp
+	49, // 36: drummer.v1.CreateExerciseHistoryRequest.end_time:type_name -> google.protobuf.Timestamp
+	49, // 37: drummer.v1.ListExerciseHistoryRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 38: drummer.v1.ListExerciseHistoryRequest.end_date:type_name -> google.protobuf.Timestamp
+	6,  // 39: drummer.v1.ListExerciseHistoryResponse.history_entries:type_name -> drummer.v1.ExerciseHistory
+	6,  // 40: drummer.v1.UpdateExerciseHistoryRequest.history:type_name -> drummer.v1.ExerciseHistory
+	50, // 41: drummer.v1.UpdateExerciseHistoryRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 42: drummer.v1.GetExerciseStatsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 43: drummer.v1.GetExerciseStatsRequest.end_date:type_name -> google.protobuf.Timestamp
+	43, // 44: drummer.v1.ExerciseStats.bpm_progress:type_name -> drummer.v1.BpmProgressPoint
+	49, // 45: drummer.v1.BpmProgressPoint.date:type_name -> google.protobuf.Timestamp
+	49, // 46: drummer.v1.GetPracticeStatsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 47: drummer.v1.GetPracticeStatsRequest.end_date:type_name -> google.protobuf.Timestamp
+	46, // 48: drummer.v1.PracticeStats.exercise_distribution:type_name -> drummer.v1.ExerciseTimeDistribution
+	47, // 49: drummer.v1.PracticeStats.category_distribution:type_name -> drummer.v1.CategoryTimeDistribution
+	48, // 50: drummer.v1.PracticeStats.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
+	49, // 51: drummer.v1.PracticeTimePoint.date:type_name -> google.protobuf.Timestamp
+	7,  // 52: drummer.v1.CategoryService.CreateCategory:input_type -> drummer.v1.CreateCategoryRequest
+	8,  // 53: drummer.v1.CategoryService.GetCategory:input_type -> drummer.v1.GetCategoryRequest
+	9,  // 54: drummer.v1.CategoryService.ListCategories:input_type -> drummer.v1.ListCategoriesRequest
+	11, // 55: drummer.v1.CategoryService.UpdateCategory:input_type -> drummer.v1.UpdateCategoryRequest
+	12, // 56: drummer.v1.CategoryService.DeleteCategory:input_type -> drummer.v1.DeleteCategoryRequest
+	13, // 57: drummer.v1.TagService.CreateTag:input_type -> drummer.v1.CreateTagRequest
+	14, // 58: drummer.v1.TagService.GetTag:input_type -> drummer.v1.GetTagRequest
+	15, // 59: drummer.v1.TagService.ListTags:input_type -> drummer.v1.ListTagsRequest
+	17, // 60: drummer.v1.TagService.UpdateTag:input_type -> drummer.v1.UpdateTagRequest
+	18, // 61: drummer.v1.TagService.DeleteTag:input_type -> drummer.v1.DeleteTagRequest
+	19, // 62: drummer.v1.ExerciseService.CreateExercise:input_type -> drummer.v1.CreateExerciseRequest
+	20, // 63: drummer.v1.ExerciseService.GetExercise:input_type -> drummer.v1.GetExerciseRequest
+	21, // 64: drummer.v1.ExerciseService.ListExercises:input_type -> drummer.v1.ListExercisesRequest
+	23, // 65: drummer.v1.ExerciseService.UpdateExercise:input_type -> drummer.v1.UpdateExerciseRequest
+	24, // 66: drummer.v1.ExerciseService.DeleteExercise:input_type -> drummer.v1.DeleteExerciseRequest
+	25, // 67: drummer.v1.ExerciseService.AddExerciseImage:input_type -> drummer.v1.AddExerciseImageRequest
+	26, // 68: drummer.v1.ExerciseService.DeleteExerciseImage:input_type -> drummer.v1.DeleteExerciseImageRequest
+	27, // 69: drummer.v1.ExerciseService.AddExerciseLink:input_type -> drummer.v1.AddExerciseLinkRequest
+	28, // 70: drummer.v1.ExerciseService.DeleteExerciseLink:input_type -> drummer.v1.DeleteExerciseLinkRequest
+	41, // 71: drummer.v1.ExerciseService.GetExerciseStats:input_type -> drummer.v1.GetExerciseStatsRequest
+	29, // 72: drummer.v1.PracticeSessionService.CreatePracticeSession:input_type -> drummer.v1.CreatePracticeSessionRequest
+	30, // 73: drummer.v1.PracticeSessionService.GetPracticeSession:input_type -> drummer.v1.GetPracticeSessionRequest
+	31, // 74: drummer.v1.PracticeSessionService.ListPracticeSessions:input_type -> drummer.v1.ListPracticeSessionsRequest
+	33, // 75: drummer.v1.PracticeSessionService.UpdatePracticeSession:input_type -> drummer.v1.UpdatePracticeSessionRequest
+	34, // 76: drummer.v1.PracticeSessionService.DeletePracticeSession:input_type -> drummer.v1.DeletePracticeSessionRequest
+	44, // 77: drummer.v1.PracticeSessionService.GetPracticeStats:input_type -> drummer.v1.GetPracticeStatsRequest
+	35, // 78: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:input_type -> drummer.v1.CreateExerciseHistoryRequest
+	36, // 79: drummer.v1.ExerciseHistoryService.GetExerciseHistory:input_type -> drummer.v1.GetExerciseHistoryRequest
+	37, // 80: drummer.v1.ExerciseHistoryService.ListExerciseHistory:input_type -> drummer.v1.ListExerciseHistoryRequest
+	39, // 81: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:input_type -> drummer.v1.UpdateExerciseHistoryRequest
+	40, // 82: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:input_type -> drummer.v1.DeleteExerciseHistoryRequest
+	0,  // 83: drummer.v1.CategoryService.CreateCategory:output_type -> drummer.v1.Category
+	0,  // 84: drummer.v1.CategoryService.GetCategory:output_type -> drummer.v1.Category
+	10, // 85: drummer.v1.CategoryService.ListCategories:output_type -> drummer.v1.ListCategoriesResponse
+	0,  // 86: drummer.v1.CategoryService.UpdateCategory:output_type -> drummer.v1.Category
+	51, // 87: drummer.v1.CategoryService.DeleteCategory:output_type -> google.protobuf.Empty
+	1,  // 88: drummer.v1.TagService.CreateTag:output_type -> drummer.v1.Tag
+	1,  // 89: drummer.v1.TagService.GetTag:output_type -> drummer.v1.Tag
+	16, // 90: drummer.v1.TagService.ListTags:output_type -> drummer.v1.ListTagsResponse
+	1,  // 91: drummer.v1.TagService.UpdateTag:output_type -> drummer.v1.Tag
+	51, // 92: drummer.v1.TagService.DeleteTag:output_type -> google.protobuf.Empty
+	2,  // 93: drummer.v1.ExerciseService.CreateExercise:output_type -> drummer.v1.Exercise
+	2,  // 94: drummer.v1.ExerciseService.GetExercise:output_type -> drummer.v1.Exercise
+	22, // 95: drummer.v1.ExerciseService.ListExercises:output_type -> drummer.v1.ListExercisesResponse
+	2,  // 96: drummer.v1.ExerciseService.UpdateExercise:output_type -> drummer.v1.Exercise
+	51, // 97: drummer.v1.ExerciseService.DeleteExercise:output_type -> google.protobuf.Empty
+	3,  // 98: drummer.v1.ExerciseService.AddExerciseImage:output_type -> drummer.v1.ExerciseImage
+	51, // 99: drummer.v1.ExerciseService.DeleteExerciseImage:output_type -> google.protobuf.Empty
+	4,  // 100: drummer.v1.ExerciseService.AddExerciseLink:output_type -> drummer.v1.ExerciseLink
+	51, // 101: drummer.v1.ExerciseService.DeleteExerciseLink:output_type -> google.protobuf.Empty
+	42, // 102: drummer.v1.ExerciseService.GetExerciseStats:output_type -> drummer.v1.ExerciseStats
+	5,  // 103: drummer.v1.PracticeSessionService.CreatePracticeSession:output_type -> drummer.v1.PracticeSession
+	5,  // 104: drummer.v1.PracticeSessionService.GetPracticeSession:output_type -> drummer.v1.PracticeSession
+	32, // 105: drummer.v1.PracticeSessionService.ListPracticeSessions:output_type -> drummer.v1.ListPracticeSessionsResponse
+	5,  // 106: drummer.v1.PracticeSessionService.UpdatePracticeSession:output_type -> drummer.v1.PracticeSession
+	51, // 107: drummer.v1.PracticeSessionService.DeletePracticeSession:output_type -> google.protobuf.Empty
+	45, // 108: drummer.v1.PracticeSessionService.GetPracticeStats:output_type -> drummer.v1.PracticeStats
+	6,  // 109: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	6,  // 110: drummer.v1.ExerciseHistoryService.GetExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	38, // 111: drummer.v1.ExerciseHistoryService.ListExerciseHistory:output_type -> drummer.v1.ListExerciseHistoryResponse
+	6,  // 112: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	51, // 113: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:output_type -> google.protobuf.Empty
+	83, // [83:114] is the sub-list for method output_type
+	52, // [52:83] is the sub-list for method input_type
+	52, // [52:52] is the sub-list for extension type_name
+	52, // [52:52] is the sub-list for extension extendee
+	0,  // [0:52] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_tempus_tempus_proto_init() }
@@ -4214,7 +3738,7 @@ func file_api_v1_tempus_tempus_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_v1_tempus_tempus_proto_rawDesc), len(file_api_v1_tempus_tempus_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   54,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   5,
 		},

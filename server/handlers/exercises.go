@@ -957,7 +957,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 	var practiceCount int32
 	practiceCountQuery := `
 		SELECT COUNT(*) 
-		FROM session_exercises 
+		FROM exercise_history 
 		WHERE exercise_id = ?` + dateFilter
 	params := append([]interface{}{req.ExerciseId}, dateParams...)
 	err = h.db.QueryRowContext(ctx, practiceCountQuery, params...).Scan(&practiceCount)
@@ -969,7 +969,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 	var totalDurationSeconds int32
 	durationQuery := `
 		SELECT COALESCE(SUM(strftime('%s', end_time) - strftime('%s', start_time)), 0) 
-		FROM session_exercises 
+		FROM exercise_history
 		WHERE exercise_id = ?` + dateFilter
 	err = h.db.QueryRowContext(ctx, durationQuery, params...).Scan(&totalDurationSeconds)
 	if err != nil {
@@ -986,11 +986,22 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		avgBPM = 0
 		avgRating = 0
 	} else {
-		// Get max BPM
+		// Get max BPM - using SQLite JSON functions to extract max value from BPM arrays
 		maxBPMQuery := `
-			SELECT COALESCE(MAX(bpm), 0) 
-			FROM session_exercises 
-			WHERE exercise_id = ? AND bpm IS NOT NULL` + dateFilter
+			SELECT COALESCE(
+				(
+					SELECT MAX(value)
+					FROM (
+						SELECT CAST(json_each.value AS INTEGER) AS value
+						FROM exercise_history, json_each(bpms)
+						WHERE exercise_id = ? 
+						AND bpms IS NOT NULL 
+						AND json_valid(bpms)
+						` + dateFilter + `
+					)
+				), 
+				0
+			) AS max_bpm`
 		err = h.db.QueryRowContext(ctx, maxBPMQuery, params...).Scan(&maxBPM)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to get max BPM: %v", err)
@@ -998,9 +1009,20 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 
 		// Get min BPM
 		minBPMQuery := `
-			SELECT COALESCE(MIN(bpm), 0) 
-			FROM session_exercises 
-			WHERE exercise_id = ? AND bpm IS NOT NULL` + dateFilter
+			SELECT COALESCE(
+				(
+					SELECT MIN(value) 
+					FROM (
+						SELECT CAST(json_each.value AS INTEGER) AS value
+						FROM exercise_history, json_each(bpms)
+						WHERE exercise_id = ? 
+						AND bpms IS NOT NULL 
+						AND json_valid(bpms)
+						` + dateFilter + `
+					)
+				),
+				0
+			) AS min_bpm`
 		err = h.db.QueryRowContext(ctx, minBPMQuery, params...).Scan(&minBPM)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to get min BPM: %v", err)
@@ -1008,9 +1030,20 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 
 		// Get avg BPM
 		avgBPMQuery := `
-			SELECT COALESCE(AVG(bpm), 0) 
-			FROM session_exercises 
-			WHERE exercise_id = ? AND bpm IS NOT NULL` + dateFilter
+			SELECT COALESCE(
+				(
+					SELECT AVG(value) 
+					FROM (
+						SELECT CAST(json_each.value AS INTEGER) AS value
+						FROM exercise_history, json_each(bpms)
+						WHERE exercise_id = ? 
+						AND bpms IS NOT NULL 
+						AND json_valid(bpms)
+						` + dateFilter + `
+					)
+				),
+				0
+			) AS avg_bpm`
 		err = h.db.QueryRowContext(ctx, avgBPMQuery, params...).Scan(&avgBPM)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to get avg BPM: %v", err)
@@ -1028,12 +1061,18 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		}
 	}
 
-	// Get BPM progress over time
+	// Get BPM progress over time - taking the max BPM value per day
 	bpmProgressQuery := `
-		SELECT start_time, bpm 
-		FROM session_exercises 
-		WHERE exercise_id = ? AND bpm IS NOT NULL` + dateFilter + `
-		ORDER BY start_time
+		SELECT date, MAX(bpm_value) as bpm
+		FROM (
+			SELECT 
+				CAST(strftime('%Y-%m-%d', start_time) AS TEXT) as date,
+				CAST(json_extract(value, '$') AS INTEGER) AS bpm_value
+			FROM exercise_history, json_each(bpms)
+			WHERE exercise_id = ? AND bpms IS NOT NULL` + dateFilter + `
+		) 
+		GROUP BY date
+		ORDER BY date
 	`
 	bpmRows, err := h.db.QueryContext(ctx, bpmProgressQuery, params...)
 	if err != nil {
@@ -1044,11 +1083,18 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 	var bpmProgress []*pb.BpmProgressPoint
 	for bpmRows.Next() {
 		var point pb.BpmProgressPoint
-		var startTime time.Time
-		if err := bpmRows.Scan(&startTime, &point.Bpm); err != nil {
+		var dateStr string
+		var bpmValue int32
+		if err := bpmRows.Scan(&dateStr, &bpmValue); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse BPM progress: %v", err)
 		}
-		point.Date = timestamppb.New(startTime)
+		// Convert date string to timestamp
+		dateTime, err := time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse date: %v", err)
+		}
+		point.Date = timestamppb.New(dateTime)
+		point.Bpm = bpmValue
 		bpmProgress = append(bpmProgress, &point)
 	}
 	if err = bpmRows.Err(); err != nil {

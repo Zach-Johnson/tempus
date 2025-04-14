@@ -40,3 +40,8 @@ tasks:
   list-tags:
     cmds:
       - "curl -s http://localhost:8080/v1/tags -H 'Content-Type: application/json' | jq "
+
+  nuke-data:
+    desc: Remove data
+    cmds:
+      - rm -f ./data/tempus.db

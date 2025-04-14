@@ -1011,9 +1011,6 @@ const (
 	PracticeSessionService_ListPracticeSessions_FullMethodName  = "/drummer.v1.PracticeSessionService/ListPracticeSessions"
 	PracticeSessionService_UpdatePracticeSession_FullMethodName = "/drummer.v1.PracticeSessionService/UpdatePracticeSession"
 	PracticeSessionService_DeletePracticeSession_FullMethodName = "/drummer.v1.PracticeSessionService/DeletePracticeSession"
-	PracticeSessionService_AddSessionExercise_FullMethodName    = "/drummer.v1.PracticeSessionService/AddSessionExercise"
-	PracticeSessionService_UpdateSessionExercise_FullMethodName = "/drummer.v1.PracticeSessionService/UpdateSessionExercise"
-	PracticeSessionService_DeleteSessionExercise_FullMethodName = "/drummer.v1.PracticeSessionService/DeleteSessionExercise"
 	PracticeSessionService_GetPracticeStats_FullMethodName      = "/drummer.v1.PracticeSessionService/GetPracticeStats"
 )
 
@@ -1031,12 +1028,6 @@ type PracticeSessionServiceClient interface {
 	UpdatePracticeSession(ctx context.Context, in *UpdatePracticeSessionRequest, opts ...grpc.CallOption) (*PracticeSession, error)
 	// Delete a practice session
 	DeletePracticeSession(ctx context.Context, in *DeletePracticeSessionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Add an exercise to a session
-	AddSessionExercise(ctx context.Context, in *AddSessionExerciseRequest, opts ...grpc.CallOption) (*SessionExercise, error)
-	// Update a session exercise
-	UpdateSessionExercise(ctx context.Context, in *UpdateSessionExerciseRequest, opts ...grpc.CallOption) (*SessionExercise, error)
-	// Delete a session exercise
-	DeleteSessionExercise(ctx context.Context, in *DeleteSessionExerciseRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Get practice statistics
 	GetPracticeStats(ctx context.Context, in *GetPracticeStatsRequest, opts ...grpc.CallOption) (*PracticeStats, error)
 }
@@ -1099,36 +1090,6 @@ func (c *practiceSessionServiceClient) DeletePracticeSession(ctx context.Context
 	return out, nil
 }
 
-func (c *practiceSessionServiceClient) AddSessionExercise(ctx context.Context, in *AddSessionExerciseRequest, opts ...grpc.CallOption) (*SessionExercise, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SessionExercise)
-	err := c.cc.Invoke(ctx, PracticeSessionService_AddSessionExercise_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *practiceSessionServiceClient) UpdateSessionExercise(ctx context.Context, in *UpdateSessionExerciseRequest, opts ...grpc.CallOption) (*SessionExercise, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SessionExercise)
-	err := c.cc.Invoke(ctx, PracticeSessionService_UpdateSessionExercise_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *practiceSessionServiceClient) DeleteSessionExercise(ctx context.Context, in *DeleteSessionExerciseRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PracticeSessionService_DeleteSessionExercise_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *practiceSessionServiceClient) GetPracticeStats(ctx context.Context, in *GetPracticeStatsRequest, opts ...grpc.CallOption) (*PracticeStats, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PracticeStats)
@@ -1153,12 +1114,6 @@ type PracticeSessionServiceServer interface {
 	UpdatePracticeSession(context.Context, *UpdatePracticeSessionRequest) (*PracticeSession, error)
 	// Delete a practice session
 	DeletePracticeSession(context.Context, *DeletePracticeSessionRequest) (*emptypb.Empty, error)
-	// Add an exercise to a session
-	AddSessionExercise(context.Context, *AddSessionExerciseRequest) (*SessionExercise, error)
-	// Update a session exercise
-	UpdateSessionExercise(context.Context, *UpdateSessionExerciseRequest) (*SessionExercise, error)
-	// Delete a session exercise
-	DeleteSessionExercise(context.Context, *DeleteSessionExerciseRequest) (*emptypb.Empty, error)
 	// Get practice statistics
 	GetPracticeStats(context.Context, *GetPracticeStatsRequest) (*PracticeStats, error)
 }
@@ -1184,15 +1139,6 @@ func (UnimplementedPracticeSessionServiceServer) UpdatePracticeSession(context.C
 }
 func (UnimplementedPracticeSessionServiceServer) DeletePracticeSession(context.Context, *DeletePracticeSessionRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePracticeSession not implemented")
-}
-func (UnimplementedPracticeSessionServiceServer) AddSessionExercise(context.Context, *AddSessionExerciseRequest) (*SessionExercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddSessionExercise not implemented")
-}
-func (UnimplementedPracticeSessionServiceServer) UpdateSessionExercise(context.Context, *UpdateSessionExerciseRequest) (*SessionExercise, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateSessionExercise not implemented")
-}
-func (UnimplementedPracticeSessionServiceServer) DeleteSessionExercise(context.Context, *DeleteSessionExerciseRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteSessionExercise not implemented")
 }
 func (UnimplementedPracticeSessionServiceServer) GetPracticeStats(context.Context, *GetPracticeStatsRequest) (*PracticeStats, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPracticeStats not implemented")
@@ -1307,60 +1253,6 @@ func _PracticeSessionService_DeletePracticeSession_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PracticeSessionService_AddSessionExercise_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddSessionExerciseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PracticeSessionServiceServer).AddSessionExercise(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PracticeSessionService_AddSessionExercise_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PracticeSessionServiceServer).AddSessionExercise(ctx, req.(*AddSessionExerciseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PracticeSessionService_UpdateSessionExercise_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateSessionExerciseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PracticeSessionServiceServer).UpdateSessionExercise(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PracticeSessionService_UpdateSessionExercise_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PracticeSessionServiceServer).UpdateSessionExercise(ctx, req.(*UpdateSessionExerciseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PracticeSessionService_DeleteSessionExercise_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteSessionExerciseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PracticeSessionServiceServer).DeleteSessionExercise(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PracticeSessionService_DeleteSessionExercise_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PracticeSessionServiceServer).DeleteSessionExercise(ctx, req.(*DeleteSessionExerciseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _PracticeSessionService_GetPracticeStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetPracticeStatsRequest)
 	if err := dec(in); err != nil {
@@ -1405,18 +1297,6 @@ var PracticeSessionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePracticeSession",
 			Handler:    _PracticeSessionService_DeletePracticeSession_Handler,
-		},
-		{
-			MethodName: "AddSessionExercise",
-			Handler:    _PracticeSessionService_AddSessionExercise_Handler,
-		},
-		{
-			MethodName: "UpdateSessionExercise",
-			Handler:    _PracticeSessionService_UpdateSessionExercise_Handler,
-		},
-		{
-			MethodName: "DeleteSessionExercise",
-			Handler:    _PracticeSessionService_DeleteSessionExercise_Handler,
 		},
 		{
 			MethodName: "GetPracticeStats",

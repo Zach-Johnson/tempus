@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -28,6 +29,10 @@ func NewExerciseHistoryHandler(db *sql.DB) *ExerciseHistoryHandler {
 
 // CreateExerciseHistory creates a new exercise history entry
 func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req *pb.CreateExerciseHistoryRequest) (*pb.ExerciseHistory, error) {
+	if req.SessionId <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid session ID")
+	}
+
 	if req.ExerciseId <= 0 {
 		return nil, status.Error(codes.InvalidArgument, "exercise ID is required")
 	}
@@ -65,24 +70,27 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 		return nil, status.Errorf(codes.NotFound, "exercise with ID %d not found", req.ExerciseId)
 	}
 
-	// Check if session exists (if provided)
-	if req.SessionId > 0 {
-		var sessionExists bool
-		err = tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM practice_sessions WHERE id = ?)", req.SessionId).Scan(&sessionExists)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to check session existence: %v", err)
-		}
-		if !sessionExists {
-			return nil, status.Errorf(codes.NotFound, "session with ID %d not found", req.SessionId)
-		}
+	// Check if session exists
+	var sessionExists bool
+	err = tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM practice_sessions WHERE id = ?)", req.SessionId).Scan(&sessionExists)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to check session existence: %v", err)
+	}
+	if !sessionExists {
+		return nil, status.Errorf(codes.NotFound, "session with ID %d not found", req.SessionId)
+	}
+
+	bpmJSON, err := json.Marshal(req.Bpms)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to marshal BPM values: %v", err)
 	}
 
 	// Insert the exercise history entry
 	result, err := tx.ExecContext(
 		ctx,
-		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpm, time_signature, notes, rating) 
+		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		req.ExerciseId, req.SessionId, startTime, endTime, req.Bpm, req.TimeSignature, req.Notes, req.Rating,
+		req.ExerciseId, req.SessionId, startTime, endTime, bpmJSON, req.TimeSignature, req.Notes, req.Rating,
 	)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create exercise history entry: %v", err)
@@ -111,7 +119,7 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 		ExerciseId:    req.ExerciseId,
 		StartTime:     req.StartTime,
 		EndTime:       req.EndTime,
-		Bpm:           req.Bpm,
+		Bpms:          req.Bpms,
 		TimeSignature: req.TimeSignature,
 		Notes:         req.Notes,
 		Rating:        req.Rating,
@@ -136,10 +144,11 @@ func (h *ExerciseHistoryHandler) GetExerciseHistory(ctx context.Context, req *pb
 	var history pb.ExerciseHistory
 	var exerciseId int32
 	var startTime, endTime time.Time
+	var bpmJSON string
 
 	err = tx.QueryRowContext(
 		ctx,
-		`SELECT id, exercise_id, session_id, start_time, end_time, bpm, time_signature, notes, rating
+		`SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating
      FROM exercise_history
      WHERE id = ?`,
 		req.Id,
@@ -149,11 +158,19 @@ func (h *ExerciseHistoryHandler) GetExerciseHistory(ctx context.Context, req *pb
 		&history.SessionId,
 		&startTime,
 		&endTime,
-		&history.Bpm,
+		&bpmJSON,
 		&history.TimeSignature,
 		&history.Notes,
 		&history.Rating,
 	)
+
+	if bpmJSON != "" {
+		var bpms []int32
+		if err := json.Unmarshal([]byte(bpmJSON), &bpms); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+		}
+		history.Bpms = bpms
+	}
 
 	if err == sql.ErrNoRows {
 		return nil, status.Errorf(codes.NotFound, "exercise history entry with ID %d not found", req.Id)
@@ -199,7 +216,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 
 	// Build the query based on filters
 	baseQuery := `
-        SELECT id, exercise_id, session_id, start_time, end_time, bpm, time_signature, notes, rating
+        SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating
         FROM exercise_history
     `
 	countQuery := `
@@ -292,6 +309,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 		var exerciseId int32
 		var sessionID int32
 		var startTime, endTime time.Time
+		var bpmJSON string
 
 		err := rows.Scan(
 			&history.Id,
@@ -299,13 +317,21 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 			&sessionID,
 			&startTime,
 			&endTime,
-			&history.Bpm,
+			&bpmJSON,
 			&history.TimeSignature,
 			&history.Notes,
 			&history.Rating,
 		)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse exercise history: %v", err)
+		}
+
+		if bpmJSON != "" {
+			var bpms []int32
+			if err := json.Unmarshal([]byte(bpmJSON), &bpms); err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+			}
+			history.Bpms = bpms
 		}
 
 		history.ExerciseId = exerciseId
@@ -387,7 +413,6 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 	updateTimeSignature := false
 	updateNotes := false
 	updateRating := false
-	updateSessionId := false
 
 	if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
 		// If no update mask is provided, update all fields
@@ -404,7 +429,7 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 				updateStartTime = true
 			case "end_time":
 				updateEndTime = true
-			case "bpm":
+			case "bpms":
 				updateBpm = true
 			case "time_signature":
 				updateTimeSignature = true
@@ -412,8 +437,6 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 				updateNotes = true
 			case "rating":
 				updateRating = true
-			case "session_id":
-				updateSessionId = true
 			}
 		}
 	}
@@ -478,11 +501,16 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 	}
 
 	if updateBpm {
+		bpmJSON, err := json.Marshal(req.History.Bpms)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to marshal BPM values: %v", err)
+		}
+
 		if !first {
 			sql += ","
 		}
-		sql += " bpm = ?"
-		params = append(params, req.History.Bpm)
+		sql += " bpms = ?"
+		params = append(params, bpmJSON)
 		first = false
 	}
 
@@ -517,27 +545,6 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 		return nil, status.Errorf(codes.Internal, "failed to start transaction: %v", err)
 	}
 	defer tx.Rollback() // Rollback if not committed
-
-	if updateSessionId {
-		if req.History.SessionId > 0 {
-			// Check if session exists
-			var sessionExists bool
-			err := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM practice_sessions WHERE id = ?)", req.History.SessionId).Scan(&sessionExists)
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to check session existence: %v", err)
-			}
-			if !sessionExists {
-				return nil, status.Errorf(codes.NotFound, "session with ID %d not found", req.History.SessionId)
-			}
-		}
-
-		if !first {
-			sql += ","
-		}
-		sql += " session_id = ?"
-		params = append(params, req.History.SessionId)
-		first = false
-	}
 
 	if len(params) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "no fields to update")

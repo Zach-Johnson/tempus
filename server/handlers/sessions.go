@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"strconv"
 	"time"
 
@@ -80,7 +81,7 @@ func (h *PracticeSessionHandler) CreatePracticeSession(ctx context.Context, req 
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	// Return the created session (without exercises for now)
+	// Return the created session
 	return &pb.PracticeSession{
 		Id:        int32(sessionID),
 		StartTime: req.StartTime,
@@ -88,7 +89,6 @@ func (h *PracticeSessionHandler) CreatePracticeSession(ctx context.Context, req 
 		Notes:     req.Notes,
 		CreatedAt: timestamppb.New(createdAt),
 		UpdatedAt: timestamppb.New(updatedAt),
-		Exercises: []*pb.SessionExercise{}, // Empty for now
 	}, nil
 }
 
@@ -126,11 +126,11 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 	session.CreatedAt = timestamppb.New(createdAt)
 	session.UpdatedAt = timestamppb.New(updatedAt)
 
-	// Query session exercises
+	// Query exercise history
 	exerciseRows, err := tx.QueryContext(
 		ctx,
-		`SELECT id, exercise_id, start_time, end_time, bpm, time_signature, notes
-         FROM session_exercises
+		`SELECT id, exercise_id, start_time, end_time, bpms, time_signature, notes
+         FROM exercise_history
          WHERE session_id = ?
          ORDER BY start_time`,
 		req.Id,
@@ -141,25 +141,34 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 	defer exerciseRows.Close()
 
 	// Parse exercises
-	var exercises []*pb.SessionExercise
+	var exercises []*pb.ExerciseHistory
 	exerciseIDMap := make(map[int32]int) // Maps exercise ID to index in exercises slice
 
 	for exerciseRows.Next() {
-		var sessionExercise pb.SessionExercise
+		var sessionExercise pb.ExerciseHistory
 		var exerciseId int32
 		var startTime, endTime time.Time
+		var bpmJSON string
 
 		err := exerciseRows.Scan(
 			&sessionExercise.Id,
 			&exerciseId,
 			&startTime,
 			&endTime,
-			&sessionExercise.Bpm,
+			&bpmJSON,
 			&sessionExercise.TimeSignature,
 			&sessionExercise.Notes,
 		)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse session exercise: %v", err)
+		}
+
+		if bpmJSON != "" {
+			var bpms []int32
+			if err := json.Unmarshal([]byte(bpmJSON), &bpms); err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+			}
+			sessionExercise.Bpms = bpms
 		}
 
 		sessionExercise.SessionId = req.Id
@@ -241,7 +250,7 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
 		} else {
 			whereClause += " AND"
 		}
-		whereClause += " id IN (SELECT session_id FROM session_exercises WHERE exercise_id = ?)"
+		whereClause += " id IN (SELECT session_id FROM exercise_history WHERE exercise_id = ?)"
 		queryParams = append(queryParams, req.ExerciseId)
 	}
 
@@ -291,7 +300,7 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
 		session.EndTime = timestamppb.New(endTime)
 		session.CreatedAt = timestamppb.New(createdAt)
 		session.UpdatedAt = timestamppb.New(updatedAt)
-		session.Exercises = []*pb.SessionExercise{} // Empty for now
+		session.Exercises = []*pb.ExerciseHistory{}
 
 		sessions = append(sessions, &session)
 		count++
@@ -461,337 +470,6 @@ func (h *PracticeSessionHandler) DeletePracticeSession(ctx context.Context, req 
 	_, err = h.db.ExecContext(ctx, "DELETE FROM practice_sessions WHERE id = ?", req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to delete practice session: %v", err)
-	}
-
-	return &emptypb.Empty{}, nil
-}
-
-// AddSessionExercise adds an exercise to a session
-func (h *PracticeSessionHandler) AddSessionExercise(ctx context.Context, req *pb.AddSessionExerciseRequest) (*pb.SessionExercise, error) {
-	if req.SessionId <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid session ID")
-	}
-
-	if req.ExerciseId <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid exercise ID")
-	}
-
-	if req.StartTime == nil || req.EndTime == nil {
-		return nil, status.Error(codes.InvalidArgument, "start time and end time are required")
-	}
-
-	startTime := req.StartTime.AsTime()
-	endTime := req.EndTime.AsTime()
-
-	if startTime.After(endTime) {
-		return nil, status.Error(codes.InvalidArgument, "start time cannot be after end time")
-	}
-
-	// Start a transaction
-	tx, err := h.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to start transaction: %v", err)
-	}
-	defer tx.Rollback() // Rollback if not committed
-
-	// Check if session exists
-	var sessionExists bool
-	err = tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM practice_sessions WHERE id = ?)", req.SessionId).Scan(&sessionExists)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to check session existence: %v", err)
-	}
-	if !sessionExists {
-		return nil, status.Errorf(codes.NotFound, "session with ID %d not found", req.SessionId)
-	}
-
-	// Check if exercise exists
-	var exerciseExists bool
-	err = tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM exercises WHERE id = ?)", req.ExerciseId).Scan(&exerciseExists)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to check exercise existence: %v", err)
-	}
-	if !exerciseExists {
-		return nil, status.Errorf(codes.NotFound, "exercise with ID %d not found", req.ExerciseId)
-	}
-
-	// Insert the session exercise
-	result, err := tx.ExecContext(
-		ctx,
-		`INSERT INTO session_exercises (session_id, exercise_id, start_time, end_time, bpm, time_signature, notes) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		req.SessionId, req.ExerciseId, startTime, endTime, req.Bpm, req.TimeSignature, req.Notes,
-	)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to add exercise to session: %v", err)
-	}
-
-	// Get the session exercise ID
-	sessionExerciseId, err := result.LastInsertId()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get session exercise ID: %v", err)
-	}
-
-	// Fetch exercise details
-	exercise, err := h.getExerciseDetails(ctx, tx, req.ExerciseId)
-	if err != nil {
-		return nil, err
-	}
-
-	// Commit the transaction
-	if err := tx.Commit(); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
-	}
-
-	// Return the created session exercise
-	return &pb.SessionExercise{
-		Id:            int32(sessionExerciseId),
-		SessionId:     req.SessionId,
-		ExerciseId:    req.ExerciseId,
-		StartTime:     req.StartTime,
-		EndTime:       req.EndTime,
-		Bpm:           req.Bpm,
-		TimeSignature: req.TimeSignature,
-		Notes:         req.Notes,
-		Exercise:      exercise,
-	}, nil
-}
-
-// UpdateSessionExercise updates a session exercise
-func (h *PracticeSessionHandler) UpdateSessionExercise(ctx context.Context, req *pb.UpdateSessionExerciseRequest) (*pb.SessionExercise, error) {
-	if req.Id <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid session exercise ID")
-	}
-
-	if req.SessionId <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid session ID")
-	}
-
-	if req.Exercise == nil {
-		return nil, status.Error(codes.InvalidArgument, "session exercise data is required")
-	}
-
-	// Start a transaction
-	tx, err := h.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to start transaction: %v", err)
-	}
-	defer tx.Rollback() // Rollback if not committed
-
-	// Check if the session exercise exists and belongs to the specified session
-	var exists bool
-	err = tx.QueryRowContext(
-		ctx,
-		"SELECT EXISTS(SELECT 1 FROM session_exercises WHERE id = ? AND session_id = ?)",
-		req.Id, req.SessionId,
-	).Scan(&exists)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to check session exercise existence: %v", err)
-	}
-	if !exists {
-		return nil, status.Errorf(codes.NotFound, "session exercise with ID %d not found in session %d", req.Id, req.SessionId)
-	}
-
-	// Parse update mask
-	updateStartTime := false
-	updateEndTime := false
-	updateBpm := false
-	updateTimeSignature := false
-	updateNotes := false
-
-	if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
-		// If no update mask is provided, update all fields
-		updateStartTime = true
-		updateEndTime = true
-		updateBpm = true
-		updateTimeSignature = true
-		updateNotes = true
-	} else {
-		for _, path := range req.UpdateMask.Paths {
-			switch path {
-			case "start_time":
-				updateStartTime = true
-			case "end_time":
-				updateEndTime = true
-			case "bpm":
-				updateBpm = true
-			case "time_signature":
-				updateTimeSignature = true
-			case "notes":
-				updateNotes = true
-			}
-		}
-	}
-
-	// Validate times if updating
-	if updateStartTime && updateEndTime {
-		startTime := req.Exercise.StartTime.AsTime()
-		endTime := req.Exercise.EndTime.AsTime()
-		if startTime.After(endTime) {
-			return nil, status.Error(codes.InvalidArgument, "start time cannot be after end time")
-		}
-	} else if updateStartTime {
-		// If only updating start time, check against existing end time
-		var endTime time.Time
-		err := tx.QueryRowContext(
-			ctx,
-			"SELECT end_time FROM session_exercises WHERE id = ?",
-			req.Id,
-		).Scan(&endTime)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to get existing end time: %v", err)
-		}
-
-		startTime := req.Exercise.StartTime.AsTime()
-		if startTime.After(endTime) {
-			return nil, status.Error(codes.InvalidArgument, "start time cannot be after end time")
-		}
-	} else if updateEndTime {
-		// If only updating end time, check against existing start time
-		var startTime time.Time
-		err := tx.QueryRowContext(
-			ctx,
-			"SELECT start_time FROM session_exercises WHERE id = ?",
-			req.Id,
-		).Scan(&startTime)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to get existing start time: %v", err)
-		}
-
-		endTime := req.Exercise.EndTime.AsTime()
-		if startTime.After(endTime) {
-			return nil, status.Error(codes.InvalidArgument, "start time cannot be after end time")
-		}
-	}
-
-	// Build update SQL
-	sql := "UPDATE session_exercises SET"
-	params := []interface{}{}
-	first := true
-
-	if updateStartTime {
-		if req.Exercise.StartTime == nil {
-			return nil, status.Error(codes.InvalidArgument, "start time cannot be empty")
-		}
-		sql += " start_time = ?"
-		params = append(params, req.Exercise.StartTime.AsTime())
-		first = false
-	}
-
-	if updateEndTime {
-		if req.Exercise.EndTime == nil {
-			return nil, status.Error(codes.InvalidArgument, "end time cannot be empty")
-		}
-		if !first {
-			sql += ","
-		}
-		sql += " end_time = ?"
-		params = append(params, req.Exercise.EndTime.AsTime())
-		first = false
-	}
-
-	if updateBpm {
-		if !first {
-			sql += ","
-		}
-		sql += " bpm = ?"
-		params = append(params, req.Exercise.Bpm)
-		first = false
-	}
-
-	if updateTimeSignature {
-		if !first {
-			sql += ","
-		}
-		sql += " time_signature = ?"
-		params = append(params, req.Exercise.TimeSignature)
-		first = false
-	}
-
-	if updateNotes {
-		if !first {
-			sql += ","
-		}
-		sql += " notes = ?"
-		params = append(params, req.Exercise.Notes)
-	}
-
-	if len(params) == 0 {
-		return nil, status.Error(codes.InvalidArgument, "no fields to update")
-	}
-
-	sql += " WHERE id = ? AND session_id = ?"
-	params = append(params, req.Id, req.SessionId)
-
-	// Execute the update
-	_, err = tx.ExecContext(ctx, sql, params...)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to update session exercise: %v", err)
-	}
-
-	// Get the updated session exercise
-	var sessionExercise pb.SessionExercise
-	var exerciseId int32
-	var startTime, endTime time.Time
-
-	err = tx.QueryRowContext(
-		ctx,
-		`SELECT id, session_id, exercise_id, start_time, end_time, bpm, time_signature, notes
-         FROM session_exercises
-         WHERE id = ? AND session_id = ?`,
-		req.Id, req.SessionId,
-	).Scan(
-		&sessionExercise.Id,
-		&sessionExercise.SessionId,
-		&exerciseId,
-		&startTime,
-		&endTime,
-		&sessionExercise.Bpm,
-		&sessionExercise.TimeSignature,
-		&sessionExercise.Notes,
-	)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to retrieve updated session exercise: %v", err)
-	}
-
-	sessionExercise.ExerciseId = exerciseId
-	sessionExercise.StartTime = timestamppb.New(startTime)
-	sessionExercise.EndTime = timestamppb.New(endTime)
-
-	// Fetch exercise details
-	exercise, err := h.getExerciseDetails(ctx, tx, exerciseId)
-	if err != nil {
-		return nil, err
-	}
-	sessionExercise.Exercise = exercise
-
-	// Commit the transaction
-	if err := tx.Commit(); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
-	}
-
-	return &sessionExercise, nil
-}
-
-// DeleteSessionExercise deletes a session exercise
-func (h *PracticeSessionHandler) DeleteSessionExercise(ctx context.Context, req *pb.DeleteSessionExerciseRequest) (*emptypb.Empty, error) {
-	if req.Id <= 0 {
-		return nil, status.Error(codes.InvalidArgument, "invalid session exercise ID")
-	}
-
-	// Check if the session exercise exists
-	var exists bool
-	err := h.db.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM session_exercises WHERE id = ?)", req.Id).Scan(&exists)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to check session exercise existence: %v", err)
-	}
-	if !exists {
-		return nil, status.Errorf(codes.NotFound, "session exercise with ID %d not found", req.Id)
-	}
-
-	// Delete the session exercise
-	_, err = h.db.ExecContext(ctx, "DELETE FROM session_exercises WHERE id = ?", req.Id)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to delete session exercise: %v", err)
 	}
 
 	return &emptypb.Empty{}, nil

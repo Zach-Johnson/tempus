@@ -17,6 +17,17 @@ curl -X POST \
     "description": "Independence exercises"
   }' | jq
 
+curl -X PATCH \
+  http://localhost:8080/v1/categories/1 \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "category": {
+    "name": "Rudiments",
+    "description": "Standard drum rudiments and technique"
+  },
+  "update_mask": "name,description"
+  }'| jq
+
 curl -X POST \
   http://localhost:8080/v1/tags \
   -H 'Content-Type: application/json' \
@@ -170,20 +181,6 @@ curl -X PATCH \
 # Delete session with ID 1
 # curl -X DELETE http://localhost:8080/v1/sessions/1 | jq
 
-# Create a history entry without linking to a session
-curl -X POST \
-  http://localhost:8080/v1/history \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "exercise_id": 1,
-    "start_time": "2025-04-10T10:00:00Z",
-    "end_time": "2025-04-10T10:15:00Z",
-    "bpm": 90,
-    "time_signature": "4/4",
-    "notes": "Feeling more confident with this pattern",
-    "rating": 4
-  }' | jq
-
 # Create a history entry linked to a practice session (assuming session ID 1 exists)
 curl -X POST \
   http://localhost:8080/v1/history \
@@ -193,7 +190,7 @@ curl -X POST \
     "session_id": 1,
     "start_time": "2025-04-10T10:00:00Z",
     "end_time": "2025-04-10T10:15:00Z",
-    "bpm": 90,
+    "bpms": [85,90],
     "time_signature": "4/4",
     "notes": "Practiced during my morning session",
     "rating": 4
@@ -214,28 +211,16 @@ curl -X GET "http://localhost:8080/v1/history?start_date=2025-04-01T00:00:00Z&en
 # Combined filters with pagination
 curl -X GET "http://localhost:8080/v1/history?exercise_id=1&session_id=1&page_size=10" | jq
 
-# Update BPM, rating, and associate with a session
+# Update BPM, rating
 curl -X PATCH \
   http://localhost:8080/v1/history/1 \
   -H 'Content-Type: application/json' \
   -d '{
     "history": {
-      "bpm": 95,
-      "rating": 5,
-      "session_id": 2
+      "bpms": [95],
+      "rating": 5
     },
-    "update_mask": "bpm,rating,sessionId"
-  }' | jq
-
-# Remove session association (set to 0 or null)
-curl -X PATCH \
-  http://localhost:8080/v1/history/1 \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "history": {
-      "session_id": 0
-    },
-    "update_mask": "sessionId"
+    "update_mask": "bpms,rating"
   }' | jq
 
 # curl -X DELETE http://localhost:8080/v1/history/1 | jq

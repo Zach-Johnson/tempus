@@ -82,20 +82,6 @@ CREATE TABLE practice_sessions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Session Exercises Junction Table
-CREATE TABLE session_exercises (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id INTEGER NOT NULL,
-    exercise_id INTEGER NOT NULL,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
-    bpm INTEGER,  -- Speed at which exercise was practiced
-    time_signature TEXT, -- Stored as string like "4/4", "7/8", etc.
-    notes TEXT,
-    FOREIGN KEY (session_id) REFERENCES practice_sessions(id) ON DELETE CASCADE,
-    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
-);
-
 -- Exercise History Table (for tracking progress over time)
 CREATE TABLE exercise_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,10 +89,11 @@ CREATE TABLE exercise_history (
     session_id INTEGER, -- nullable since some history entries might not be linked to sessions
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
-    bpm INTEGER,
+    bpms TEXT, -- JSON array of bpm values
     time_signature TEXT,
     notes TEXT,
     rating INTEGER, -- Optional: User rating of their performance (1-5)
+    FOREIGN KEY (session_id) REFERENCES practice_sessions(id) ON DELETE CASCADE,
     FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE
 );
 

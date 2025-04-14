@@ -780,39 +780,6 @@
         ]
       }
     },
-    "/v1/session-exercises/{id}": {
-      "delete": {
-        "summary": "Delete a session exercise",
-        "operationId": "PracticeSessionService_DeleteSessionExercise",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "PracticeSessionService"
-        ]
-      }
-    },
     "/v1/sessions": {
       "get": {
         "summary": "List practice sessions with optional pagination and filtering",
@@ -1048,93 +1015,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/PracticeSessionServiceUpdatePracticeSessionBody"
-            }
-          }
-        ],
-        "tags": [
-          "PracticeSessionService"
-        ]
-      }
-    },
-    "/v1/sessions/{sessionId}/exercises": {
-      "post": {
-        "summary": "Add an exercise to a session",
-        "operationId": "PracticeSessionService_AddSessionExercise",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1SessionExercise"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/PracticeSessionServiceAddSessionExerciseBody"
-            }
-          }
-        ],
-        "tags": [
-          "PracticeSessionService"
-        ]
-      }
-    },
-    "/v1/sessions/{sessionId}/exercises/{id}": {
-      "patch": {
-        "summary": "Update a session exercise",
-        "operationId": "PracticeSessionService_UpdateSessionExercise",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1SessionExercise"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/PracticeSessionServiceUpdateSessionExerciseBody"
             }
           }
         ],
@@ -1390,34 +1270,6 @@
       },
       "title": "UpdateExerciseRequest is used to update an exercise"
     },
-    "PracticeSessionServiceAddSessionExerciseBody": {
-      "type": "object",
-      "properties": {
-        "exerciseId": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "bpm": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "timeSignature": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        }
-      },
-      "title": "AddSessionExerciseRequest is used to add an exercise to a session"
-    },
     "PracticeSessionServiceUpdatePracticeSessionBody": {
       "type": "object",
       "properties": {
@@ -1429,18 +1281,6 @@
         }
       },
       "title": "UpdatePracticeSessionRequest is used to update a practice session"
-    },
-    "PracticeSessionServiceUpdateSessionExerciseBody": {
-      "type": "object",
-      "properties": {
-        "exercise": {
-          "$ref": "#/definitions/v1SessionExercise"
-        },
-        "updateMask": {
-          "type": "string"
-        }
-      },
-      "title": "UpdateSessionExerciseRequest is used to update a session exercise"
     },
     "TagServiceUpdateTagBody": {
       "type": "object",
@@ -1568,9 +1408,12 @@
           "type": "string",
           "format": "date-time"
         },
-        "bpm": {
-          "type": "integer",
-          "format": "int32"
+        "bpms": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         },
         "timeSignature": {
           "type": "string"
@@ -1642,13 +1485,6 @@
         },
         "notes": {
           "type": "string"
-        },
-        "exercises": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1SessionExerciseInput"
-          }
         }
       },
       "title": "CreatePracticeSessionRequest is used to create a new practice session"
@@ -1743,9 +1579,12 @@
           "type": "string",
           "format": "date-time"
         },
-        "bpm": {
-          "type": "integer",
-          "format": "int32"
+        "bpms": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         },
         "timeSignature": {
           "type": "string"
@@ -2019,7 +1858,7 @@
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/v1SessionExercise"
+            "$ref": "#/definitions/v1ExerciseHistory"
           }
         }
       },
@@ -2077,74 +1916,6 @@
         }
       },
       "title": "PracticeTimePoint represents a point in the practice frequency chart"
-    },
-    "v1SessionExercise": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "sessionId": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "exerciseId": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "bpm": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "timeSignature": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        },
-        "exercise": {
-          "$ref": "#/definitions/v1Exercise",
-          "title": "Full exercise details"
-        }
-      },
-      "title": "SessionExercise represents an exercise performed during a practice session"
-    },
-    "v1SessionExerciseInput": {
-      "type": "object",
-      "properties": {
-        "exerciseId": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "startTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "endTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "bpm": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "timeSignature": {
-          "type": "string"
-        },
-        "notes": {
-          "type": "string"
-        }
-      },
-      "title": "SessionExerciseInput is used for creating session exercises"
     },
     "v1Tag": {
       "type": "object",

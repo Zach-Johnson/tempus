@@ -110,16 +110,20 @@
                   <v-expansion-panel-text>
                     <v-row>
                       <v-col cols="12" md="6">
-                        <v-text-field
-                          v-model="exercise.bpm"
-                          label="BPM"
-                          type="number"
-                          min="1"
-                          variant="outlined"
-                          hide-details
-                          class="mb-4"
-                          :disabled="!sessionStarted"
-                        ></v-text-field>
+                        <v-combobox
+                        v-model="exercise.bpms"
+                        label="BPMs"
+                        multiple
+                        chips
+                        hide-selected
+                        clearable
+                        variant="outlined"
+                        hide-details
+                        class="mb-4"
+                        :disabled="!sessionStarted"
+                        placeholder="Enter BPM values (e.g. 100, 120)"
+                        @change="exercise.bpms = exercise.bpms.filter(v => !isNaN(v) && v > 0)"
+                        />
                       </v-col>
                       <v-col cols="12" md="6">
                         <v-select
@@ -165,7 +169,7 @@
     </v-card>
 
     <!-- Exercise search and selection -->
-    <v-card v-if="!sessionStarted" class="mb-4">
+    <v-card class="mb-4">
       <v-card-title>
         <div class="text-h6">Choose Exercises</div>
       </v-card-title>
@@ -350,6 +354,7 @@ import { useExercisesStore } from '@/stores/exercises.js'
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
 import { useSessionsStore } from '@/stores/sessions.js'
+import { useHistoryStore } from '@/stores/history.js'
 import { useAppStore } from '@/stores/app.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
 import TagChip from '@/components/tags/TagChip.vue'
@@ -361,6 +366,7 @@ const exercisesStore = useExercisesStore()
 const categoriesStore = useCategoriesStore()
 const tagsStore = useTagsStore()
 const sessionsStore = useSessionsStore()
+const historyStore = useHistoryStore()
 const appStore = useAppStore()
 
 // Data for session
@@ -505,7 +511,7 @@ function addExerciseToSession(exercise) {
   sessionExercises.value.push({
     ...exercise,
     addedAt: new Date(),
-    bpm: '', // Empty initially so user can set it
+    bpms: [], // Empty initially so user can set it
     timeSignature: '4/4', // Default time signature
     notes: '', // Empty initially for user input
     startTime: new Date(),
@@ -601,13 +607,13 @@ async function saveSession() {
         exercise_id: exercise.id,
         start_time: exercise.startTime.toISOString(),
         end_time: endTime.toISOString(),
-        bpm: exercise.bpm ? parseInt(exercise.bpm) : null,
+        bpms: exercise.bpms ? exercise.bpms : [],
         time_signature: exercise.timeSignature || '4/4',
         notes: exercise.notes || ''
       }
       
       // console.log(`Adding exercise ${exercise.id} to session ${sessionId}`, exerciseData)
-      await sessionsStore.addSessionExercise(sessionId, exerciseData)
+      await historyStore.createHistoryEntry(exerciseData)
     }
     
     appStore.showSuccessMessage('Practice session saved successfully!')

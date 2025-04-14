@@ -18,24 +18,27 @@ api.interceptors.request.use(
 );
 
 // Response interceptor for error handling
-api.interceptors.response.use((response) => {
-    return response;
-}, (error) => {
-    // Handle common errors
-    const { response } = error;
-    if (response) {
-        // Log the error details
-        console.error("API Error:", response.status, response.data);
-    } else if (error.request) {
-        // The request was made but no response was received
-        console.error("Network Error:", error.request);
-    } else {
-        // Something happened in setting up the request
-        console.error("Request Error:", error.message);
-    }
+api.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        // Handle common errors
+        const { response } = error;
+        if (response) {
+            // Log the error details
+            console.error("API Error:", response.status, response.data);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error("Network Error:", error.request);
+        } else {
+            // Something happened in setting up the request
+            console.error("Request Error:", error.message);
+        }
 
-    return Promise.reject(error);
-});
+        return Promise.reject(error);
+    },
+);
 
 // Categories API
 const categoriesAPI = {
@@ -103,17 +106,6 @@ const sessionsAPI = {
             update_mask: updateMask,
         }),
     delete: (id) => api.delete(`/sessions/${id}`),
-    addExercise: (sessionId, data) =>
-        api.post(`/sessions/${sessionId}/exercises`, data),
-    updateExercise: (sessionId, exerciseId, data, updateMask) =>
-        api.patch(
-            `/sessions/${sessionId}/exercises/${exerciseId}`,
-            {
-                exercise: data,
-                update_mask: updateMask,
-            },
-        ),
-    deleteExercise: (id) => api.delete(`/session-exercises/${id}`),
     getStats: (params = {}) => api.get("/sessions/stats", { params }),
 };
 
