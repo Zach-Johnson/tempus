@@ -26,12 +26,9 @@
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
               <template v-for="categoryId in item.categoryIds || []" :key="categoryId">
-                <category-chip
-                  v-if="getCategoryById(categoryId)"
-                  :category="getCategoryById(categoryId)"
-                  size="x-small"
-                  class="mr-1"
-                ></category-chip>
+                <span v-if="getCategoryById(categoryId)" class="text-caption">
+                  {{ getCategoryById(categoryId).name }}
+                </span>
               </template>
             </v-chip-group>
           </template>
@@ -39,12 +36,9 @@
           <template v-slot:item.tags="{ item }">
             <v-chip-group>
               <template v-for="tagId in item.tagIds || []" :key="tagId">
-                <tag-chip
-                  v-if="getTagById(tagId)"
-                  :tag="getTagById(tagId)"
-                  size="x-small"
-                  class="mr-1"
-                ></tag-chip>
+                <span v-if="getTagById(tagId)" class="text-caption">
+                  {{ getTagById(tagId).name }}
+                </span>
               </template>
             </v-chip-group>
           </template>
@@ -55,10 +49,11 @@
               variant="text"
               size="small"
               color="primary"
-              :to="{ name: 'exercise-detail', params: { id: item.id }}"
+              :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: item.id }}"
               class="mr-1"
+              @click="allowSelect ? selectExercise(item) : undefined"
             >
-              <v-icon>mdi-eye</v-icon>
+              <v-icon>{{ allowSelect ? 'mdi-plus' : 'mdi-eye' }}</v-icon>
             </v-btn>
             
             <v-btn
@@ -80,8 +75,8 @@
           <v-list-item
             v-for="exercise in exercises"
             :key="exercise.id"
-            :to="selectable ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
-            @click="selectable ? selectExercise(exercise) : undefined"
+            :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
+            @click="allowSelect ? selectExercise(exercise) : undefined"
           >
             <template v-slot:prepend>
               <v-avatar size="32" color="primary" class="text-white">
@@ -109,9 +104,11 @@
           >
             <exercise-card
               :exercise="exercise"
-              :to="selectable ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
+              :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
               variant="outlined"
-              @click="selectable ? selectExercise(exercise) : undefined"
+              @click="handleCardClick(exercise)"
+              :selected="isExerciseSelected(exercise)"
+              :selectable="allowSelect"
             ></exercise-card>
           </v-col>
         </v-row>
@@ -133,8 +130,6 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useExercisesStore } from '@/stores/exercises.js'
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
-import CategoryChip from '@/components/categories/CategoryChip.vue'
-import TagChip from '@/components/tags/TagChip.vue'
 import ExerciseCard from '@/components/exercises/ExerciseCard.vue'
 
 const props = defineProps({
@@ -240,6 +235,18 @@ function getTagById(tagId) {
 
 function selectExercise(exercise) {
   emit('select-exercise', exercise)
+}
+
+function isExerciseSelected(exercise) {
+  return props.selectedExerciseIds.includes(exercise.id)
+}
+
+function handleCardClick(exercise) {
+  if (props.allowSelect) {
+    // If in select mode, just emit the selection event
+    selectExercise(exercise)
+  }
+  // If not in select mode, the to property will handle navigation
 }
 
 // Ensure categories and tags are loaded

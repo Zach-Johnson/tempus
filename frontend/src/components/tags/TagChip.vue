@@ -1,5 +1,6 @@
 <template>
   <v-chip
+    v-if="tag"
     :color="color"
     :variant="variant"
     :size="size"
@@ -22,7 +23,8 @@ import { useRouter } from 'vue-router'
 const props = defineProps({
   tag: {
     type: Object,
-    required: true
+    required: true,
+    // No default since it's required, but we'll check its existence in template
   },
   color: {
     type: String,
@@ -68,6 +70,8 @@ const isClickable = computed(() => {
 
 // Methods
 function handleClick() {
+  if (!props.tag) return
+  
   emit('click', props.tag)
   
   // Navigate to tag's exercises view unless disabled
@@ -80,6 +84,8 @@ function handleClick() {
 }
 
 function handleClose(event) {
+  if (!props.tag) return
+  
   // Prevent click event from propagating
   event.stopPropagation()
   emit('close', props.tag)

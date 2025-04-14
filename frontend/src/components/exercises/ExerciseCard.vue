@@ -1,10 +1,11 @@
 <template>
   <v-card
     class="exercise-card"
-    :to="computedTo"
+    :to="selectable ? undefined : computedTo"
     :flat="flat"
     :variant="variant"
-    @click="$emit('click', exercise)"
+    @click="handleClick"
+    :class="{ 'selected-exercise': selected }"
   >
     <v-card-title class="text-subtitle-1">
       {{ exercise.name }}
@@ -16,62 +17,37 @@
       </p>
       
       <div v-if="showCategories && exercise.categoryIds && exercise.categoryIds.length > 0" class="mb-2">
-        <v-chip-group>
-          <category-chip
-            v-for="categoryId in exercise.categoryIds.slice(0, 3)"
-            :key="categoryId"
-            :category="getCategoryById(categoryId)"
-            size="x-small"
-          ></category-chip>
-          <v-chip
-            v-if="exercise.categoryIds.length > 3"
-            size="x-small"
-            color="secondary"
-            variant="outlined"
-          >
-            +{{ exercise.categoryIds.length - 3 }}
-          </v-chip>
-        </v-chip-group>
+        <span class="text-caption text-grey">
+          {{ exercise.categoryIds.length }} {{ exercise.categoryIds.length === 1 ? 'category' : 'categories' }}
+        </span>
       </div>
       
       <div v-if="showTags && exercise.tagIds && exercise.tagIds.length > 0">
-        <v-chip-group>
-          <tag-chip
-            v-for="tagId in exercise.tagIds.slice(0, 3)"
-            :key="tagId"
-            :tag="getTagById(tagId)"
-            size="x-small"
-          ></tag-chip>
-          <v-chip
-            v-if="exercise.tagIds.length > 3"
-            size="x-small"
-            color="primary"
-            variant="outlined"
-          >
-            +{{ exercise.tagIds.length - 3 }}
-          </v-chip>
-        </v-chip-group>
+        <span class="text-caption text-grey">
+          {{ exercise.tagIds.length }} {{ exercise.tagIds.length === 1 ? 'tag' : 'tags' }}
+        </span>
       </div>
     </v-card-text>
     
-    <slot name="actions"></slot>
+    <slot name="actions">
+      <v-card-actions v-if="selectable">
+        <v-spacer></v-spacer>
+        <v-btn 
+          variant="text"
+          :color="selected ? 'error' : 'primary'"
+          size="small"
+        >
+          {{ selected ? 'Remove' : 'Add' }}
+        </v-btn>
+      </v-card-actions>
+    </slot>
   </v-card>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-
-// Computed props
-const computedTo = computed(() => {
-  if (props.to) return props.to
-  return props.exercise && props.exercise.id 
-    ? { name: 'exercise-detail', params: { id: props.exercise.id } }
-    : null
-})
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
-import CategoryChip from '@/components/categories/CategoryChip.vue'
-import TagChip from '@/components/tags/TagChip.vue'
 
 const props = defineProps({
   exercise: {
@@ -97,10 +73,26 @@ const props = defineProps({
   showTags: {
     type: Boolean,
     default: true
+  },
+  selected: {
+    type: Boolean,
+    default: false
+  },
+  selectable: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['click'])
+const emit = defineEmits(['click'])
+
+// Computed props
+const computedTo = computed(() => {
+  if (props.to) return props.to
+  return props.exercise && props.exercise.id 
+    ? { name: 'exercise-detail', params: { id: props.exercise.id } }
+    : null
+})
 
 // Stores
 const categoriesStore = useCategoriesStore()
@@ -114,6 +106,11 @@ function truncateText(text, maxLength) {
     : text
 }
 
+function handleClick() {
+  emit('click', props.exercise)
+}
+
+// These functions are no longer used in the simplified template
 function getCategoryById(categoryId) {
   return categoriesStore.categoryById(categoryId)
 }
@@ -127,9 +124,15 @@ function getTagById(tagId) {
 .exercise-card {
   height: 100%;
   transition: transform 0.2s;
+  cursor: pointer;
 }
 
 .exercise-card:hover {
   transform: translateY(-2px);
+}
+
+.selected-exercise {
+  border: 2px solid rgb(var(--v-theme-primary)) !important;
+  background-color: rgba(var(--v-theme-primary), 0.05);
 }
 </style>

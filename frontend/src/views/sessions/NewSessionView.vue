@@ -87,42 +87,77 @@
               </v-btn>
             </div>
 
-            <v-list v-else density="compact">
-              <v-list-item
-                v-for="exercise in sessionExercises"
-                :key="exercise.id"
-                :title="exercise.name"
-                :subtitle="`Added at ${formatTime(exercise.addedAt)}`"
-              >
-                <template v-slot:prepend>
-                  <v-avatar size="36" color="primary" class="text-white">
-                    {{ exercise.name.charAt(0).toUpperCase() }}
-                  </v-avatar>
-                </template>
+            <div v-else>
+              <v-expansion-panels variant="accordion">
+                <v-expansion-panel
+                  v-for="(exercise, index) in sessionExercises"
+                  :key="exercise.id"
+                >
+                  <v-expansion-panel-title>
+                    {{ exercise.name }}
+                    <template v-slot:actions>
+                      <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        color="error"
+                        @click.stop="removeExercise(exercise)"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                  </v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <v-row>
+                      <v-col cols="12" md="6">
+                        <v-text-field
+                          v-model="exercise.bpm"
+                          label="BPM"
+                          type="number"
+                          min="1"
+                          variant="outlined"
+                          hide-details
+                          class="mb-4"
+                          :disabled="!sessionStarted"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" md="6">
+                        <v-select
+                          v-model="exercise.timeSignature"
+                          :items="timeSignatureOptions"
+                          label="Time Signature"
+                          variant="outlined"
+                          hide-details
+                          class="mb-4"
+                          :disabled="!sessionStarted"
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-textarea
+                          v-model="exercise.notes"
+                          label="Notes for this exercise"
+                          variant="outlined"
+                          rows="2"
+                          placeholder="Add specific notes about this exercise (optional)"
+                          hide-details
+                          :disabled="!sessionStarted"
+                        ></v-textarea>
+                      </v-col>
+                    </v-row>
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
 
-                <template v-slot:append>
-                  <v-btn
-                    icon
-                    variant="text"
-                    size="small"
-                    color="error"
-                    @click="removeExercise(exercise)"
-                  >
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                </template>
-              </v-list-item>
-            </v-list>
-
-            <div class="d-flex justify-end mt-2" v-if="sessionExercises.length > 0">
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-plus"
-                variant="text"
-                @click="openAddExerciseDialog"
-              >
-                Add More
-              </v-btn>
+              <div class="d-flex justify-end mt-2">
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-plus"
+                  variant="text"
+                  @click="openAddExerciseDialog"
+                >
+                  Add More
+                </v-btn>
+              </div>
             </div>
           </v-col>
         </v-row>
@@ -130,53 +165,59 @@
     </v-card>
 
     <!-- Exercise search and selection -->
-    <v-card v-if="exercisesStore.exercises.length > 0 && !sessionStarted">
+    <v-card v-if="!sessionStarted" class="mb-4">
       <v-card-title>
         <div class="text-h6">Choose Exercises</div>
-        <v-text-field
-          v-model="exerciseSearch"
-          append-inner-icon="mdi-magnify"
-          label="Search exercises"
-          single-line
-          hide-details
-          variant="underlined"
-          class="mx-4"
-        ></v-text-field>
       </v-card-title>
 
       <v-card-text>
+        <!-- Filters -->
         <v-row>
-          <v-col cols="12" sm="6" md="4" lg="3" v-for="exercise in filteredExercises" :key="exercise.id">
-            <v-card 
-              variant="outlined" 
-              @click="addExerciseToSession(exercise)"
-              class="exercise-card"
-              :class="{ 'selected-exercise': isExerciseInSession(exercise) }"
-            >
-              <v-card-title>{{ exercise.name }}</v-card-title>
-              <v-card-text>
-                <p class="text-body-2 text-truncate">{{ exercise.description || 'No description' }}</p>
-                
-                <div v-if="exercise.categoryIds && exercise.categoryIds.length > 0" class="mt-2">
-                  <span v-if="exercise.categoryIds.length > 0" class="text-caption text-grey">
-                    {{ exercise.categoryIds.length }} {{ exercise.categoryIds.length === 1 ? 'category' : 'categories' }}
-                  </span>
-                </div>
-              </v-card-text>
-              
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  variant="text"
-                  :color="isExerciseInSession(exercise) ? 'error' : 'primary'"
-                  size="small"
-                >
-                  {{ isExerciseInSession(exercise) ? 'Remove' : 'Add' }}
-                </v-btn>
-              </v-card-actions>
-            </v-card>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="exerciseSearch"
+              label="Search exercises"
+              variant="outlined"
+              density="compact"
+              prepend-inner-icon="mdi-magnify"
+              hide-details
+              clearable
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="categoryFilter"
+              :items="categoriesForSelect"
+              label="Filter by category"
+              variant="outlined"
+              density="compact"
+              hide-details
+              clearable
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="4">
+            <v-select
+              v-model="tagFilter"
+              :items="tagsForSelect"
+              label="Filter by tag"
+              variant="outlined"
+              density="compact"
+              hide-details
+              clearable
+            ></v-select>
           </v-col>
         </v-row>
+
+        <!-- Exercise List -->
+        <exercise-list
+          :exercises="filteredExercises"
+          :loading="exercisesStore.loading"
+          display-type="grid"
+          :allow-select="true"
+          @select-exercise="toggleExerciseInSession"
+          :selected-exercise-ids="sessionExerciseIds"
+          class="mt-4"
+        />
       </v-card-text>
     </v-card>
 
@@ -185,38 +226,52 @@
       <v-card>
         <v-card-title>Add Exercises to Session</v-card-title>
         <v-card-text>
-          <v-text-field
-            v-model="dialogExerciseSearch"
-            label="Search exercises"
-            variant="outlined"
-            prepend-inner-icon="mdi-magnify"
-            clearable
-            class="mb-4"
-          ></v-text-field>
-
           <v-row>
-            <v-col cols="12" sm="6" md="4" v-for="exercise in dialogFilteredExercises" :key="exercise.id">
-              <v-card
+            <v-col cols="12" sm="4">
+              <v-text-field
+                v-model="dialogExerciseSearch"
+                label="Search exercises"
                 variant="outlined"
-                :class="{ 'selected-exercise': isExerciseInSession(exercise) }"
-              >
-                <v-card-title>{{ exercise.name }}</v-card-title>
-                <v-card-text>
-                  <p class="text-body-2 text-truncate">{{ exercise.description || 'No description' }}</p>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    variant="text"
-                    :color="isExerciseInSession(exercise) ? 'error' : 'primary'"
-                    @click="toggleExerciseInSession(exercise)"
-                  >
-                    {{ isExerciseInSession(exercise) ? 'Remove' : 'Add' }}
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
+                density="compact"
+                prepend-inner-icon="mdi-magnify"
+                hide-details
+                clearable
+                class="mb-4"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-select
+                v-model="dialogCategoryFilter"
+                :items="categoriesForSelect"
+                label="Filter by category"
+                variant="outlined"
+                density="compact"
+                hide-details
+                clearable
+              ></v-select>
+            </v-col>
+            <v-col cols="12" sm="4">
+              <v-select
+                v-model="dialogTagFilter"
+                :items="tagsForSelect"
+                label="Filter by tag"
+                variant="outlined"
+                density="compact"
+                hide-details
+                clearable
+              ></v-select>
             </v-col>
           </v-row>
+
+          <exercise-list
+            :exercises="dialogFilteredExercises"
+            :loading="exercisesStore.loading"
+            display-type="grid"
+            :allow-select="true"
+            @select-exercise="toggleExerciseInSession"
+            :selected-exercise-ids="sessionExerciseIds"
+            class="mt-4"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -249,7 +304,7 @@
     </v-dialog>
 
     <!-- Finish Session Form Dialog -->
-    <v-dialog v-model="finishSessionDialog" max-width="800" persistent>
+    <v-dialog v-model="finishSessionDialog" max-width="600" persistent>
       <v-card>
         <v-card-title class="text-h5">Complete Practice Session</v-card-title>
         <v-card-text>
@@ -258,57 +313,15 @@
               v-model="notes"
               label="Session Notes"
               variant="outlined"
-              rows="3"
-              placeholder="Add notes about this practice session (optional)"
+              rows="4"
+              placeholder="Add any final notes about this practice session (optional)"
               class="mb-4"
             ></v-textarea>
-
-            <div class="text-h6 mb-2">Exercise Details</div>
-            <v-expansion-panels variant="accordion" v-if="sessionExercises.length > 0">
-              <v-expansion-panel
-                v-for="(exercise, index) in sessionExercises"
-                :key="exercise.id"
-              >
-                <v-expansion-panel-title>
-                  {{ exercise.name }}
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <v-row>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="exercise.bpm"
-                        label="BPM"
-                        type="number"
-                        min="1"
-                        variant="outlined"
-                        hide-details
-                        class="mb-4"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-select
-                        v-model="exercise.timeSignature"
-                        :items="timeSignatureOptions"
-                        label="Time Signature"
-                        variant="outlined"
-                        hide-details
-                        class="mb-4"
-                      ></v-select>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-textarea
-                        v-model="exercise.notes"
-                        label="Notes for this exercise"
-                        variant="outlined"
-                        rows="2"
-                        placeholder="Add specific notes about this exercise (optional)"
-                        hide-details
-                      ></v-textarea>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
+            
+            <p class="text-body-2 mt-4">
+              This will complete your practice session with {{ sessionExercises.length }} exercises 
+              and a total duration of {{ sessionDuration }}.
+            </p>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -340,6 +353,7 @@ import { useSessionsStore } from '@/stores/sessions.js'
 import { useAppStore } from '@/stores/app.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
 import TagChip from '@/components/tags/TagChip.vue'
+import ExerciseList from '@/components/exercises/ExerciseList.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -363,7 +377,11 @@ const durationInterval = ref(null)
 // Dialog controls
 const addExerciseDialog = ref(false)
 const dialogExerciseSearch = ref('')
+const dialogCategoryFilter = ref(null)
+const dialogTagFilter = ref(null)
 const exerciseSearch = ref('')
+const categoryFilter = ref(null)
+const tagFilter = ref(null)
 const cancelDialog = ref(false)
 const finishSessionDialog = ref(false)
 const finishForm = ref(null)
@@ -375,28 +393,80 @@ const timeSignatureOptions = [
 ]
 
 // Computed properties
+const sessionExerciseIds = computed(() => {
+  return sessionExercises.value.map(exercise => exercise.id)
+})
+
 const filteredExercises = computed(() => {
-  if (!exerciseSearch.value) {
-    return exercisesStore.exercises
+  let result = exercisesStore.exercises
+  
+  // Search filter
+  if (exerciseSearch.value) {
+    const searchLower = exerciseSearch.value.toLowerCase()
+    result = result.filter(exercise => 
+      exercise.name.toLowerCase().includes(searchLower) || 
+      (exercise.description && exercise.description.toLowerCase().includes(searchLower))
+    )
   }
   
-  const search = exerciseSearch.value.toLowerCase()
-  return exercisesStore.exercises.filter(exercise => 
-    exercise.name.toLowerCase().includes(search) || 
-    (exercise.description && exercise.description.toLowerCase().includes(search))
-  )
+  // Category filter
+  if (categoryFilter.value) {
+    result = result.filter(exercise => 
+      exercise.categoryIds && exercise.categoryIds.includes(parseInt(categoryFilter.value))
+    )
+  }
+  
+  // Tag filter
+  if (tagFilter.value) {
+    result = result.filter(exercise => 
+      exercise.tagIds && exercise.tagIds.includes(parseInt(tagFilter.value))
+    )
+  }
+  
+  return result
 })
 
 const dialogFilteredExercises = computed(() => {
-  if (!dialogExerciseSearch.value) {
-    return exercisesStore.exercises
+  let result = exercisesStore.exercises
+  
+  // Search filter
+  if (dialogExerciseSearch.value) {
+    const search = dialogExerciseSearch.value.toLowerCase()
+    result = result.filter(exercise => 
+      exercise.name.toLowerCase().includes(search) || 
+      (exercise.description && exercise.description.toLowerCase().includes(search))
+    )
   }
   
-  const search = dialogExerciseSearch.value.toLowerCase()
-  return exercisesStore.exercises.filter(exercise => 
-    exercise.name.toLowerCase().includes(search) || 
-    (exercise.description && exercise.description.toLowerCase().includes(search))
-  )
+  // Category filter
+  if (dialogCategoryFilter.value) {
+    result = result.filter(exercise => 
+      exercise.categoryIds && exercise.categoryIds.includes(parseInt(dialogCategoryFilter.value))
+    )
+  }
+  
+  // Tag filter
+  if (dialogTagFilter.value) {
+    result = result.filter(exercise => 
+      exercise.tagIds && exercise.tagIds.includes(parseInt(dialogTagFilter.value))
+    )
+  }
+  
+  return result
+})
+
+const categoriesForSelect = computed(() => {
+  return categoriesStore.categories.map(category => ({
+    title: category.name,
+    value: category.id
+  }))
+})
+
+const tagsForSelect = computed(() => {
+  return tagsStore.tags.map(tag => ({
+    title: tag.name,
+    value: tag.id
+  }))
 })
 
 // Methods
@@ -435,9 +505,9 @@ function addExerciseToSession(exercise) {
   sessionExercises.value.push({
     ...exercise,
     addedAt: new Date(),
-    bpm: '',
-    timeSignature: '4/4',
-    notes: '',
+    bpm: '', // Empty initially so user can set it
+    timeSignature: '4/4', // Default time signature
+    notes: '', // Empty initially for user input
     startTime: new Date(),
     endTime: null
   })
@@ -460,6 +530,8 @@ function removeExercise(exercise) {
 
 function openAddExerciseDialog() {
   dialogExerciseSearch.value = ''
+  dialogCategoryFilter.value = null
+  dialogTagFilter.value = null
   addExerciseDialog.value = true
 }
 
@@ -510,30 +582,40 @@ async function saveSession() {
   try {
     const endTime = new Date()
     
-    // Prepare session data
+    // Step 1: Create the session first
     const sessionData = {
       start_time: startTime.value.toISOString(),
       end_time: endTime.toISOString(),
-      notes: notes.value || '',
-      exercises: sessionExercises.value.map(exercise => ({
+      notes: notes.value || ''
+    }
+    
+    // console.log('Creating session with data:', sessionData)
+    const newSession = await sessionsStore.createSession(sessionData)
+    
+    // Step 2: Add exercises to the session one by one
+    const sessionId = newSession.id
+    
+    for (const exercise of sessionExercises.value) {
+      const exerciseData = {
+        session_id: sessionId,
         exercise_id: exercise.id,
         start_time: exercise.startTime.toISOString(),
         end_time: endTime.toISOString(),
         bpm: exercise.bpm ? parseInt(exercise.bpm) : null,
         time_signature: exercise.timeSignature || '4/4',
         notes: exercise.notes || ''
-      }))
+      }
+      
+      // console.log(`Adding exercise ${exercise.id} to session ${sessionId}`, exerciseData)
+      await sessionsStore.addSessionExercise(sessionId, exerciseData)
     }
-    
-    // Send to server
-    const newSession = await sessionsStore.createSession(sessionData)
     
     appStore.showSuccessMessage('Practice session saved successfully!')
     
     // Navigate to session detail
     router.push({
       name: 'session-detail',
-      params: { id: newSession.id }
+      params: { id: sessionId }
     })
   } catch (error) {
     console.error('Failed to save session:', error)
