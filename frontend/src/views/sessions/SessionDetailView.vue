@@ -88,7 +88,7 @@
                   >
                     <v-list-item-title>{{ exercise.exercise ? exercise.exercise.name : `Exercise #${exercise.exerciseId}` }}</v-list-item-title>
                     <v-list-item-subtitle>
-                      <span v-if="exercise.bpm">{{ exercise.bpm }} BPM</span>
+                      <span v-if="exercise.bpms">{{ exercise.bpms.join(', ') }} BPM</span>
                       <span v-if="exercise.timeSignature" class="ml-2">{{ exercise.timeSignature }}</span>
                       <span v-if="exercise.notes" class="d-block">{{ exercise.notes }}</span>
                     </v-list-item-subtitle>
@@ -122,7 +122,7 @@
                 <div class="d-flex mb-2">
                   <div class="text-body-2 font-weight-medium mr-4">
                     <v-icon icon="mdi-metronome" size="small" class="mr-1"></v-icon>
-                    {{ exercise.bpm || 'N/A' }} BPM
+                    {{ exercise.bpms.join(', ') || 'N/A' }} BPM
                   </div>
                   <div class="text-body-2 font-weight-medium">
                     <v-icon icon="mdi-music" size="small" class="mr-1"></v-icon>

@@ -83,10 +83,13 @@ export const useAppStore = defineStore("app", () => {
     function formatMinutes(minutes) {
         if (minutes === undefined || minutes === null) return "0min";
 
-        if (minutes < 60) return `${minutes}min`;
+        // Round to 1 decimal place for cleaner display
+        const roundedMinutes = Math.round(minutes * 10) / 10;
 
-        const hours = Math.floor(minutes / 60);
-        const remainingMinutes = minutes % 60;
+        if (roundedMinutes < 60) return `${roundedMinutes}min`;
+
+        const hours = Math.floor(roundedMinutes / 60);
+        const remainingMinutes = Math.round((roundedMinutes % 60) * 10) / 10;
 
         if (remainingMinutes === 0) return `${hours}h`;
         return `${hours}h ${remainingMinutes}min`;

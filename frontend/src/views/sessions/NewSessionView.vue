@@ -19,7 +19,7 @@
           v-else
           color="success"
           prepend-icon="mdi-check"
-          :loading="savingSession"
+          :loading="finishingSession"
           @click="finishSession"
         >
           Finish Session
@@ -40,7 +40,7 @@
                   variant="outlined"
                   rows="2"
                   placeholder="Add notes about this practice session (optional)"
-                  :disabled="savingSession"
+                  :disabled="finishingSession"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -82,6 +82,7 @@
                 prepend-icon="mdi-plus"
                 variant="text"
                 @click="openAddExerciseDialog"
+                :disabled="!sessionStarted"
               >
                 Add Exercises
               </v-btn>
@@ -94,7 +95,20 @@
                   :key="exercise.id"
                 >
                   <v-expansion-panel-title>
-                    {{ exercise.name }}
+                    <div class="d-flex align-center">
+                      <span>{{ exercise.name }}</span>
+                      <v-chip 
+                        size="small" 
+                        class="ml-2" 
+                        :color="getExerciseStatusColor(exercise)"
+                      >
+                        {{ getExerciseStatus(exercise) }}
+                      </v-chip>
+                      <span v-if="exercise.duration" class="ml-2 text-caption">
+                        {{ exercise.duration }}
+                      </span>
+                    </div>
+
                     <template v-slot:actions>
                       <v-btn
                         icon
@@ -102,6 +116,7 @@
                         size="small"
                         color="error"
                         @click.stop="removeExercise(exercise)"
+                        :disabled="exercise.isActive"
                       >
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
@@ -111,18 +126,18 @@
                     <v-row>
                       <v-col cols="12" md="6">
                         <v-combobox
-                        v-model="exercise.bpms"
-                        label="BPMs"
-                        multiple
-                        chips
-                        hide-selected
-                        clearable
-                        variant="outlined"
-                        hide-details
-                        class="mb-4"
-                        :disabled="!sessionStarted"
-                        placeholder="Enter BPM values (e.g. 100, 120)"
-                        @change="exercise.bpms = exercise.bpms.filter(v => !isNaN(v) && v > 0)"
+                          v-model="exercise.bpms"
+                          label="BPMs"
+                          multiple
+                          chips
+                          hide-selected
+                          clearable
+                          variant="outlined"
+                          hide-details
+                          class="mb-4"
+                          :disabled="!sessionStarted || !exercise.isActive"
+                          placeholder="Enter BPM values (e.g. 100, 120)"
+                          @update:model-value="validateBpms(exercise)"
                         />
                       </v-col>
                       <v-col cols="12" md="6">
@@ -133,7 +148,7 @@
                           variant="outlined"
                           hide-details
                           class="mb-4"
-                          :disabled="!sessionStarted"
+                          :disabled="!sessionStarted || !exercise.isActive"
                         ></v-select>
                       </v-col>
                       <v-col cols="12">
@@ -144,8 +159,35 @@
                           rows="2"
                           placeholder="Add specific notes about this exercise (optional)"
                           hide-details
-                          :disabled="!sessionStarted"
+                          :disabled="!sessionStarted || !exercise.isActive"
                         ></v-textarea>
+                      </v-col>
+                      <v-col cols="12" class="d-flex justify-end">
+                        <v-btn
+                          v-if="!exercise.isActive && !exercise.completed"
+                          color="primary"
+                          prepend-icon="mdi-play"
+                          @click="startExercisePractice(exercise)"
+                          :disabled="!sessionStarted || (hasActiveExercise && !exercise.isActive)"
+                        >
+                          Start Practice
+                        </v-btn>
+                        <v-btn
+                          v-else-if="exercise.isActive"
+                          color="error"
+                          prepend-icon="mdi-stop"
+                          @click="stopExercisePractice(exercise)"
+                        >
+                          Stop Practice
+                        </v-btn>
+                        <v-btn
+                          v-else
+                          color="success"
+                          prepend-icon="mdi-check"
+                          disabled
+                        >
+                          Completed
+                        </v-btn>
                       </v-col>
                     </v-row>
                   </v-expansion-panel-text>
@@ -158,6 +200,7 @@
                   prepend-icon="mdi-plus"
                   variant="text"
                   @click="openAddExerciseDialog"
+                  :disabled="!sessionStarted"
                 >
                   Add More
                 </v-btn>
@@ -336,8 +379,8 @@
           <v-btn
             color="success"
             variant="flat"
-            @click="saveSession"
-            :loading="savingSession"
+            @click="completeSession"
+            :loading="finishingSession"
           >
             Complete Session
           </v-btn>
@@ -375,10 +418,11 @@ const startTime = ref(null)
 const notes = ref('')
 const sessionExercises = ref([])
 const startingSession = ref(false)
-const savingSession = ref(false)
+const finishingSession = ref(false)
 const loadingSessionExercises = ref(false)
 const sessionDuration = ref('0:00:00')
 const durationInterval = ref(null)
+const sessionId = ref(null)
 
 // Dialog controls
 const addExerciseDialog = ref(false)
@@ -397,6 +441,11 @@ const finishFormValid = ref(true)
 const timeSignatureOptions = [
   '4/4', '3/4', '2/4', '6/8', '7/8', '5/4', '9/8', '12/8'
 ]
+
+// Exercise tracking
+const hasActiveExercise = computed(() => {
+  return sessionExercises.value.some(ex => ex.isActive)
+})
 
 // Computed properties
 const sessionExerciseIds = computed(() => {
@@ -501,6 +550,18 @@ function isExerciseInSession(exercise) {
   return sessionExercises.value.some(e => e.id === exercise.id)
 }
 
+function getExerciseStatus(exercise) {
+  if (exercise.isActive) return 'Active'
+  if (exercise.completed) return 'Completed'
+  return 'Pending'
+}
+
+function getExerciseStatusColor(exercise) {
+  if (exercise.isActive) return 'success'
+  if (exercise.completed) return 'primary'
+  return 'grey'
+}
+
 function addExerciseToSession(exercise) {
   if (isExerciseInSession(exercise)) {
     removeExercise(exercise)
@@ -514,8 +575,11 @@ function addExerciseToSession(exercise) {
     bpms: [], // Empty initially so user can set it
     timeSignature: '4/4', // Default time signature
     notes: '', // Empty initially for user input
-    startTime: new Date(),
-    endTime: null
+    startTime: null,
+    endTime: null,
+    isActive: false,
+    completed: false,
+    duration: null
   })
   
   appStore.showSuccessMessage(`Added ${exercise.name} to session`)
@@ -529,8 +593,24 @@ function toggleExerciseInSession(exercise) {
   }
 }
 
-function removeExercise(exercise) {
+async function removeExercise(exercise) {
+  // The exercise passed in may come from one of the sub-components, which doesn't have the full local context
+  // of the hisotryID
+  const fullExercise = sessionExercises.value.find(e => e.id === exercise.id)
+
+  // Don't allow removing active exercises
+  if (exercise.isActive) {
+    appStore.showWarningMessage(`Can't remove an active exercise. Stop it first.`)
+    return
+  }
+  
   sessionExercises.value = sessionExercises.value.filter(e => e.id !== exercise.id)
+
+  // Also remove from the backend
+  if (fullExercise.completed && fullExercise.historyID) {
+      await historyStore.deleteHistoryEntry(fullExercise.historyID)
+  }
+  
   appStore.showInfoMessage(`Removed ${exercise.name} from session`)
 }
 
@@ -541,20 +621,34 @@ function openAddExerciseDialog() {
   addExerciseDialog.value = true
 }
 
-function startSession() {
+async function startSession() {
   startingSession.value = true
   
-  setTimeout(() => {
+  try {
     // Set start time to now
     startTime.value = new Date()
-    sessionStarted.value = true
-    startingSession.value = false
+    
+    // Create session in the database immediately
+    const sessionData = {
+      start_time: startTime.value.toISOString(),
+      end_time: startTime.value.toISOString(), // Temporary end time, will be updated later
+      notes: notes.value || ''
+    }
+    
+    const newSession = await sessionsStore.createSession(sessionData)
+    sessionId.value = newSession.id
     
     // Start the timer to show elapsed time
     startDurationTimer()
     
+    sessionStarted.value = true
     appStore.showSuccessMessage('Practice session started!')
-  }, 500) // Simulated brief delay
+  } catch (error) {
+    console.error('Error creating session:', error)
+    appStore.showErrorMessage(`Failed to start session: ${error.message}`)
+  } finally {
+    startingSession.value = false
+  }
 }
 
 function startDurationTimer() {
@@ -569,64 +663,116 @@ function startDurationTimer() {
       const hours = Math.floor(diffMs / (1000 * 60 * 60))
       
       sessionDuration.value = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+      
+      // Update duration for active exercises
+      sessionExercises.value.forEach(exercise => {
+        if (exercise.isActive && exercise.startTime) {
+          const exDiffMs = now - exercise.startTime
+          const exSeconds = Math.floor((exDiffMs / 1000) % 60)
+          const exMinutes = Math.floor((exDiffMs / (1000 * 60)) % 60)
+          const exHours = Math.floor(exDiffMs / (1000 * 60 * 60))
+          
+          exercise.duration = `${exHours}:${exMinutes.toString().padStart(2, '0')}:${exSeconds.toString().padStart(2, '0')}`
+        }
+      })
     }
   }, 1000)
 }
 
 function finishSession() {
-  finishSessionDialog.value = true
-}
-
-async function saveSession() {
-  if (sessionExercises.value.length === 0) {
-    appStore.showWarningMessage('Please add at least one exercise to this session')
+  // Check if any exercise is still active
+  const activeExercise = sessionExercises.value.find(ex => ex.isActive)
+  if (activeExercise) {
+    appStore.showWarningMessage(`Please stop the active exercise "${activeExercise.name}" before finishing the session.`)
     return
   }
   
-  savingSession.value = true
+  finishSessionDialog.value = true
+}
+
+async function completeSession() {
+  finishingSession.value = true
   
   try {
     const endTime = new Date()
     
-    // Step 1: Create the session first
+    // Update the session with the end time and notes
     const sessionData = {
-      start_time: startTime.value.toISOString(),
       end_time: endTime.toISOString(),
       notes: notes.value || ''
     }
     
-    // console.log('Creating session with data:', sessionData)
-    const newSession = await sessionsStore.createSession(sessionData)
-    
-    // Step 2: Add exercises to the session one by one
-    const sessionId = newSession.id
-    
-    for (const exercise of sessionExercises.value) {
-      const exerciseData = {
-        session_id: sessionId,
-        exercise_id: exercise.id,
-        start_time: exercise.startTime.toISOString(),
-        end_time: endTime.toISOString(),
-        bpms: exercise.bpms ? exercise.bpms : [],
-        time_signature: exercise.timeSignature || '4/4',
-        notes: exercise.notes || ''
-      }
-      
-      // console.log(`Adding exercise ${exercise.id} to session ${sessionId}`, exerciseData)
-      await historyStore.createHistoryEntry(exerciseData)
-    }
+    await sessionsStore.updateSession(sessionId.value, sessionData, 'endTime,notes')
     
     appStore.showSuccessMessage('Practice session saved successfully!')
     
     // Navigate to session detail
     router.push({
       name: 'session-detail',
-      params: { id: sessionId }
+      params: { id: sessionId.value }
     })
   } catch (error) {
-    console.error('Failed to save session:', error)
-    appStore.showErrorMessage(`Failed to save session: ${error.message}`)
-    savingSession.value = false
+    console.error('Failed to complete session:', error)
+    appStore.showErrorMessage(`Failed to complete session: ${error.message}`)
+    finishingSession.value = false
+  }
+}
+
+function startExercisePractice(exercise) {
+  if (hasActiveExercise.value) {
+    // Already checked in the UI, but double-check here
+    appStore.showWarningMessage('Please finish the current exercise first.')
+    return
+  }
+  
+  // Set exercise as active and record start time
+  exercise.isActive = true
+  exercise.startTime = new Date()
+  exercise.duration = '0:00:00'
+  
+  appStore.showSuccessMessage(`Started practice: ${exercise.name}`)
+}
+
+async function stopExercisePractice(exercise) {
+  // Set end time and mark as completed
+  exercise.isActive = false
+  exercise.endTime = new Date()
+  exercise.completed = true
+  
+  try {
+    // Save the exercise history entry immediately
+    const exerciseData = {
+      session_id: sessionId.value,
+      exercise_id: exercise.id,
+      start_time: exercise.startTime.toISOString(),
+      end_time: exercise.endTime.toISOString(),
+      bpms: exercise.bpms ? exercise.bpms : [],
+      time_signature: exercise.timeSignature || '4/4',
+      notes: exercise.notes || ''
+    }
+    
+    const newHistoryEntry = await historyStore.createHistoryEntry(exerciseData)
+    exercise.historyID = newHistoryEntry.id
+    appStore.showSuccessMessage(`Completed practice: ${exercise.name}`)
+  } catch (error) {
+    console.error(`Error saving exercise history for ${exercise.name}:`, error)
+    appStore.showErrorMessage(`Failed to save exercise history: ${error.message}`)
+  }
+}
+
+function validateBpms(exercise) {
+  // Filter out non-numeric values and convert strings to numbers
+  if (exercise.bpms && Array.isArray(exercise.bpms)) {
+    exercise.bpms = exercise.bpms
+      .map(bpm => {
+        // Convert to string first to handle all input types
+        const bpmStr = String(bpm).trim()
+        // Parse it as a number
+        const bpmNum = parseInt(bpmStr, 10)
+        // Return the number if valid, otherwise null
+        return !isNaN(bpmNum) && bpmNum > 0 ? bpmNum : null
+      })
+      .filter(bpm => bpm !== null) // Remove nulls
   }
 }
 
@@ -639,8 +785,17 @@ function openCancelDialog() {
   }
 }
 
-function confirmCancelSession() {
+async function confirmCancelSession() {
   cancelDialog.value = false
+  
+  // If we have created a session in the database, delete it
+  if (sessionId.value) {
+    try {
+      await sessionsStore.deleteSession(sessionId.value)
+    } catch (error) {
+      console.error('Error deleting session:', error)
+    }
+  }
   
   // Clean up
   if (durationInterval.value) {
@@ -648,7 +803,7 @@ function confirmCancelSession() {
   }
   
   // Navigate back
-  router.push({ name: 'home' })
+  router.push({ name: 'sessions' })
 }
 
 // Check for URL parameter with exercise ID to pre-add
@@ -660,6 +815,10 @@ onMounted(async () => {
   
   if (categoriesStore.categories.length === 0) {
     await categoriesStore.fetchCategories()
+  }
+  
+  if (tagsStore.tags.length === 0) {
+    await tagsStore.fetchTags()
   }
   
   // Check for exercise ID in URL
