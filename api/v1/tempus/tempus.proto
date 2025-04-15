@@ -384,6 +384,7 @@ message CategoryTimeDistribution {
     string category_name = 2;
     int32 duration_seconds = 3;
     double percentage = 4;
+    repeated PracticeTimePoint practice_frequency = 5;
 }
 
 // PracticeTimePoint represents a point in the practice frequency chart

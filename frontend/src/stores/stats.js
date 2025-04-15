@@ -13,41 +13,37 @@ export const useStatsStore = defineStore("stats", () => {
     // Getters
     const totalPracticeTime = computed(() => {
         if (!practiceStats.value) return 0;
-        return practiceStats.value.total_duration_seconds /
+        return practiceStats.value.totalDurationSeconds /
             60; // Convert to minutes
     });
 
     const totalSessions = computed(() => {
         if (!practiceStats.value) return 0;
-        return practiceStats.value.total_sessions;
+        return practiceStats.value.totalSessions;
     });
 
     const avgSessionTime = computed(() => {
         if (!practiceStats.value) return 0;
-        return practiceStats.value.avg_session_duration_seconds /
+        return practiceStats.value.avgSessionDurationSeconds /
             60; // Convert to minutes
     });
 
     const categoryDistribution = computed(() => {
-        if (
-            !practiceStats.value || !practiceStats.value.category_distribution
-        ) {
+        if (!practiceStats.value || !practiceStats.value.categoryDistribution) {
             return [];
         }
-        return practiceStats.value.category_distribution;
+        return practiceStats.value.categoryDistribution;
     });
 
     const exerciseDistribution = computed(() => {
-        if (
-            !practiceStats.value || !practiceStats.value.exercise_distribution
-        ) {
+        if (!practiceStats.value || !practiceStats.value.exerciseDistribution) {
             return [];
         }
-        return practiceStats.value.exercise_distribution;
+        return practiceStats.value.exerciseDistribution;
     });
 
     const practiceFrequency = computed(() => {
-        if (!practiceStats.value || !practiceStats.value.practice_frequency) {
+        if (!practiceStats.value || !practiceStats.value.practiceFrequency) {
             return [];
         }
 
@@ -55,14 +51,14 @@ export const useStatsStore = defineStore("stats", () => {
         // Format for charts: { date: "YYYY-MM-DD", minutes: X, categoryId: Y }
         const chartData = [];
 
-        practiceStats.value.practice_frequency.forEach((point) => {
+        practiceStats.value.practiceFrequency.forEach((point) => {
             // Convert to simple date format
             const date = new Date(point.date);
             const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
 
             // Find category if available
             let categoryId = null;
-            const minutes = point.duration_seconds / 60; // Convert to minutes
+            const minutes = point.durationSeconds / 60; // Convert to minutes
 
             // For now we don't have category info in practice_frequency
             // In a future version, we might add category to the backend API
@@ -76,20 +72,18 @@ export const useStatsStore = defineStore("stats", () => {
     });
 
     const topExercises = computed(() => {
-        if (
-            !practiceStats.value || !practiceStats.value.exercise_distribution
-        ) {
+        if (!practiceStats.value || !practiceStats.value.exerciseDistribution) {
             return [];
         }
 
         // Sort by duration and take top 5
-        return [...practiceStats.value.exercise_distribution]
-            .sort((a, b) => b.duration_seconds - a.duration_seconds)
+        return [...practiceStats.value.exerciseDistribution]
+            .sort((a, b) => b.durationSeconds - a.durationSeconds)
             .slice(0, 5)
             .map((exercise) => ({
-                id: exercise.exercise_id,
-                name: exercise.exercise_name,
-                duration: exercise.duration_seconds / 60, // Convert to minutes
+                id: exercise.exerciseId,
+                name: exercise.exerciseName,
+                duration: exercise.durationSeconds / 60, // Convert to minutes
                 percentage: exercise.percentage,
             }));
     });

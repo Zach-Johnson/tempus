@@ -1377,6 +1377,13 @@
         "percentage": {
           "type": "number",
           "format": "double"
+        },
+        "practiceFrequency": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PracticeTimePoint"
+          }
         }
       },
       "title": "CategoryTimeDistribution shows how much time was spent on each category"

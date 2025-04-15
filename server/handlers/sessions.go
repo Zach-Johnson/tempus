@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"strconv"
+	"strings"
 	"time"
 
 	pb "github.com/Zach-Johnson/tempus/proto/api/v1/tempus"
@@ -566,53 +567,7 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		return nil, status.Errorf(codes.Internal, "error reading exercise distribution: %v", err)
 	}
 
-	// Get category time distribution
-	categoryDistQuery := `
-		SELECT 
-			c.id, 
-			c.name, 
-			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
-			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
-		FROM 
-			categories c
-		JOIN 
-			exercise_categories ec ON c.id = ec.category_id
-		JOIN 
-			exercise_history eh ON ec.exercise_id = eh.exercise_id
-		JOIN 
-			practice_sessions ps ON eh.session_id = ps.id
-	` + whereClause + `
-		GROUP BY 
-			c.id
-		ORDER BY 
-			duration DESC
-	`
-
-	categoryDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
-	categoryRows, err := h.db.QueryContext(ctx, categoryDistQuery, categoryDistParams...)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to calculate category distribution: %v", err)
-	}
-	defer categoryRows.Close()
-
-	var categoryDistribution []*pb.CategoryTimeDistribution
-	for categoryRows.Next() {
-		var dist pb.CategoryTimeDistribution
-		var percentage float64
-
-		if err := categoryRows.Scan(&dist.CategoryId, &dist.CategoryName, &dist.DurationSeconds, &percentage); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to parse category distribution: %v", err)
-		}
-
-		dist.Percentage = percentage
-		categoryDistribution = append(categoryDistribution, &dist)
-	}
-
-	if err = categoryRows.Err(); err != nil {
-		return nil, status.Errorf(codes.Internal, "error reading category distribution: %v", err)
-	}
-
-	// Get practice frequency by day
+	// Get overall practice frequency by day
 	frequencyQuery := `
 		SELECT 
 			date(ps.start_time) as practice_date,
@@ -659,6 +614,61 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		return nil, status.Errorf(codes.Internal, "error reading practice frequency: %v", err)
 	}
 
+	// Get category time distribution with daily breakdown
+	categoryDistQuery := `
+		SELECT 
+			c.id, 
+			c.name, 
+			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
+			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
+		FROM 
+			categories c
+		JOIN 
+			exercise_categories ec ON c.id = ec.category_id
+		JOIN 
+			exercise_history eh ON ec.exercise_id = eh.exercise_id
+		JOIN 
+			practice_sessions ps ON eh.session_id = ps.id
+	` + whereClause + `
+		GROUP BY 
+			c.id
+		ORDER BY 
+			duration DESC
+	`
+
+	categoryDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
+	categoryRows, err := h.db.QueryContext(ctx, categoryDistQuery, categoryDistParams...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to calculate category distribution: %v", err)
+	}
+	defer categoryRows.Close()
+
+	var categoryDistribution []*pb.CategoryTimeDistribution
+
+	for categoryRows.Next() {
+		var dist pb.CategoryTimeDistribution
+		var percentage float64
+
+		if err := categoryRows.Scan(&dist.CategoryId, &dist.CategoryName, &dist.DurationSeconds, &percentage); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse category distribution: %v", err)
+		}
+
+		dist.Percentage = percentage
+
+		// For each category, get daily practice times
+		categoryFrequency, err := h.getCategoryDailyPractice(ctx, dist.CategoryId, whereClause, queryParams)
+		if err != nil {
+			return nil, err
+		}
+
+		dist.PracticeFrequency = categoryFrequency
+		categoryDistribution = append(categoryDistribution, &dist)
+	}
+
+	if err = categoryRows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "error reading category distribution: %v", err)
+	}
+
 	// Return the statistics
 	return &pb.PracticeStats{
 		TotalSessions:             totalSessions,
@@ -668,6 +678,79 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		CategoryDistribution:      categoryDistribution,
 		PracticeFrequency:         practiceFrequency,
 	}, nil
+}
+
+// getCategoryDailyPractice retrieves the daily practice data for a specific category
+func (h *PracticeSessionHandler) getCategoryDailyPractice(ctx context.Context, categoryId int32, baseWhereClause string, baseParams []interface{}) ([]*pb.PracticeTimePoint, error) {
+	// Build the query for category daily practice
+	categoryDailyQuery := `
+		SELECT 
+			date(ps.start_time) as practice_date,
+			SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)) as duration
+		FROM 
+			exercise_history eh
+		JOIN 
+			practice_sessions ps ON eh.session_id = ps.id
+		JOIN 
+			exercise_categories ec ON eh.exercise_id = ec.exercise_id
+		WHERE 
+			ec.category_id = ?
+	`
+
+	// Create parameters for query, starting with category ID
+	categoryDailyParams := []interface{}{categoryId}
+
+	// Add date range filters if they exist in the base query
+	if baseWhereClause != "" {
+		// Convert "WHERE ps.start_time >= ?" to "AND ps.start_time >= ?"
+		categoryFilter := strings.Replace(baseWhereClause, "WHERE", "AND", 1)
+		categoryDailyQuery += categoryFilter
+		categoryDailyParams = append(categoryDailyParams, baseParams...)
+	}
+
+	// Add grouping and ordering
+	categoryDailyQuery += `
+		GROUP BY 
+			practice_date
+		ORDER BY 
+			practice_date ASC
+	`
+
+	// Execute the query
+	categoryDailyRows, err := h.db.QueryContext(ctx, categoryDailyQuery, categoryDailyParams...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to calculate daily practice for category %d: %v", categoryId, err)
+	}
+	defer categoryDailyRows.Close()
+
+	var categoryDailyPoints []*pb.PracticeTimePoint
+
+	for categoryDailyRows.Next() {
+		var dateStr string
+		var durationSeconds int32
+
+		if err := categoryDailyRows.Scan(&dateStr, &durationSeconds); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse daily category practice: %v", err)
+		}
+
+		// Parse the date string (format: YYYY-MM-DD)
+		practiceDate, err := time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse date: %v", err)
+		}
+
+		point := &pb.PracticeTimePoint{
+			Date:            timestamppb.New(practiceDate),
+			DurationSeconds: durationSeconds,
+		}
+		categoryDailyPoints = append(categoryDailyPoints, point)
+	}
+
+	if err = categoryDailyRows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "error reading daily category practice: %v", err)
+	}
+
+	return categoryDailyPoints, nil
 }
 
 // Helper method to get exercise details

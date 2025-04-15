@@ -284,7 +284,24 @@ async function loadStats() {
       end_date: endDate.toISOString()
     };
     
-    await statsStore.fetchPracticeStats(params);
+    console.log('Fetching practice stats with params:', params);
+    const result = await statsStore.fetchPracticeStats(params);
+    
+    // Debug logs
+    console.log('Practice stats API response:', result);
+    console.log('Practice frequency in store:', statsStore.practiceFrequency);
+    console.log('Category distribution in store:', statsStore.categoryDistribution);
+    
+    // Check for empty data
+    if (!statsStore.practiceFrequency || statsStore.practiceFrequency.length === 0) {
+      console.warn('No practice frequency data available');
+    }
+    
+    if (!statsStore.categoryDistribution || statsStore.categoryDistribution.length === 0) {
+      console.warn('No category distribution data available');
+    }
+    
+    return result;
   } catch (error) {
     console.error('Error loading statistics:', error);
     appStore.showErrorMessage('Error loading statistics');
