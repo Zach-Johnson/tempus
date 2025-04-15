@@ -475,6 +475,201 @@ func (h *PracticeSessionHandler) DeletePracticeSession(ctx context.Context, req 
 	return &emptypb.Empty{}, nil
 }
 
+// GetPracticeStats returns statistics for practice sessions
+func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.GetPracticeStatsRequest) (*pb.PracticeStats, error) {
+	// Build query filters based on request parameters
+	var whereClause string
+	var queryParams []interface{}
+
+	// Add filter by date range if provided
+	if req.StartDate != nil && req.EndDate != nil {
+		whereClause = " WHERE ps.start_time >= ? AND ps.end_time <= ?"
+		queryParams = append(queryParams, req.StartDate.AsTime(), req.EndDate.AsTime())
+	} else if req.StartDate != nil {
+		whereClause = " WHERE ps.start_time >= ?"
+		queryParams = append(queryParams, req.StartDate.AsTime())
+	} else if req.EndDate != nil {
+		whereClause = " WHERE ps.end_time <= ?"
+		queryParams = append(queryParams, req.EndDate.AsTime())
+	}
+
+	// Add category filter if provided
+	var categoryJoin, categoryFilter string
+	if req.CategoryId > 0 {
+		categoryJoin = " JOIN exercise_history eh ON eh.session_id = ps.id JOIN exercise_categories ec ON eh.exercise_id = ec.exercise_id"
+		if whereClause == "" {
+			categoryFilter = " WHERE ec.category_id = ?"
+		} else {
+			categoryFilter = " AND ec.category_id = ?"
+		}
+		queryParams = append(queryParams, req.CategoryId)
+	}
+
+	// Get total sessions and duration
+	var totalSessions int32
+	var totalDurationSeconds int32
+
+	sessionQuery := "SELECT COUNT(DISTINCT ps.id), COALESCE(SUM(strftime('%s', ps.end_time) - strftime('%s', ps.start_time)), 0) FROM practice_sessions ps" + categoryJoin + whereClause + categoryFilter
+	err := h.db.QueryRowContext(ctx, sessionQuery, queryParams...).Scan(&totalSessions, &totalDurationSeconds)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to retrieve session statistics: %v", err)
+	}
+
+	// Calculate average session duration
+	var avgSessionDurationSeconds float64
+	if totalSessions > 0 {
+		avgSessionDurationSeconds = float64(totalDurationSeconds) / float64(totalSessions)
+	}
+
+	// Get exercise time distribution
+	exerciseDistQuery := `
+		SELECT 
+			e.id, 
+			e.name, 
+			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
+			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
+		FROM 
+			exercises e
+		JOIN 
+			exercise_history eh ON e.id = eh.exercise_id
+		JOIN 
+			practice_sessions ps ON eh.session_id = ps.id
+	` + whereClause + `
+		GROUP BY 
+			e.id
+		ORDER BY 
+			duration DESC
+		LIMIT 10
+	`
+
+	exerciseDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
+	exerciseRows, err := h.db.QueryContext(ctx, exerciseDistQuery, exerciseDistParams...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to calculate exercise distribution: %v", err)
+	}
+	defer exerciseRows.Close()
+
+	var exerciseDistribution []*pb.ExerciseTimeDistribution
+	for exerciseRows.Next() {
+		var dist pb.ExerciseTimeDistribution
+		var percentage float64
+
+		if err := exerciseRows.Scan(&dist.ExerciseId, &dist.ExerciseName, &dist.DurationSeconds, &percentage); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse exercise distribution: %v", err)
+		}
+
+		dist.Percentage = percentage
+		exerciseDistribution = append(exerciseDistribution, &dist)
+	}
+
+	if err = exerciseRows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "error reading exercise distribution: %v", err)
+	}
+
+	// Get category time distribution
+	categoryDistQuery := `
+		SELECT 
+			c.id, 
+			c.name, 
+			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
+			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
+		FROM 
+			categories c
+		JOIN 
+			exercise_categories ec ON c.id = ec.category_id
+		JOIN 
+			exercise_history eh ON ec.exercise_id = eh.exercise_id
+		JOIN 
+			practice_sessions ps ON eh.session_id = ps.id
+	` + whereClause + `
+		GROUP BY 
+			c.id
+		ORDER BY 
+			duration DESC
+	`
+
+	categoryDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
+	categoryRows, err := h.db.QueryContext(ctx, categoryDistQuery, categoryDistParams...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to calculate category distribution: %v", err)
+	}
+	defer categoryRows.Close()
+
+	var categoryDistribution []*pb.CategoryTimeDistribution
+	for categoryRows.Next() {
+		var dist pb.CategoryTimeDistribution
+		var percentage float64
+
+		if err := categoryRows.Scan(&dist.CategoryId, &dist.CategoryName, &dist.DurationSeconds, &percentage); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse category distribution: %v", err)
+		}
+
+		dist.Percentage = percentage
+		categoryDistribution = append(categoryDistribution, &dist)
+	}
+
+	if err = categoryRows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "error reading category distribution: %v", err)
+	}
+
+	// Get practice frequency by day
+	frequencyQuery := `
+		SELECT 
+			date(ps.start_time) as practice_date,
+			SUM(strftime('%s', ps.end_time) - strftime('%s', ps.start_time)) as duration
+		FROM 
+			practice_sessions ps
+	` + whereClause + `
+		GROUP BY 
+			practice_date
+		ORDER BY 
+			practice_date ASC
+	`
+
+	frequencyRows, err := h.db.QueryContext(ctx, frequencyQuery, queryParams...)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to calculate practice frequency: %v", err)
+	}
+	defer frequencyRows.Close()
+
+	var practiceFrequency []*pb.PracticeTimePoint
+	for frequencyRows.Next() {
+		var dateStr string
+		var durationSeconds int32
+		var practiceDate time.Time
+
+		if err := frequencyRows.Scan(&dateStr, &durationSeconds); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse practice frequency: %v", err)
+		}
+
+		// Parse the date string (format: YYYY-MM-DD)
+		practiceDate, err = time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to parse date: %v", err)
+		}
+
+		point := &pb.PracticeTimePoint{
+			Date:            timestamppb.New(practiceDate),
+			DurationSeconds: durationSeconds,
+		}
+		practiceFrequency = append(practiceFrequency, point)
+	}
+
+	if err = frequencyRows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "error reading practice frequency: %v", err)
+	}
+
+	// Return the statistics
+	return &pb.PracticeStats{
+		TotalSessions:             totalSessions,
+		TotalDurationSeconds:      totalDurationSeconds,
+		AvgSessionDurationSeconds: avgSessionDurationSeconds,
+		ExerciseDistribution:      exerciseDistribution,
+		CategoryDistribution:      categoryDistribution,
+		PracticeFrequency:         practiceFrequency,
+	}, nil
+}
+
 // Helper method to get exercise details
 func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql.Tx, exerciseId int32) (*pb.Exercise, error) {
 	// Get basic exercise info
