@@ -1,16 +1,21 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"embed"
 	"flag"
 	"fmt"
+	"io"
+	"io/fs"
 	"log"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
 	"time"
 
@@ -23,6 +28,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
+
+//go:embed frontend/dist/*
+var embeddedFiles embed.FS
 
 var (
 	grpcPort  = flag.Int("grpc-port", 9090, "gRPC server port")
@@ -150,10 +158,22 @@ func startHTTPServer() {
 		log.Fatalf("Failed to register gateway for ExerciseHistoryService: %v", err)
 	}
 
+	staticFS, err := fs.Sub(embeddedFiles, "frontend/dist")
+	if err != nil {
+		log.Fatalf("failed to open file system")
+	}
+	mux := http.NewServeMux()
+
+	// API routes
+	mux.Handle("/api/", http.StripPrefix("/api", middleware(gwmux)))
+
+	// Frontend (embedded)
+	mux.Handle("/", spaHandlerFS(staticFS, "index.html"))
+
 	// Create HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", *httpPort),
-		Handler: middleware(gwmux),
+		Handler: mux,
 	}
 
 	// Start HTTP server
@@ -161,6 +181,40 @@ func startHTTPServer() {
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Failed to serve HTTP: %v", err)
 	}
+}
+
+func spaHandlerFS(staticFS fs.FS, indexPath string) http.Handler {
+	fileServer := http.FileServer(http.FS(staticFS))
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestedPath := r.URL.Path
+		filePath := path.Clean(requestedPath[1:]) // remove leading slash
+
+		f, err := staticFS.Open(filePath)
+		if err == nil {
+			defer f.Close()
+			fileServer.ServeHTTP(w, r)
+			return
+		}
+
+		// Fallback to index.html
+		indexFile, err := staticFS.Open(indexPath)
+		if err != nil {
+			http.Error(w, "index.html not found", http.StatusInternalServerError)
+			return
+		}
+		defer indexFile.Close()
+
+		// Read the file into memory
+		content, err := io.ReadAll(indexFile)
+		if err != nil {
+			http.Error(w, "failed to read index.html", http.StatusInternalServerError)
+			return
+		}
+
+		// Use a bytes.Reader to satisfy io.ReadSeeker
+		http.ServeContent(w, r, indexPath, time.Now(), bytes.NewReader(content))
+	})
 }
 
 type statusRec struct {
@@ -208,7 +262,6 @@ func waitForShutdown() {
 	sig := <-sigs
 	log.Printf("Received signal %v, shutting down...", sig)
 
-	// Add any cleanup code here
 	time.Sleep(time.Second) // Give time for graceful shutdown
 	log.Println("Server shutdown complete")
 }

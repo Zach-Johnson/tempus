@@ -2,7 +2,6 @@ version: "3"
 
 vars:
   PROTO_DIR: ./proto
-  SERVER_DIR: ./server
   CLIENT_DIR: ./client
   BUILD_DIR: ./bin
   GO_MODULE: github.com/Zach-Johnson/tempus
@@ -24,7 +23,7 @@ tasks:
     deps: [proto]
     cmds:
       - mkdir -p {{.BUILD_DIR}}
-      - go build -o {{.BUILD_DIR}}/tempus-server {{.SERVER_DIR}}/main.go
+      - go build -o {{.BUILD_DIR}}/tempus-server ./main.go
 
   run-server:
     desc: Run the server
