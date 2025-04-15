@@ -1,0 +1,12 @@
+app = "tempus"
+primary_region = "den"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+[[mounts]]
+  source = "db_data"
+  destination = "/app/data"

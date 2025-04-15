@@ -58,12 +58,6 @@ const routes = [
         meta: { title: "Session Detail" },
         props: true,
     },
-    // {
-    //     path: "/stats",
-    //     name: "stats",
-    //     component: () => import("@/views/stats/StatsView.vue"),
-    //     meta: { title: "Statistics" },
-    // },
     {
         path: "/:pathMatch(.*)*",
         name: "not-found",

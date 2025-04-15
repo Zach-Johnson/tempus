@@ -53,7 +53,6 @@ const menuItems = [
   { title: 'Exercises', icon: 'mdi-music-note', to: '/exercises' },
   { title: 'Categories', icon: 'mdi-folder', to: '/categories' },
   { title: 'Tags', icon: 'mdi-tag-multiple', to: '/tags' },
-  { title: 'Statistics', icon: 'mdi-chart-bar', to: '/stats' }
 ]
 
 function toggleDrawer() {

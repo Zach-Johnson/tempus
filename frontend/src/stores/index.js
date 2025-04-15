@@ -4,6 +4,7 @@ import { useCategoriesStore } from "./categories.js";
 import { useExercisesStore } from "./exercises.js";
 import { useHistoryStore } from "./history.js";
 import { useSessionsStore } from "./sessions.js";
+import { useStatsStore } from "./stats.js";
 import { useTagsStore } from "./tags.js";
 
 // Export a function to get all stores for easy access
@@ -14,6 +15,7 @@ export function useStores() {
     const exercisesStore = useExercisesStore();
     const sessionsStore = useSessionsStore();
     const historyStore = useHistoryStore();
+    const statsStore = useStatsStore();
 
     return {
         app: appStore,
@@ -22,6 +24,7 @@ export function useStores() {
         exercises: exercisesStore,
         sessions: sessionsStore,
         history: historyStore,
+        stats: statsStore,
     };
 }
 
@@ -32,5 +35,6 @@ export {
     useExercisesStore,
     useHistoryStore,
     useSessionsStore,
+    useStatsStore,
     useTagsStore,
 };

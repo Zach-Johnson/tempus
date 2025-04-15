@@ -6,7 +6,7 @@
       </v-col>
     </v-row>
 
-    <!-- Recent Activity Summary -->
+    <!-- Summary Cards -->
     <v-row>
       <v-col cols="12" md="4">
         <v-card class="mb-4">
@@ -24,9 +24,9 @@
                 v-for="session in recentSessions" 
                 :key="session.id" 
                 :to="`/sessions/${session.id}`">
-                <v-list-item-title>{{ formatDate(session.start_time) }}</v-list-item-title>
+                <v-list-item-title>{{ formatDate(session.startTime) }}</v-list-item-title>
                 <v-list-item-subtitle>
-                  {{ formatDuration(session.start_time, session.end_time) }}
+                  {{ formatDuration(session.startTime, session.endTime) }}
                 </v-list-item-subtitle>
               </v-list-item>
             </template>
@@ -49,21 +49,21 @@
             <div v-else>
               <v-row>
                 <v-col cols="6">
-                  <div class="text-h4 text-center primary--text">{{ stats.totalSessions || 0 }}</div>
+                  <div class="text-h4 text-center primary--text">{{ statsStore.totalSessions || 0 }}</div>
                   <div class="text-body-2 text-center">Total Sessions</div>
                 </v-col>
                 <v-col cols="6">
-                  <div class="text-h4 text-center primary--text">{{ formatTime(stats.totalDuration) }}</div>
+                  <div class="text-h4 text-center primary--text">{{ formatTime(statsStore.totalPracticeTime) }}</div>
                   <div class="text-body-2 text-center">Total Practice Time</div>
                 </v-col>
               </v-row>
               <v-row class="mt-4">
                 <v-col cols="6">
-                  <div class="text-h4 text-center primary--text">{{ stats.exerciseCount || 0 }}</div>
+                  <div class="text-h4 text-center primary--text">{{ exercisesStore.exercises.length || 0 }}</div>
                   <div class="text-body-2 text-center">Exercises</div>
                 </v-col>
                 <v-col cols="6">
-                  <div class="text-h4 text-center primary--text">{{ stats.categoryCount || 0 }}</div>
+                  <div class="text-h4 text-center primary--text">{{ categoriesStore.categories.length || 0 }}</div>
                   <div class="text-body-2 text-center">Categories</div>
                 </v-col>
               </v-row>
@@ -77,15 +77,15 @@
           <v-card-title class="text-h6">
             Most Practiced
             <v-spacer></v-spacer>
-            <v-btn variant="text" to="/stats">View Stats</v-btn>
+            <v-btn variant="text" to="/exercises">View All</v-btn>
           </v-card-title>
           <v-card-text v-if="loading">
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
           </v-card-text>
           <v-list v-else density="compact">
-            <template v-if="topExercises.length > 0">
+            <template v-if="statsStore.topExercises.length > 0">
               <v-list-item 
-                v-for="exercise in topExercises" 
+                v-for="exercise in statsStore.topExercises" 
                 :key="exercise.id"
                 :to="`/exercises/${exercise.id}`">
                 <v-list-item-title>{{ exercise.name }}</v-list-item-title>
@@ -106,23 +106,57 @@
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-card-title class="text-h6">
+          <v-card-title class="d-flex align-center text-h6">
             Practice Time (Last 30 Days)
+            <v-spacer></v-spacer>
+            <v-btn
+              variant="text"
+              prepend-icon="mdi-refresh"
+              @click="loadStats"
+              :loading="statsStore.loading"
+              size="small"
+            >
+              Refresh
+            </v-btn>
           </v-card-title>
           <v-card-text style="height: 300px">
-            <div v-if="loading" class="d-flex justify-center align-center" style="height: 100%">
-              <v-progress-circular indeterminate color="primary"></v-progress-circular>
-            </div>
-            <div v-else-if="practiceData.length > 0" style="height: 100%">
-              <practice-time-chart :chart-data="practiceData" />
-            </div>
-            <div v-else class="d-flex justify-center align-center" style="height: 100%">
-              <p class="text-body-1">No practice data available for the last 30 days</p>
-            </div>
+            <category-practice-time-chart
+              :loading="statsStore.loading"
+            />
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Detailed Statistics -->
+    <!-- <v-row class="mt-4"> -->
+    <!--   <v-col cols="12" md="6"> -->
+    <!--     <v-card> -->
+    <!--       <v-card-title class="text-h6"> -->
+    <!--         Practice by Category -->
+    <!--       </v-card-title> -->
+    <!--       <v-card-text> -->
+    <!--         <category-summary-stats -->
+    <!--           :loading="statsStore.loading" -->
+    <!--         /> -->
+    <!--       </v-card-text> -->
+    <!--     </v-card> -->
+    <!--   </v-col> -->
+    <!---->
+    <!--   <v-col cols="12" md="6"> -->
+    <!--     <v-card> -->
+    <!--       <v-card-title class="text-h6"> -->
+    <!--         Top Exercises -->
+    <!--       </v-card-title> -->
+    <!--       <v-card-text> -->
+    <!--         <top-exercises-stats -->
+    <!--           :loading="statsStore.loading" -->
+    <!--           :limit="5" -->
+    <!--         /> -->
+    <!--       </v-card-text> -->
+    <!--     </v-card> -->
+    <!--   </v-col> -->
+    <!-- </v-row> -->
 
     <!-- Quick Actions -->
     <v-row class="mt-5">
@@ -164,10 +198,10 @@
         <v-btn
           block
           size="large"
-          to="/stats"
-          prepend-icon="mdi-chart-bar"
+          to="/tags"
+          prepend-icon="mdi-tag-multiple"
         >
-          Statistics
+          Tags
         </v-btn>
       </v-col>
     </v-row>
@@ -175,128 +209,104 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { format, parseISO, differenceInMinutes } from 'date-fns'
-import PracticeTimeChart from '@/components/charts/PracticeTimeChart.vue'
+import { ref, onMounted } from 'vue';
+import { useAppStore } from '@/stores/app.js';
+import { useSessionsStore } from '@/stores/sessions.js';
+import { useExercisesStore } from '@/stores/exercises.js';
+import { useCategoriesStore } from '@/stores/categories.js';
+import { useStatsStore } from '@/stores/stats.js';
+import CategoryPracticeTimeChart from '@/components/charts/CategoryPracticeTimeChart.vue';
+import CategorySummaryStats from '@/components/stats/CategorySummaryStats.vue';
+import TopExercisesStats from '@/components/stats/TopExercisesStats.vue';
 
-// Mock data states
-const loading = ref(true)
-const recentSessions = ref([])
-const stats = ref({})
-const topExercises = ref([])
-const practiceData = ref([])
+const appStore = useAppStore();
+const sessionsStore = useSessionsStore();
+const exercisesStore = useExercisesStore();
+const categoriesStore = useCategoriesStore();
+const statsStore = useStatsStore();
+
+// Data states
+const loading = ref(true);
+const recentSessions = ref([]);
 
 onMounted(async () => {
   try {
-    // In a real app, these would be API calls
+    // Load all required data
     await Promise.all([
+      loadCategories(),
+      loadExercises(),
       fetchRecentSessions(),
-      fetchStats(),
-      fetchTopExercises(),
-      fetchPracticeData()
-    ])
+      loadStats()
+    ]);
   } catch (error) {
-    console.error('Error loading dashboard data:', error)
+    console.error('Error loading dashboard data:', error);
+    appStore.showErrorMessage('Error loading dashboard data');
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 
-// Mock data fetching functions
+// Load categories
+async function loadCategories() {
+  if (categoriesStore.categories.length === 0) {
+    await categoriesStore.fetchCategories();
+  }
+}
+
+// Load exercises
+async function loadExercises() {
+  if (exercisesStore.exercises.length === 0) {
+    await exercisesStore.fetchExercises();
+  }
+}
+
+// Fetch recent sessions
 async function fetchRecentSessions() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  // Mock data
-  recentSessions.value = [
-    { 
-      id: 1, 
-      start_time: '2023-11-01T18:30:00Z', 
-      end_time: '2023-11-01T19:45:00Z'
-    },
-    { 
-      id: 2, 
-      start_time: '2023-10-29T17:00:00Z', 
-      end_time: '2023-10-29T18:30:00Z'
-    },
-    { 
-      id: 3, 
-      start_time: '2023-10-27T19:15:00Z', 
-      end_time: '2023-10-27T20:00:00Z'
-    }
-  ]
-}
-
-async function fetchStats() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 700))
-  
-  // Mock data
-  stats.value = {
-    totalSessions: 42,
-    totalDuration: 3760, // in minutes
-    exerciseCount: 28,
-    categoryCount: 5
+  try {
+    const response = await sessionsStore.fetchSessions({ page_size: 5 });
+    recentSessions.value = response.sessions || [];
+  } catch (error) {
+    console.error('Error fetching recent sessions:', error);
   }
 }
 
-async function fetchTopExercises() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 600))
-  
-  // Mock data
-  topExercises.value = [
-    { id: 5, name: 'Paradiddles', duration: 420 },
-    { id: 8, name: 'Double Stroke Roll', duration: 380 },
-    { id: 12, name: 'Flam Accent', duration: 310 },
-    { id: 3, name: 'Six Stroke Roll', duration: 290 }
-  ]
-}
-
-async function fetchPracticeData() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 800))
-  
-  // Mock data for the last 30 days
-  const data = []
-  const now = new Date()
-  
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(now.getDate() - i)
+// Load stats
+async function loadStats() {
+  try {
+    // Get last 30 days range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
     
-    // Random practice duration between 0-120 minutes (some days might have no practice)
-    const randomDuration = Math.floor(Math.random() * 120) * (Math.random() > 0.3 ? 1 : 0)
+    // Format dates for the API
+    const params = {
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString()
+    };
     
-    data.push({
-      date: format(date, 'yyyy-MM-dd'),
-      minutes: randomDuration
-    })
+    await statsStore.fetchPracticeStats(params);
+  } catch (error) {
+    console.error('Error loading statistics:', error);
+    appStore.showErrorMessage('Error loading statistics');
   }
-  
-  practiceData.value = data
 }
 
-// Utility functions
+// Format helpers
 function formatDate(dateString) {
-  if (!dateString) return ''
-  return format(parseISO(dateString), 'MMM d, yyyy')
-}
-
-function formatDuration(startTime, endTime) {
-  if (!startTime || !endTime) return ''
-  const minutes = differenceInMinutes(parseISO(endTime), parseISO(startTime))
-  return formatTime(minutes)
+  return appStore.formatDate(dateString);
 }
 
 function formatTime(minutes) {
-  if (!minutes) return '0min'
-  if (minutes < 60) return `${minutes}min`
-  
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
-  
-  if (remainingMinutes === 0) return `${hours}h`
-  return `${hours}h ${remainingMinutes}min`
+  return appStore.formatMinutes(minutes);
+}
+
+function formatDuration(startTime, endTime) {
+  return appStore.formatDuration(startTime, endTime);
 }
 </script>
+
+<style scoped>
+.primary--text {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+</style>
