@@ -51,22 +51,41 @@ export const useStatsStore = defineStore("stats", () => {
         // Format for charts: { date: "YYYY-MM-DD", minutes: X, categoryId: Y }
         const chartData = [];
 
+        // First add the overall practice frequency points
         practiceStats.value.practiceFrequency.forEach((point) => {
             // Convert to simple date format
             const date = new Date(point.date);
             const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
-
-            // Find category if available
-            let categoryId = null;
             const minutes = point.durationSeconds / 60; // Convert to minutes
 
-            // For now we don't have category info in practice_frequency
-            // In a future version, we might add category to the backend API
-
-            chartData.push(
-                { date: dateStr, minutes: minutes, categoryId: categoryId },
-            );
+            chartData.push({
+                date: dateStr,
+                minutes: minutes,
+                categoryId: null, // null indicates overall practice time
+            });
         });
+
+        // Now add the category-specific practice frequency points if available
+        if (practiceStats.value.categoryDistribution) {
+            practiceStats.value.categoryDistribution.forEach((category) => {
+                if (
+                    category.practiceFrequency &&
+                    category.practiceFrequency.length > 0
+                ) {
+                    category.practiceFrequency.forEach((point) => {
+                        const date = new Date(point.date);
+                        const dateStr = date.toISOString().split("T")[0];
+                        const minutes = point.durationSeconds / 60;
+
+                        chartData.push({
+                            date: dateStr,
+                            minutes: minutes,
+                            categoryId: category.categoryId,
+                        });
+                    });
+                }
+            });
+        }
 
         return chartData;
     });

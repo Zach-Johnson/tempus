@@ -69,111 +69,75 @@ const setupCategoryColors = () => {
 
 // Computed properties for chart data
 const chartData = computed(() => {
-  if (debug.value) {
-    console.log('practiceFrequency:', statsStore.practiceFrequency)
-    console.log('categoryDistribution:', statsStore.categoryDistribution)
-  }
-
-  if (!statsStore.practiceFrequency || statsStore.practiceFrequency.length === 0) {
-    return { labels: [], datasets: [] }
-  }
-
-  // Get unique dates from practice frequency data
-  const sortedFrequency = [...statsStore.practiceFrequency].sort((a, b) => 
-    new Date(a.date) - new Date(b.date)
-  )
-  
-  // Get the unique dates as labels
-  const labels = [...new Set(sortedFrequency.map(item => {
-    // Format the date as 'MMM D' (e.g., 'Jan 1')
-    const date = new Date(item.date)
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`
-  }))]
-
-  // Check if we have category distribution data
-  if (!statsStore.categoryDistribution || statsStore.categoryDistribution.length === 0) {
-    // Simplified approach if no category data: just show total practice time
-    const dataset = {
-      label: 'Practice Time',
-      backgroundColor: '#1976D2',
-      data: labels.map(() => 0)
+    if (debug.value) {
+        console.log('practiceFrequency:', statsStore.practiceFrequency);
+        console.log('categoryDistribution:', statsStore.categoryDistribution);
     }
 
-    // Fill in the data
-    sortedFrequency.forEach(item => {
-      const dateStr = new Date(item.date).toLocaleString('default', { month: 'short' }) + 
-                     ' ' + new Date(item.date).getDate()
-      const dateIndex = labels.indexOf(dateStr)
-      
-      if (dateIndex !== -1) {
-        dataset.data[dateIndex] += item.minutes
-      }
-    })
+    if (!statsStore.practiceFrequency || statsStore.practiceFrequency.length === 0) {
+        return { labels: [], datasets: [] };
+    }
+
+    // Get unique dates from practice frequency data
+    const dates = [...new Set(statsStore.practiceFrequency.map(item => item.date))];
+    
+    // Sort the dates chronologically
+    const sortedDates = dates.sort((a, b) => new Date(a) - new Date(b));
+    
+    // Format the dates for display as labels
+    const labels = sortedDates.map(dateStr => {
+        const date = new Date(dateStr);
+        return `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+    });
+
+    // Create a map of category ID to dataset
+    const datasetsMap = {};
+
+    // Initialize datasets for each category from categoryDistribution
+    if (statsStore.categoryDistribution && statsStore.categoryDistribution.length > 0) {
+        statsStore.categoryDistribution.forEach(category => {
+            datasetsMap[category.categoryId] = {
+                label: category.categoryName,
+                backgroundColor: categoryColors[category.categoryId] || categoryColors[0],
+                data: Array(labels.length).fill(0) // Initialize with zeros
+            };
+        });
+    } else {
+        // Fallback to a single dataset if no category data
+        datasetsMap['total'] = {
+            label: 'Practice Time',
+            backgroundColor: '#1976D2',
+            data: Array(labels.length).fill(0)
+        };
+    }
+
+    // Add data points from practiceFrequency
+    statsStore.practiceFrequency.forEach(point => {
+        const dateStr = point.date;
+        const dateIndex = sortedDates.indexOf(dateStr);
+        
+        if (dateIndex !== -1) {
+            const minutes = point.minutes;
+            
+            if (point.categoryId !== null && datasetsMap[point.categoryId]) {
+                // Add category-specific data
+                datasetsMap[point.categoryId].data[dateIndex] += minutes;
+            } else if (datasetsMap['total']) {
+                // Add to total if no category is specified and we're using the fallback
+                datasetsMap['total'].data[dateIndex] += minutes;
+            }
+        }
+    });
+
+    // Convert map to array, filtering out empty datasets
+    const datasets = Object.values(datasetsMap)
+        .filter(dataset => dataset.data.some(value => value > 0));
 
     return {
-      labels,
-      datasets: [dataset]
-    }
-  }
-
-  // If we have category distribution data, proceed with full implementation
-  
-  // Create datasets for each category
-  const categoriesMap = {}
-  
-  // Initialize with zeros for all dates
-  statsStore.categoryDistribution.forEach(category => {
-    categoriesMap[category.category_id] = {
-      label: category.category_name,
-      backgroundColor: categoryColors[category.category_id] || categoryColors[0],
-      data: labels.map(() => 0) // Initialize with zeros for all dates
-    }
-  })
-  
-  // Add uncategorized category if needed
-  if (!categoriesMap[0] && categoryColors[0]) {
-    categoriesMap[0] = {
-      label: 'Uncategorized',
-      backgroundColor: categoryColors[0],
-      data: labels.map(() => 0)
-    }
-  }
-  
-  // Fill in the data
-  sortedFrequency.forEach((item) => {
-    const dateStr = new Date(item.date).toLocaleString('default', { month: 'short' }) + 
-                   ' ' + new Date(item.date).getDate()
-    const dateIndex = labels.indexOf(dateStr)
-    
-    if (dateIndex === -1) return
-    
-    // If we don't have category breakdown in practiceFrequency,
-    // proportionally distribute based on category distribution percentages
-    const minutes = item.minutes
-    
-    // Only distribute if we have non-zero minutes
-    if (minutes > 0) {
-      statsStore.categoryDistribution.forEach(category => {
-        if (categoriesMap[category.category_id]) {
-          // Use percentage (if available) or distribute evenly
-          const percentage = category.percentage || 
-                           (100 / statsStore.categoryDistribution.length)
-          const share = minutes * (percentage / 100)
-          categoriesMap[category.category_id].data[dateIndex] += share
-        }
-      })
-    }
-  })
-  
-  // Convert to datasets array, filtering out empty categories
-  const datasets = Object.values(categoriesMap)
-    .filter(category => category.data.some(value => value > 0))
-  
-  return {
-    labels,
-    datasets
-  }
-})
+        labels,
+        datasets
+    };
+});
 
 // Chart options
 const chartOptions = computed(() => ({
