@@ -28,6 +28,8 @@ tasks:
   run-server:
     desc: Run the server
     deps: [build]
+    env:
+      RUN_MIGRATIONS: true
     cmds:
       - ./{{.BUILD_DIR}}/tempus-server
 

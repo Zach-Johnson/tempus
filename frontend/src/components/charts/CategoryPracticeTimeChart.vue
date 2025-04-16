@@ -42,13 +42,7 @@ const appStore = useAppStore()
 const debug = ref(true)
 
 // Generate colors for categories
-const categoryColors = {
-  0: '#9e9e9e', // Gray for uncategorized items (category_id 0)
-}
-
-// Prepare category colors
-const setupCategoryColors = () => {
-  // Generate colors for each category
+const categoryColors = computed(() => {
   const colorPalette = [
     '#1976D2', // Primary blue
     '#E53935', // Red
@@ -62,10 +56,16 @@ const setupCategoryColors = () => {
     '#00897B', // Teal
   ]
 
+  const colors = {
+    0: '#9e9e9e' // Fallback for uncategorized
+  }
+
   categoriesStore.categories.forEach((category, index) => {
-    categoryColors[category.id] = colorPalette[index % colorPalette.length]
+    colors[category.id] = colorPalette[index % colorPalette.length]
   })
-}
+
+  return colors
+})
 
 // Computed properties for chart data
 const chartData = computed(() => {
@@ -98,7 +98,7 @@ const chartData = computed(() => {
         statsStore.categoryDistribution.forEach(category => {
             datasetsMap[category.categoryId] = {
                 label: category.categoryName,
-                backgroundColor: categoryColors[category.categoryId] || categoryColors[0],
+                backgroundColor: categoryColors.value[category.categoryId] || categoryColors.value[0],
                 data: Array(labels.length).fill(0) // Initialize with zeros
             };
         });
@@ -192,21 +192,4 @@ watch(() => statsStore.practiceStats, (newStats) => {
     console.log('New practice stats received:', newStats)
   }
 }, { deep: true })
-
-// Setup and initialize
-onMounted(() => {
-  setupCategoryColors()
-  
-  // Enable this line to debug
-  // debug.value = true
-  
-  if (debug.value) {
-    // Log initial data
-    console.log('Initial store data:')
-    console.log('Categories:', categoriesStore.categories)
-    console.log('Practice stats:', statsStore.practiceStats)
-    console.log('Practice frequency:', statsStore.practiceFrequency)
-    console.log('Category distribution:', statsStore.categoryDistribution)
-  }
-})
 </script>
