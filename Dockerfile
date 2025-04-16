@@ -25,7 +25,6 @@ RUN apk add --no-cache sqlite
 
 COPY --from=go-builder /app/tempus ./
 COPY --from=go-builder /app/schema.sql ./
-COPY --from=go-builder /app/data ./data
 
 EXPOSE 8080
 

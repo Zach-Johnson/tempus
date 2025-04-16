@@ -33,30 +33,30 @@ import (
 var embeddedFiles embed.FS
 
 var (
-	grpcPort  = flag.Int("grpc-port", 9090, "gRPC server port")
-	httpPort  = flag.Int("http-port", 8080, "HTTP server port")
-	dbPath    = flag.String("db-path", "./data/tempus.db", "Path to SQLite database file")
-	enableTLS = flag.Bool("tls", false, "Enable TLS for gRPC server")
+	dbPath    string
+	grpcPort  int
+	httpPort  int
+	enableTLS bool
 )
 
 func main() {
+	flag.BoolVar(&enableTLS, "tls", false, "Enable TLS for gRPC server")
+	flag.IntVar(&httpPort, "http-port", 8080, "HTTP server port")
+	flag.IntVar(&grpcPort, "grpc-port", 9090, "gRPC server port")
+	flag.StringVar(&dbPath, "db-path", "./data/tempus.db", "Path to SQLite database file")
 	flag.Parse()
 
 	// Set up logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Printf("Starting tempus application")
 
-	// Ensure data directory exists
-	dataDir := "./data"
-	if _, err := os.Stat(dataDir); os.IsNotExist(err) {
-		log.Printf("Creating data directory: %s", dataDir)
-		if err := os.MkdirAll(dataDir, 0755); err != nil {
-			log.Fatalf("Failed to create data directory: %v", err)
-		}
+	dbPathEnv, ok := os.LookupEnv("DB_PATH")
+	if ok {
+		dbPath = dbPathEnv
 	}
 
 	// Initialize database
-	db, err := sql.Open("sqlite3", *dbPath)
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
@@ -114,12 +114,12 @@ func startGRPCServer(store *storage.SQLiteStore) {
 	reflection.Register(grpcServer)
 
 	// Start listening
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *grpcPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
-	log.Printf("gRPC server listening on :%d", *grpcPort)
+	log.Printf("gRPC server listening on :%d", grpcPort)
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve gRPC: %v", err)
 	}
@@ -132,7 +132,7 @@ func startHTTPServer() {
 
 	// Create a client connection to the gRPC server
 	conn, err := grpc.NewClient(
-		fmt.Sprintf("localhost:%d", *grpcPort),
+		fmt.Sprintf("localhost:%d", grpcPort),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -172,12 +172,12 @@ func startHTTPServer() {
 
 	// Create HTTP server
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", *httpPort),
+		Addr:    fmt.Sprintf(":%d", httpPort),
 		Handler: mux,
 	}
 
 	// Start HTTP server
-	log.Printf("HTTP server listening on :%d", *httpPort)
+	log.Printf("HTTP server listening on :%d", httpPort)
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Failed to serve HTTP: %v", err)
 	}
