@@ -497,11 +497,13 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 	// Add category filter if provided
 	var categoryJoin, categoryFilter string
 	if req.CategoryId > 0 {
-		categoryJoin = " JOIN exercise_history eh ON eh.session_id = ps.id JOIN exercise_categories ec ON eh.exercise_id = ec.exercise_id"
+		categoryJoin = ` JOIN exercise_history eh ON eh.session_id = ps.id 
+						JOIN exercise_tags ec ON eh.exercise_id = ec.exercise_id
+						JOIN tag_categories tc ON tc.tag_id = ec.tag_id`
 		if whereClause == "" {
-			categoryFilter = " WHERE ec.category_id = ?"
+			categoryFilter = " WHERE tc.category_id = ?"
 		} else {
-			categoryFilter = " AND ec.category_id = ?"
+			categoryFilter = " AND tc.category_id = ?"
 		}
 		queryParams = append(queryParams, req.CategoryId)
 	}
@@ -623,10 +625,10 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
 		FROM 
 			categories c
+		JOIN tag_categories tc ON tc.category_id = c.id
+		JOIN exercise_tags et on tc.tag_id = et.tag_id
 		JOIN 
-			exercise_categories ec ON c.id = ec.category_id
-		JOIN 
-			exercise_history eh ON ec.exercise_id = eh.exercise_id
+			exercise_history eh ON et.exercise_id = eh.exercise_id
 		JOIN 
 			practice_sessions ps ON eh.session_id = ps.id
 	` + whereClause + `
@@ -691,10 +693,10 @@ func (h *PracticeSessionHandler) getCategoryDailyPractice(ctx context.Context, c
 			exercise_history eh
 		JOIN 
 			practice_sessions ps ON eh.session_id = ps.id
-		JOIN 
-			exercise_categories ec ON eh.exercise_id = ec.exercise_id
+		JOIN exercise_tags et on et.exercise_id = eh.exercise_id
+		JOIN tag_categories tc on et.tag_id = tc.tag_id
 		WHERE 
-			ec.category_id = ?
+			tc.category_id = ?
 	`
 
 	// Create parameters for query, starting with category ID
@@ -801,7 +803,11 @@ func (h *PracticeSessionHandler) getExerciseDetails(ctx context.Context, tx *sql
 	// Get associated category IDs
 	categoryRows, err := tx.QueryContext(
 		ctx,
-		"SELECT category_id FROM exercise_categories WHERE exercise_id = ?",
+		`SELECT category_id 
+		FROM exercise_tags et
+		JOIN tag_categories tc ON tc.tag_id = et.tag_id
+		WHERE et.exercise_id = ?
+		GROUP BY tc.category_id`,
 		exerciseId,
 	)
 	if err != nil {

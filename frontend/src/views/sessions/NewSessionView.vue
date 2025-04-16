@@ -747,11 +747,6 @@ async function stopExercisePractice(exercise) {
   exercise.completed = true
   
   try {
-    // Prepare the session tags - convert to array of strings if objects
-    const sessionTagsArray = exercise.sessionTags?.map(tag => {
-      return typeof tag === 'string' ? tag : (tag.title || tag.text || tag)
-    }) || []
-    
     // Save the exercise history entry immediately
     const exerciseData = {
       session_id: sessionId.value,
@@ -760,8 +755,7 @@ async function stopExercisePractice(exercise) {
       end_time: exercise.endTime.toISOString(),
       bpms: exercise.bpms ? exercise.bpms : [],
       time_signature: exercise.timeSignature || '4/4',
-      notes: exercise.notes || '',
-      additional_tags: sessionTagsArray
+      notes: exercise.notes || ''
     }
     
     const newHistoryEntry = await historyStore.createHistoryEntry(exerciseData)

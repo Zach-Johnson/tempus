@@ -65,8 +65,16 @@ curl -X POST \
   -d '{
     "name": "Single Paradiddle",
     "description": "A basic drum rudiment pattern: RLRR LRLL",
-    "tag_ids": [],
-    "category_ids": [1]
+    "tag_ids": [1]
+  }' | jq
+
+curl -X POST \
+  http://localhost:8080/api/v1/exercises \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Fun Song",
+    "description": "A cool groove",
+    "tag_ids": [3]
   }' | jq
 
 curl -X GET http://localhost:8080/api/v1/exercises/1 | jq
@@ -208,6 +216,20 @@ curl -X POST \
     "bpms": [85,90],
     "time_signature": "4/4",
     "notes": "Practiced during my morning session",
+    "rating": 4
+  }' | jq
+
+curl -X POST \
+  http://localhost:8080/api/v1/history \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "exercise_id": 2,
+    "session_id": 2,
+    "start_time": "2025-04-10T18:00:00Z",
+    "end_time": "2025-04-10T18:15:00Z",
+    "bpms": [100],
+    "time_signature": "4/4",
+    "notes": "Practiced during my evening session",
     "rating": 4
   }' | jq
 

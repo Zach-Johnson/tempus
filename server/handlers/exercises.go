@@ -961,7 +961,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		FROM (
 			SELECT 
 				CAST(strftime('%Y-%m-%d', start_time) AS TEXT) as date,
-				CAST(json_extract(value, '/) AS INTEGER) AS bpm_value
+				CAST(json_extract(value, '$') AS INTEGER) AS bpm_value
 			FROM exercise_history, json_each(bpms)
 			WHERE exercise_id = ? AND bpms IS NOT NULL` + dateFilter + `
 		) 

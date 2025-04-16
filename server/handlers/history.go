@@ -89,7 +89,7 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 	result, err := tx.ExecContext(
 		ctx,
 		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		req.ExerciseId, req.SessionId, startTime, endTime, bpmJSON, req.TimeSignature, req.Notes, req.Rating,
 	)
 	if err != nil {
@@ -641,7 +641,11 @@ func (h *ExerciseHistoryHandler) getExerciseDetails(ctx context.Context, tx *sql
 	// Get associated category IDs
 	categoryRows, err := tx.QueryContext(
 		ctx,
-		"SELECT category_id FROM exercise_categories WHERE exercise_id = ?",
+		`SELECT tc.category_id 
+		FROM exercise_tags ec
+		JOIN tag_categories tc ON tc.tag_id = ec.tag_id
+		WHERE ec.exercise_id = ?
+		GROUP BY tc.category_id`,
 		exerciseId,
 	)
 	if err != nil {
@@ -767,7 +771,11 @@ func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx 
 
 	// Fetch categories
 	catQuery := fmt.Sprintf(
-		"SELECT exercise_id, category_id FROM exercise_categories WHERE exercise_id IN (%s)",
+		`SELECT et.exercise_id, tc.category_id 
+		FROM exercise_tags et
+		JOIN tag_categories tc ON tc.tag_id = et.tag_id
+		WHERE et.exercise_id IN (%s)
+		GROUP BY tc.category_id`,
 		strings.Join(placeholders, ","),
 	)
 	catRows, err := tx.QueryContext(ctx, catQuery, args...)
