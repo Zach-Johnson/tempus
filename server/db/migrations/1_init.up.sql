@@ -1,5 +1,5 @@
 -- Categories Table
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -8,14 +8,14 @@ CREATE TABLE categories (
 );
 
 -- Tags Table
-CREATE TABLE tags (
+CREATE TABLE IF NOT EXISTS tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tag Categories Junction Table (many-to-many relationship)
-CREATE TABLE tag_categories (
+CREATE TABLE IF NOT EXISTS tag_categories (
     tag_id INTEGER NOT NULL,
     category_id INTEGER NOT NULL,
     PRIMARY KEY (tag_id, category_id),
@@ -24,7 +24,7 @@ CREATE TABLE tag_categories (
 );
 
 -- Exercises Table
-CREATE TABLE exercises (
+CREATE TABLE IF NOT EXISTS exercises (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT,
@@ -33,7 +33,7 @@ CREATE TABLE exercises (
 );
 
 -- Exercise Images Table
-CREATE TABLE exercise_images (
+CREATE TABLE IF NOT EXISTS exercise_images (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
     image_data BLOB NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE exercise_images (
 );
 
 -- Exercise Links Table (for external resources)
-CREATE TABLE exercise_links (
+CREATE TABLE IF NOT EXISTS exercise_links (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
     url TEXT NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE exercise_links (
 );
 
 -- Exercise Tags Junction Table (many-to-many relationship)
-CREATE TABLE exercise_tags (
+CREATE TABLE IF NOT EXISTS exercise_tags (
     exercise_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
     PRIMARY KEY (exercise_id, tag_id),
@@ -63,8 +63,17 @@ CREATE TABLE exercise_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
+-- Exercise Categories Junction Table (many-to-many relationship)
+CREATE TABLE IF NOT EXISTS exercise_categories (
+    exercise_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+    PRIMARY KEY (exercise_id, category_id),
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
 -- Practice Sessions Table
-CREATE TABLE practice_sessions (
+CREATE TABLE IF NOT EXISTS practice_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
@@ -74,7 +83,7 @@ CREATE TABLE practice_sessions (
 );
 
 -- Exercise History Table (for tracking progress over time)
-CREATE TABLE exercise_history (
+CREATE TABLE IF NOT EXISTS exercise_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
     session_id INTEGER NOT NULL,
@@ -89,19 +98,19 @@ CREATE TABLE exercise_history (
 );
 
 -- Triggers to update the updated_at timestamp
-CREATE TRIGGER update_exercises_timestamp 
+CREATE TRIGGER IF NOT EXISTS update_exercises_timestamp 
 AFTER UPDATE ON exercises
 BEGIN
     UPDATE exercises SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
 
-CREATE TRIGGER update_categories_timestamp 
+CREATE TRIGGER IF NOT EXISTS update_categories_timestamp 
 AFTER UPDATE ON categories
 BEGIN
     UPDATE categories SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
 
-CREATE TRIGGER update_practice_sessions_timestamp 
+CREATE TRIGGER IF NOT EXISTS update_practice_sessions_timestamp 
 AFTER UPDATE ON practice_sessions
 BEGIN
     UPDATE practice_sessions SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;

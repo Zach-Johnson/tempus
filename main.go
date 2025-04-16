@@ -77,9 +77,11 @@ func main() {
 	// Initialize the storage layer
 	store := storage.NewSQLiteStore(db)
 
-	// Create database schema if it doesn't exist
-	if err := store.InitializeSchema(); err != nil {
-		log.Fatalf("Failed to initialize database schema: %v", err)
+	if os.Getenv("RUN_MIGRATIONS") == "true" {
+		if err := storage.RunMigrations(store.GetDB()); err != nil {
+			log.Fatalf("Failed to run migrations: %v", err)
+		}
+		log.Println("Migrations ran successfully")
 	}
 
 	// Start the gRPC server
