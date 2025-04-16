@@ -76,29 +76,6 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 		}
 	}
 
-	// Associate exercise with categories if provided
-	for _, categoryID := range req.CategoryIds {
-		// Check if category exists
-		var exists bool
-		err := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE id = ?)", categoryID).Scan(&exists)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to check category existence: %v", err)
-		}
-		if !exists {
-			return nil, status.Errorf(codes.NotFound, "category with ID %d not found", categoryID)
-		}
-
-		// Create exercise-category relationship
-		_, err = tx.ExecContext(
-			ctx,
-			"INSERT INTO exercise_categories (exercise_id, category_id) VALUES (?, ?)",
-			id, categoryID,
-		)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to associate exercise with category: %v", err)
-		}
-	}
-
 	// Add images if provided
 	images := make([]*pb.ExerciseImage, 0, len(req.Images))
 	for _, imageReq := range req.Images {
@@ -199,7 +176,6 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 		CreatedAt:   timestamppb.New(createdAt),
 		UpdatedAt:   timestamppb.New(updatedAt),
 		TagIds:      req.TagIds,
-		CategoryIds: req.CategoryIds,
 		Images:      images,
 		Links:       links,
 	}, nil
@@ -253,30 +229,6 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 		return nil, status.Errorf(codes.Internal, "error reading exercise tags: %v", err)
 	}
 	exercise.TagIds = tagIDs
-
-	// Get associated category IDs
-	categoryRows, err := h.db.QueryContext(
-		ctx,
-		"SELECT category_id FROM exercise_categories WHERE exercise_id = ?",
-		req.Id,
-	)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to retrieve exercise categories: %v", err)
-	}
-	defer categoryRows.Close()
-
-	var categoryIDs []int32
-	for categoryRows.Next() {
-		var categoryID int32
-		if err := categoryRows.Scan(&categoryID); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to parse category ID: %v", err)
-		}
-		categoryIDs = append(categoryIDs, categoryID)
-	}
-	if err = categoryRows.Err(); err != nil {
-		return nil, status.Errorf(codes.Internal, "error reading exercise categories: %v", err)
-	}
-	exercise.CategoryIds = categoryIDs
 
 	// Get images
 	imageRows, err := h.db.QueryContext(
@@ -371,11 +323,13 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 
 	if req.CategoryId > 0 && req.TagId > 0 {
 		// Filter by both category and tag
+		// For category, we need to find tags in that category first
 		whereClause = `
             WHERE e.id IN (
-                SELECT ec.exercise_id 
-                FROM exercise_categories ec 
-                WHERE ec.category_id = ?
+                SELECT et.exercise_id 
+                FROM exercise_tags et
+                JOIN tag_categories tc ON et.tag_id = tc.tag_id 
+                WHERE tc.category_id = ?
             ) AND e.id IN (
                 SELECT et.exercise_id 
                 FROM exercise_tags et 
@@ -384,12 +338,13 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
         `
 		queryParams = append(queryParams, req.CategoryId, req.TagId)
 	} else if req.CategoryId > 0 {
-		// Filter by category only
+		// Filter by category only - now uses tag_categories junction table
 		whereClause = `
             WHERE e.id IN (
-                SELECT ec.exercise_id 
-                FROM exercise_categories ec 
-                WHERE ec.category_id = ?
+                SELECT DISTINCT et.exercise_id 
+                FROM exercise_tags et
+                JOIN tag_categories tc ON et.tag_id = tc.tag_id
+                WHERE tc.category_id = ?
             )
         `
 		queryParams = append(queryParams, req.CategoryId)
@@ -411,7 +366,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 
 	// Query total count
 	var totalCount int32
-	countQueryParams := make([]any, len(queryParams)-2) // Exclude limit and offset
+	countQueryParams := make([]interface{}, len(queryParams)-2) // Exclude limit and offset
 	copy(countQueryParams, queryParams[:len(queryParams)-2])
 
 	err := h.db.QueryRowContext(ctx, countQuery+whereClause, countQueryParams...).Scan(&totalCount)
@@ -457,7 +412,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 		return nil, status.Errorf(codes.Internal, "error reading exercises: %v", err)
 	}
 
-	// For each exercise, get tags, categories, images, and links
+	// For each exercise, get tags, images, and links
 	if len(exerciseIDs) > 0 {
 		if err := h.addRelatedData(ctx, exercises); err != nil {
 			return nil, err
@@ -477,11 +432,11 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 	}, nil
 }
 
-// addRelatedData adds tags, categories, images, and links to the exercises
+// addRelatedData adds tags, images, and links to the exercises
 func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Exercise) error {
 	// Map for quick lookup of exercises by ID
 	exerciseMap := make(map[int32]*pb.Exercise)
-	exerciseIDs := make([]any, 0, len(exercises))
+	exerciseIDs := make([]interface{}, 0, len(exercises))
 
 	// Build query params and map
 	placeholders := ""
@@ -516,31 +471,6 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	if err = tagRows.Err(); err != nil {
 		return status.Errorf(codes.Internal, "error reading exercise tags: %v", err)
 	}
-
-	// Get categories for all exercises
-	catQuery := "SELECT exercise_id, category_id FROM exercise_categories WHERE exercise_id IN (" + placeholders + ")"
-	catRows, err := h.db.QueryContext(ctx, catQuery, exerciseIDs...)
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to retrieve exercise categories: %v", err)
-	}
-	defer catRows.Close()
-
-	for catRows.Next() {
-		var exerciseID, categoryID int32
-		if err := catRows.Scan(&exerciseID, &categoryID); err != nil {
-			return status.Errorf(codes.Internal, "failed to parse exercise category: %v", err)
-		}
-
-		if exercise, ok := exerciseMap[exerciseID]; ok {
-			exercise.CategoryIds = append(exercise.CategoryIds, categoryID)
-		}
-	}
-	if err = catRows.Err(); err != nil {
-		return status.Errorf(codes.Internal, "error reading exercise categories: %v", err)
-	}
-
-	// Get images for all exercises (optional, as these can be large)
-	// We could skip this for list calls and only include them in GetExercise
 
 	// Get links for all exercises
 	linkQuery := "SELECT id, exercise_id, url, description, created_at FROM exercise_links WHERE exercise_id IN (" + placeholders + ")"
@@ -602,14 +532,12 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 	updateName := false
 	updateDescription := false
 	updateTags := false
-	updateCategories := false
 
 	if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
 		// If no update mask is provided, update all fields
 		updateName = true
 		updateDescription = true
 		updateTags = true
-		updateCategories = true
 	} else {
 		for _, path := range req.UpdateMask.Paths {
 			switch path {
@@ -619,8 +547,6 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 				updateDescription = true
 			case "tag_ids":
 				updateTags = true
-			case "category_ids":
-				updateCategories = true
 			}
 		}
 	}
@@ -628,7 +554,7 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 	// Update exercise fields
 	if updateName || updateDescription {
 		sql := "UPDATE exercises SET"
-		params := []any{}
+		params := []interface{}{}
 		needsComma := false
 
 		if updateName {
@@ -685,38 +611,6 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 			)
 			if err != nil {
 				return nil, status.Errorf(codes.Internal, "failed to associate exercise with tag: %v", err)
-			}
-		}
-	}
-
-	// Update categories if requested
-	if updateCategories {
-		// Delete existing category associations
-		_, err = tx.ExecContext(ctx, "DELETE FROM exercise_categories WHERE exercise_id = ?", req.Id)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to remove existing category associations: %v", err)
-		}
-
-		// Add new category associations
-		for _, categoryID := range req.Exercise.CategoryIds {
-			// Check if category exists
-			var exists bool
-			err := tx.QueryRowContext(ctx, "SELECT EXISTS(SELECT 1 FROM categories WHERE id = ?)", categoryID).Scan(&exists)
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to check category existence: %v", err)
-			}
-			if !exists {
-				return nil, status.Errorf(codes.NotFound, "category with ID %d not found", categoryID)
-			}
-
-			// Create association
-			_, err = tx.ExecContext(
-				ctx,
-				"INSERT INTO exercise_categories (exercise_id, category_id) VALUES (?, ?)",
-				req.Id, categoryID,
-			)
-			if err != nil {
-				return nil, status.Errorf(codes.Internal, "failed to associate exercise with category: %v", err)
 			}
 		}
 	}
@@ -1067,7 +961,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		FROM (
 			SELECT 
 				CAST(strftime('%Y-%m-%d', start_time) AS TEXT) as date,
-				CAST(json_extract(value, '$') AS INTEGER) AS bpm_value
+				CAST(json_extract(value, '/) AS INTEGER) AS bpm_value
 			FROM exercise_history, json_each(bpms)
 			WHERE exercise_id = ? AND bpms IS NOT NULL` + dateFilter + `
 		) 

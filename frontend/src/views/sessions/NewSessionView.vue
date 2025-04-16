@@ -575,6 +575,7 @@ function addExerciseToSession(exercise) {
     bpms: [], // Empty initially so user can set it
     timeSignature: '4/4', // Default time signature
     notes: '', // Empty initially for user input
+    sessionTags: [], // New field for session-specific tags
     startTime: null,
     endTime: null,
     isActive: false,
@@ -583,6 +584,12 @@ function addExerciseToSession(exercise) {
   })
   
   appStore.showSuccessMessage(`Added ${exercise.name} to session`)
+}
+
+function removeSessionTag(exercise, index) {
+  if (exercise.sessionTags) {
+    exercise.sessionTags.splice(index, 1)
+  }
 }
 
 function toggleExerciseInSession(exercise) {
@@ -740,6 +747,11 @@ async function stopExercisePractice(exercise) {
   exercise.completed = true
   
   try {
+    // Prepare the session tags - convert to array of strings if objects
+    const sessionTagsArray = exercise.sessionTags?.map(tag => {
+      return typeof tag === 'string' ? tag : (tag.title || tag.text || tag)
+    }) || []
+    
     // Save the exercise history entry immediately
     const exerciseData = {
       session_id: sessionId.value,
@@ -748,7 +760,8 @@ async function stopExercisePractice(exercise) {
       end_time: exercise.endTime.toISOString(),
       bpms: exercise.bpms ? exercise.bpms : [],
       time_signature: exercise.timeSignature || '4/4',
-      notes: exercise.notes || ''
+      notes: exercise.notes || '',
+      additional_tags: sessionTagsArray
     }
     
     const newHistoryEntry = await historyStore.createHistoryEntry(exerciseData)

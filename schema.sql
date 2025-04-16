@@ -63,15 +63,6 @@ CREATE TABLE exercise_tags (
     FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
 );
 
--- Exercise Categories Junction Table (many-to-many relationship)
-CREATE TABLE exercise_categories (
-    exercise_id INTEGER NOT NULL,
-    category_id INTEGER NOT NULL,
-    PRIMARY KEY (exercise_id, category_id),
-    FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
-
 -- Practice Sessions Table
 CREATE TABLE practice_sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

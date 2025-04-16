@@ -29,46 +29,76 @@
               ></v-textarea>
             </v-col>
             
-            <v-col cols="12" md="6">
-              <category-select
-                v-model="formData.categoryIds"
-                label="Categories"
-                multiple
-                chips
-              ></category-select>
-            </v-col>
-            
-            <v-col cols="12" md="6">
-              <v-select
-                v-model="formData.tagIds"
-                :items="tagsForSelect"
-                label="Tags"
-                multiple
-                chips
-                variant="outlined"
-                :loading="tagsStore.loading"
-              >
-                <template v-slot:selection="{ item }">
+            <v-col cols="12">
+              <div class="mb-2">
+                <v-select
+                  v-model="formData.tagIds"
+                  :items="tagsStore.tags"
+                  item-title="name"
+                  item-value="id"
+                  label="Tags"
+                  multiple
+                  chips
+                  variant="outlined"
+                  :loading="tagsStore.loading"
+                >
+                  <template v-slot:selection="{ item }">
                   <v-chip
-                    :key="item.raw.value"
-                    closable
-                    @click:close="removeTag(item.raw.value)"
+                      :key="item.raw.id"
+                      title="item.raw.name"
+                      closable
+                      @click:close="removeTag(item.raw.id)"
                   >
-                    {{ item.title }}
+                      {{ item.raw.name }}
+                      <div v-if="item.raw.categoryIds?.length" class="d-flex align-center mt-1">
+                      <v-chip
+                          v-for="categoryId in item.raw.categoryIds"
+                          :key="`cat-${item.raw.id}-${categoryId}`"
+                          size="x-small"
+                          :color="getCategoryColor(categoryId)"
+                          class="ml-1"
+                      >
+                          {{ getCategoryName(categoryId) }}
+                      </v-chip>
+                      </div>
                   </v-chip>
-                </template>
-                <template v-slot:append-inner>
-                  <v-btn
-                    icon
-                    size="small"
-                    variant="text"
-                    class="ms-2"
-                    @click.stop="openTagForm"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </template>
-              </v-select>
+                  </template>
+                  <template v-slot:item="{ item, props }">
+                    <v-list-item v-bind="props">
+                      <template v-slot:prepend>
+                        <v-checkbox-btn :model-value="isTagSelected(item.raw.id)"></v-checkbox-btn>
+                      </template>
+                      <template v-slot:title>
+                      {{ item.raw.name }}
+                       </template> 
+                        <template v-slot:subtitle>
+                        <div v-if="item.raw.categoryIds?.length" class="d-flex align-center mt-1">
+                            <v-chip
+                            v-for="categoryId in item.raw.categoryIds"
+                            :key="`cat-${item.raw.id}-${categoryId}`"
+                            size="x-small"
+                            :color="getCategoryColor(categoryId)"
+                            class="mr-1"
+                            >
+                            {{ getCategoryName(categoryId) }}
+                            </v-chip>
+                        </div>
+                        </template>
+                    </v-list-item>
+                  </template>
+                  <template v-slot:append-inner>
+                    <v-btn
+                      icon
+                      size="small"
+                      variant="text"
+                      class="ms-2"
+                      @click.stop="openTagForm"
+                    >
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </template>
+                </v-select>
+              </div>
             </v-col>
             
             <!-- External Resources Section -->
@@ -198,7 +228,6 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useTagsStore } from '@/stores/tags.js'
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useAppStore } from '@/stores/app.js'
-import CategorySelect from '@/components/categories/CategorySelect.vue'
 import TagFormDialog from '@/components/tags/TagFormDialog.vue'
 
 // Props
@@ -232,7 +261,6 @@ const saving = ref(false)
 const formData = ref({
   name: '',
   description: '',
-  categoryIds: [],
   tagIds: [],
   links: []
 })
@@ -250,17 +278,24 @@ const linkFormData = ref({
 // Tag Form Dialog
 const tagFormDialog = ref(false)
 
+// Category color mapping
+const categoryColors = {
+  1: '#1976D2', // Primary blue
+  2: '#E53935', // Red
+  3: '#43A047', // Green
+  4: '#FB8C00', // Orange
+  5: '#8E24AA', // Purple
+  6: '#00ACC1', // Cyan
+  7: '#FFB300', // Amber
+  8: '#5E35B1', // Deep Purple
+  9: '#1E88E5', // Blue
+  10: '#00897B', // Teal
+}
+
 // Computed
 const dialogModel = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
-})
-
-const tagsForSelect = computed(() => {
-  return tagsStore.tags.map(tag => ({
-    title: tag.name,
-    value: tag.id
-  }))
 })
 
 // Validation rules
@@ -289,7 +324,6 @@ async function save() {
     const exerciseData = {
       name: formData.value.name,
       description: formData.value.description || '',
-      categoryIds: formData.value.categoryIds.map(id => Number(id)),
       tagIds: formData.value.tagIds.map(id => Number(id)),
       links: formData.value.links
     }
@@ -303,8 +337,21 @@ async function save() {
   }
 }
 
+function isTagSelected(tagId) {
+  return formData.value.tagIds.includes(tagId)
+}
+
 function removeTag(tagId) {
   formData.value.tagIds = formData.value.tagIds.filter(id => id !== tagId)
+}
+
+function getCategoryName(categoryId) {
+  const category = categoriesStore.categoryById(categoryId)
+  return category ? category.name : ''
+}
+
+function getCategoryColor(categoryId) {
+  return categoryColors[categoryId] || '#9e9e9e'
 }
 
 function addExternalLink() {
@@ -355,7 +402,6 @@ watch(() => props.modelValue, (isOpen) => {
     formData.value = {
       name: props.exercise.name || '',
       description: props.exercise.description || '',
-      categoryIds: props.exercise.categoryIds ? [...props.exercise.categoryIds] : [],
       tagIds: props.exercise.tagIds ? [...props.exercise.tagIds] : [],
       links: props.exercise.links ? JSON.parse(JSON.stringify(props.exercise.links)) : []
     }
@@ -367,7 +413,6 @@ watch(() => props.modelValue, (isOpen) => {
     formData.value = {
       name: '',
       description: '',
-      categoryIds: [],
       tagIds: [],
       links: []
     }

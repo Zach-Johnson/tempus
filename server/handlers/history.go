@@ -89,7 +89,7 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 	result, err := tx.ExecContext(
 		ctx,
 		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		req.ExerciseId, req.SessionId, startTime, endTime, bpmJSON, req.TimeSignature, req.Notes, req.Rating,
 	)
 	if err != nil {

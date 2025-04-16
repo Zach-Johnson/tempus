@@ -80,7 +80,7 @@
           
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
-              <template v-for="categoryId in item.categoryIds || []" :key="categoryId">
+              <template v-for="categoryId in getCategoriesForExercise(item)" :key="categoryId">
                 <category-chip
                   v-if="getCategoryById(categoryId)"
                   :category="getCategoryById(categoryId)"
@@ -239,11 +239,12 @@ const filteredExercises = computed(() => {
     )
   }
   
-  // Category filter
+  // Category filter - using derived categories through tags
   if (categoryFilter.value) {
-    result = result.filter(exercise => 
-      exercise.categoryIds && exercise.categoryIds.includes(parseInt(categoryFilter.value))
-    )
+    result = result.filter(exercise => {
+      const categoryIds = getCategoriesForExercise(exercise)
+      return categoryIds.includes(parseInt(categoryFilter.value))
+    })
   }
   
   // Tag filter
@@ -290,11 +291,29 @@ function getTagById(tagId) {
   return tagsStore.tagById(tagId)
 }
 
+// Get derived categories for an exercise based on its tags
+function getCategoriesForExercise(exercise) {
+  if (!exercise || !exercise.tagIds || exercise.tagIds.length === 0) {
+    return []
+  }
+  
+  // Get all unique category IDs from the exercise's tags
+  const categoryIdsSet = new Set()
+  
+  exercise.tagIds.forEach(tagId => {
+    const tag = tagsStore.tagById(tagId)
+    if (tag && tag.category_ids) {
+      tag.category_ids.forEach(catId => categoryIdsSet.add(catId))
+    }
+  })
+  
+  return Array.from(categoryIdsSet)
+}
+
 function openCreateDialog() {
   selectedExercise.value = {
     name: '',
     description: '',
-    categoryIds: [],
     tagIds: [],
     links: []
   }
@@ -312,7 +331,7 @@ async function saveExercise(exerciseData) {
   try {
     if (isEdit.value) {
       const id = selectedExercise.value.id
-      await exercisesStore.updateExercise(id, exerciseData, 'name,description,categoryIds,tagIds')
+      await exercisesStore.updateExercise(id, exerciseData, 'name,description,tagIds')
       appStore.showSuccessMessage(`Exercise "${exerciseData.name}" updated successfully`)
     } else {
       await exercisesStore.createExercise(exerciseData)
