@@ -480,7 +480,7 @@ func (h *PracticeSessionHandler) DeletePracticeSession(ctx context.Context, req 
 func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.GetPracticeStatsRequest) (*pb.PracticeStats, error) {
 	// Build query filters based on request parameters
 	var whereClause string
-	var queryParams []interface{}
+	var queryParams []any
 
 	// Add filter by date range if provided
 	if req.StartDate != nil && req.EndDate != nil {
@@ -543,7 +543,7 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		LIMIT 10
 	`
 
-	exerciseDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
+	exerciseDistParams := append([]any{totalDurationSeconds}, queryParams...)
 	exerciseRows, err := h.db.QueryContext(ctx, exerciseDistQuery, exerciseDistParams...)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to calculate exercise distribution: %v", err)
@@ -636,7 +636,7 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 			duration DESC
 	`
 
-	categoryDistParams := append([]interface{}{totalDurationSeconds}, queryParams...)
+	categoryDistParams := append([]any{totalDurationSeconds}, queryParams...)
 	categoryRows, err := h.db.QueryContext(ctx, categoryDistQuery, categoryDistParams...)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to calculate category distribution: %v", err)

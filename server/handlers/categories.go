@@ -213,7 +213,7 @@ func (h *CategoryHandler) UpdateCategory(ctx context.Context, req *pb.UpdateCate
 
 	// Build update SQL
 	sql := "UPDATE categories SET"
-	params := []interface{}{}
+	params := []any{}
 	first := true
 
 	if updateName {

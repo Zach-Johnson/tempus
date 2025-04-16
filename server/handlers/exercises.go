@@ -367,7 +367,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
     `
 
 	var whereClause string
-	var queryParams []interface{}
+	var queryParams []any
 
 	if req.CategoryId > 0 && req.TagId > 0 {
 		// Filter by both category and tag
@@ -411,7 +411,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 
 	// Query total count
 	var totalCount int32
-	countQueryParams := make([]interface{}, len(queryParams)-2) // Exclude limit and offset
+	countQueryParams := make([]any, len(queryParams)-2) // Exclude limit and offset
 	copy(countQueryParams, queryParams[:len(queryParams)-2])
 
 	err := h.db.QueryRowContext(ctx, countQuery+whereClause, countQueryParams...).Scan(&totalCount)
@@ -481,7 +481,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Exercise) error {
 	// Map for quick lookup of exercises by ID
 	exerciseMap := make(map[int32]*pb.Exercise)
-	exerciseIDs := make([]interface{}, 0, len(exercises))
+	exerciseIDs := make([]any, 0, len(exercises))
 
 	// Build query params and map
 	placeholders := ""
@@ -628,7 +628,7 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 	// Update exercise fields
 	if updateName || updateDescription {
 		sql := "UPDATE exercises SET"
-		params := []interface{}{}
+		params := []any{}
 		needsComma := false
 
 		if updateName {
@@ -943,7 +943,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 
 	// Build date filter if provided
 	dateFilter := ""
-	dateParams := []interface{}{}
+	dateParams := []any{}
 	if req.StartDate != nil {
 		dateFilter += " AND start_time >= ?"
 		dateParams = append(dateParams, req.StartDate.AsTime())
@@ -959,7 +959,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		SELECT COUNT(*) 
 		FROM exercise_history 
 		WHERE exercise_id = ?` + dateFilter
-	params := append([]interface{}{req.ExerciseId}, dateParams...)
+	params := append([]any{req.ExerciseId}, dateParams...)
 	err = h.db.QueryRowContext(ctx, practiceCountQuery, params...).Scan(&practiceCount)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get practice count: %v", err)
@@ -1050,7 +1050,7 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 		}
 
 		// Get avg rating from exercise_history
-		historyParams := append([]interface{}{req.ExerciseId}, dateParams...)
+		historyParams := append([]any{req.ExerciseId}, dateParams...)
 		avgRatingQuery := `
 			SELECT COALESCE(AVG(rating), 0) 
 			FROM exercise_history 

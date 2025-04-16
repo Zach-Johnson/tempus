@@ -1,3 +1,4 @@
+// Update app.js store to include sidebar state management
 import {
     differenceInMinutes,
     format,
@@ -5,7 +6,7 @@ import {
     parseISO,
 } from "date-fns";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
 export const useAppStore = defineStore("app", () => {
     // State

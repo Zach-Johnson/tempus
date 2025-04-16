@@ -86,7 +86,7 @@ CREATE TABLE practice_sessions (
 CREATE TABLE exercise_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     exercise_id INTEGER NOT NULL,
-    session_id INTEGER, -- nullable since some history entries might not be linked to sessions
+    session_id INTEGER NOT NULL,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
     bpms TEXT, -- JSON array of bpm values

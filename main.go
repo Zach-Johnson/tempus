@@ -10,7 +10,6 @@ import (
 	"io"
 	"io/fs"
 	"log"
-	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -244,8 +243,8 @@ func middleware(handler http.Handler) http.Handler {
 
 		handler.ServeHTTP(wrapped, r)
 
-		if r.URL.Path != "/healthz" || wrapped.status != http.StatusOK {
-			slog.Info("request",
+		if r.URL.Path != "/healthz" {
+			log.Println("request",
 				"method", r.Method,
 				"path", r.URL.Path,
 				"duration", time.Since(start),
