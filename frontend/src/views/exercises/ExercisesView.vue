@@ -302,8 +302,8 @@ function getCategoriesForExercise(exercise) {
   
   exercise.tagIds.forEach(tagId => {
     const tag = tagsStore.tagById(tagId)
-    if (tag && tag.category_ids) {
-      tag.category_ids.forEach(catId => categoryIdsSet.add(catId))
+    if (tag && tag.categoryIds) {
+      tag.categoryIds.forEach(catId => categoryIdsSet.add(catId))
     }
   })
   
