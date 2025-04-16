@@ -1310,9 +1310,8 @@ type CreateExerciseRequest struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	TagIds        []int32                `protobuf:"varint,3,rep,packed,name=tag_ids,json=tagIds,proto3" json:"tag_ids,omitempty"`
-	CategoryIds   []int32                `protobuf:"varint,4,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"`
-	Images        []*ExerciseImage       `protobuf:"bytes,5,rep,name=images,proto3" json:"images,omitempty"`
-	Links         []*ExerciseLink        `protobuf:"bytes,6,rep,name=links,proto3" json:"links,omitempty"`
+	Images        []*ExerciseImage       `protobuf:"bytes,4,rep,name=images,proto3" json:"images,omitempty"`
+	Links         []*ExerciseLink        `protobuf:"bytes,5,rep,name=links,proto3" json:"links,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1364,13 +1363,6 @@ func (x *CreateExerciseRequest) GetDescription() string {
 func (x *CreateExerciseRequest) GetTagIds() []int32 {
 	if x != nil {
 		return x.TagIds
-	}
-	return nil
-}
-
-func (x *CreateExerciseRequest) GetCategoryIds() []int32 {
-	if x != nil {
-		return x.CategoryIds
 	}
 	return nil
 }
@@ -3340,14 +3332,13 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\"\"\n" +
 	"\x10DeleteTagRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xec\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xc9\x01\n" +
 	"\x15CreateExerciseRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x17\n" +
-	"\atag_ids\x18\x03 \x03(\x05R\x06tagIds\x12!\n" +
-	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\x121\n" +
-	"\x06images\x18\x05 \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
-	"\x05links\x18\x06 \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\"$\n" +
+	"\atag_ids\x18\x03 \x03(\x05R\x06tagIds\x121\n" +
+	"\x06images\x18\x04 \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
+	"\x05links\x18\x05 \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\"$\n" +
 	"\x12GetExerciseRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"\x8a\x01\n" +
 	"\x14ListExercisesRequest\x12\x1b\n" +

@@ -1,6 +1,8 @@
 <template>
   <v-app-bar>
-    <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
+    <v-btn icon @click="toggleSidebar">
+      <v-icon>{{ isSidebarOpen ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+    </v-btn>
     
     <v-app-bar-title>
       <router-link to="/" class="text-decoration-none">
@@ -15,7 +17,7 @@
     </v-btn>
   </v-app-bar>
   
-  <v-navigation-drawer v-model="drawer" temporary>
+  <v-navigation-drawer :model-value="isSidebarOpen" @update:model-value="updateSidebarState">
     <v-list-item class="pa-4">
       <v-list-item-title class="text-h6">
         Tempus
@@ -42,7 +44,7 @@ import { useAppStore } from '@/stores/app.js'
 
 const theme = useTheme()
 const appStore = useAppStore()
-const drawer = ref(false)
+const isSidebarOpen = ref(true) // Default to open
 
 const isDarkTheme = computed(() => theme.global.name.value === 'dark')
 
@@ -55,8 +57,14 @@ const menuItems = [
   { title: 'Tags', icon: 'mdi-tag-multiple', to: '/tags' },
 ]
 
-function toggleDrawer() {
-  drawer.value = !drawer.value
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  localStorage.setItem("sidebarOpen", isSidebarOpen.value ? "true" : "false");
+}
+
+function updateSidebarState(newValue) {
+  isSidebarOpen.value = newValue;
+  localStorage.setItem("sidebarOpen", newValue ? "true" : "false");
 }
 
 function toggleTheme() {
@@ -64,10 +72,17 @@ function toggleTheme() {
   theme.global.name.value = isDarkTheme.value ? 'light' : 'dark'
 }
 
-// Initialize theme from app store
+// Initialize from local storage
 onMounted(() => {
+  // Initialize theme
   appStore.initDarkMode()
   theme.global.name.value = appStore.darkMode ? 'dark' : 'light'
+  
+  // Initialize sidebar state from localStorage
+  const storedOpen = localStorage.getItem("sidebarOpen");
+  if (storedOpen !== null) {
+    isSidebarOpen.value = storedOpen === "true";
+  }
 })
 </script>
 

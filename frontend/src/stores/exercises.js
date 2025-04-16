@@ -1,8 +1,12 @@
 import { exercisesAPI } from "@/services/api.js";
+import { useTagsStore } from "@/stores/tags.js";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
 export const useExercisesStore = defineStore("exercises", () => {
+    // Load tags store to help with category derivation
+    const tagsStore = useTagsStore();
+
     // State
     const exercises = ref([]);
     const loading = ref(false);
@@ -25,14 +29,23 @@ export const useExercisesStore = defineStore("exercises", () => {
         return (id) => exercises.value.find((ex) => ex.id === id);
     });
 
+    // This getter derives categories through tags
     const exercisesByCategory = computed(
         () => {
-            return (categoryId) =>
-                exercises.value.filter(
+            return (categoryId) => {
+                // Get all tags in this category
+                const categoryTags = tagsStore.tagsByCategory(categoryId)
+                    .map(
+                        (tag) => tag.id,
+                    );
+
+                // Return exercises that have any of these tags
+                return exercises.value.filter(
                     (ex) =>
-                        ex.categoryIds &&
-                        ex.categoryIds.includes(categoryId),
+                        ex.tagIds &&
+                        ex.tagIds.some((tagId) => categoryTags.includes(tagId)),
                 );
+            };
         },
     );
 
@@ -40,10 +53,46 @@ export const useExercisesStore = defineStore("exercises", () => {
         () => {
             return (tagId) =>
                 exercises.value.filter(
-                    (ex) => ex.tag_ids && ex.tag_ids.includes(tagId),
+                    (ex) => ex.tagIds && ex.tagIds.includes(tagId),
                 );
         },
     );
+
+    // Derive category IDs for an exercise based on its tags
+    const getCategoryIdsForExercise = (exerciseId) => {
+        const exercise = exerciseById.value(exerciseId);
+        if (!exercise || !exercise.tagIds || exercise.tagIds.length === 0) {
+            return [];
+        }
+
+        // Get all unique category IDs from the exercise's tags
+        const categoryIdsSet = new Set();
+
+        exercise.tagIds.forEach((tagId) => {
+            const tag = tagsStore.tagById(tagId);
+            if (tag && tag.categoryIds) {
+                tag.categoryIds.forEach((catId) => categoryIdsSet.add(catId));
+            }
+        });
+
+        return Array.from(categoryIdsSet);
+    };
+
+    // Add derived categoryIds to all exercises
+    const exercisesWithDerivedCategories = computed(() => {
+        return exercises.value.map((exercise) => {
+            // Calculate derived categories from tags
+            const derivedCategoryIds =
+                exercise.tagIds && exercise.tagIds.length > 0
+                    ? getCategoryIdsForExercise(exercise.id)
+                    : [];
+
+            return {
+                ...exercise,
+                derivedCategoryIds: derivedCategoryIds,
+            };
+        });
+    });
 
     // Actions
     async function fetchExercises(params = {}) {
@@ -53,9 +102,11 @@ export const useExercisesStore = defineStore("exercises", () => {
         try {
             const response = await exercisesAPI.getAll(params);
             exercises.value = response.data.exercises || [];
+            return response.data;
         } catch (err) {
             error.value = err.message || "Failed to fetch exercises";
             console.error("Error fetching exercises:", err);
+            throw err;
         } finally {
             loading.value = false;
         }
@@ -76,10 +127,13 @@ export const useExercisesStore = defineStore("exercises", () => {
             } else {
                 exercises.value.push(response.data);
             }
+
+            return response.data;
         } catch (err) {
             error.value = err.message ||
                 `Failed to fetch exercise with ID ${id}`;
             console.error(`Error fetching exercise ${id}:`, err);
+            throw err;
         } finally {
             currentExerciseLoading.value = false;
         }
@@ -90,7 +144,11 @@ export const useExercisesStore = defineStore("exercises", () => {
         error.value = null;
 
         try {
-            const response = await exercisesAPI.create(exerciseData);
+            // Prepare exercise data - remove categoryIds if they exist in the
+            // data
+            const { categoryIds, ...cleanedData } = exerciseData;
+
+            const response = await exercisesAPI.create(cleanedData);
             const newExercise = response.data;
             exercises.value.push(newExercise);
             return newExercise;
@@ -108,19 +166,31 @@ export const useExercisesStore = defineStore("exercises", () => {
         error.value = null;
 
         try {
-            // Convert paths array to comma-separated string if it's in object
-            // format
+            // Prepare exercise data - remove categoryIds if they exist in the
+            // data
+            const { categoryIds, ...cleanedData } = exerciseData;
+
+            // Update the mask to remove categoryIds if present
             let formattedUpdateMask = updateMask;
-            if (
+            if (updateMask && typeof updateMask === "string") {
+                formattedUpdateMask = updateMask.split(",")
+                    .filter((path) => path !== "categoryIds")
+                    .join(",");
+            } else if (
                 updateMask && typeof updateMask === "object" &&
                 updateMask.paths
             ) {
-                formattedUpdateMask = updateMask.paths.join(",");
+                formattedUpdateMask = {
+                    ...updateMask,
+                    paths: updateMask.paths.filter(
+                        (path) => path !== "categoryIds",
+                    ),
+                };
             }
 
             const response = await exercisesAPI.update(
                 id,
-                exerciseData,
+                cleanedData,
                 formattedUpdateMask,
             );
             const updatedExercise = response.data;
@@ -334,6 +404,7 @@ export const useExercisesStore = defineStore("exercises", () => {
         }
     }
 
+    // Return the store
     return {
         // State
         exercises,
@@ -349,6 +420,8 @@ export const useExercisesStore = defineStore("exercises", () => {
         exerciseById,
         exercisesByCategory,
         exercisesByTag,
+        exercisesWithDerivedCategories,
+        getCategoryIdsForExercise,
 
         // Actions
         fetchExercises,

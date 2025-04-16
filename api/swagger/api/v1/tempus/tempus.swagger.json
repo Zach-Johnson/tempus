@@ -1455,13 +1455,6 @@
             "format": "int32"
           }
         },
-        "categoryIds": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
         "images": {
           "type": "array",
           "items": {

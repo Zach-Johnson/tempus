@@ -1,4 +1,4 @@
-app = "tempus"
+app = "tempus-xmwlvg"
 primary_region = "iad"
 
 [build]
@@ -7,6 +7,7 @@ primary_region = "iad"
 [env]
   DB_PATH = "/data/tempus.db"
   ENV = "prod"
+  RUN_MIGRATIONS=true
 
 [[mounts]]
   source = "tempus_data"

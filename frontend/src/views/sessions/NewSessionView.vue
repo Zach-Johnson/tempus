@@ -575,6 +575,7 @@ function addExerciseToSession(exercise) {
     bpms: [], // Empty initially so user can set it
     timeSignature: '4/4', // Default time signature
     notes: '', // Empty initially for user input
+    sessionTags: [], // New field for session-specific tags
     startTime: null,
     endTime: null,
     isActive: false,
@@ -583,6 +584,12 @@ function addExerciseToSession(exercise) {
   })
   
   appStore.showSuccessMessage(`Added ${exercise.name} to session`)
+}
+
+function removeSessionTag(exercise, index) {
+  if (exercise.sessionTags) {
+    exercise.sessionTags.splice(index, 1)
+  }
 }
 
 function toggleExerciseInSession(exercise) {

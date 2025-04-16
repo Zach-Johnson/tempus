@@ -161,7 +161,7 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
 
 	// Build the query based on filters
 	var countQuery, query string
-	var countParams, queryParams []interface{}
+	var countParams, queryParams []any
 
 	if req.CategoryId > 0 {
 		// Filter by category
@@ -171,7 +171,7 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
             JOIN tag_categories tc ON t.id = tc.tag_id
             WHERE tc.category_id = ?
         `
-		countParams = []interface{}{req.CategoryId}
+		countParams = []any{req.CategoryId}
 
 		query = `
             SELECT DISTINCT t.id, t.name, t.created_at
@@ -181,11 +181,11 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
             ORDER BY t.name
             LIMIT ? OFFSET ?
         `
-		queryParams = []interface{}{req.CategoryId, pageSize + 1, offset}
+		queryParams = []any{req.CategoryId, pageSize + 1, offset}
 	} else {
 		// No filter
 		countQuery = "SELECT COUNT(*) FROM tags"
-		countParams = []interface{}{}
+		countParams = []any{}
 
 		query = `
             SELECT id, name, created_at 
@@ -193,7 +193,7 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
             ORDER BY name
             LIMIT ? OFFSET ?
         `
-		queryParams = []interface{}{pageSize + 1, offset}
+		queryParams = []any{pageSize + 1, offset}
 	}
 
 	// Query total count
@@ -244,7 +244,7 @@ func (s *TagService) ListTags(ctx context.Context, req *pb.ListTagsRequest) (*pb
 	if len(tagIDs) > 0 {
 		// Build query with placeholders for all tag IDs
 		placeholders := ""
-		params := []interface{}{}
+		params := []any{}
 		for i, id := range tagIDs {
 			if i > 0 {
 				placeholders += ", "

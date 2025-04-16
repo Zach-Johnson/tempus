@@ -11,7 +11,8 @@ module.exports = {
         parser: "babel-eslint",
     },
     rules: {
-        "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-        "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+        "import/no-unresolved": [2, { ignore: ["^@/"] }], // This ignores paths starting with @/
+        "no-console": process.env.NODE_ENV === "prod" ? "warn" : "off",
+        "no-debugger": process.env.NODE_ENV === "prod" ? "warn" : "off",
     },
 };
