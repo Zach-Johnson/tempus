@@ -173,7 +173,7 @@ func startHTTPServer() {
 	// Create HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", httpPort),
-		Handler: mux,
+		Handler: basicAuthMiddleware(mux),
 	}
 
 	// Start HTTP server
@@ -252,6 +252,26 @@ func middleware(handler http.Handler) http.Handler {
 				"status", wrapped.status,
 			)
 		}
+	})
+}
+
+func basicAuthMiddleware(next http.Handler) http.Handler {
+	if os.Getenv("ENV") != "prod" {
+		// Disable auth in non-production
+		return next
+	}
+
+	user := os.Getenv("BASIC_AUTH_USER")
+	pass := os.Getenv("BASIC_AUTH_PASS")
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u, p, ok := r.BasicAuth()
+		if !ok || u != user || p != pass {
+			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next.ServeHTTP(w, r)
 	})
 }
 

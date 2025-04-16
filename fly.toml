@@ -6,6 +6,7 @@ primary_region = "iad"
 
 [env]
   DB_PATH = "/data/tempus.db"
+  ENV = "prod"
 
 [[mounts]]
   source = "tempus_data"
