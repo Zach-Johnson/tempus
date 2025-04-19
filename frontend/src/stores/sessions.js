@@ -195,6 +195,18 @@ export const useSessionsStore = defineStore("sessions", () => {
         }
     }
 
+    async function checkForActiveSession() {
+        try {
+            const response = await sessionsAPI.getAll({ active: true });
+            return response.data.sessions && response.data.sessions.length > 0
+                ? response.data.sessions[0]
+                : null;
+        } catch (err) {
+            console.error("Error checking for active sessions:", err);
+            return null;
+        }
+    }
+
     // Return the store
     return {
         // State
@@ -219,5 +231,6 @@ export const useSessionsStore = defineStore("sessions", () => {
         updateSession,
         deleteSession,
         fetchPracticeStats,
+        checkForActiveSession,
     };
 });

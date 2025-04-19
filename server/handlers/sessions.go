@@ -50,10 +50,18 @@ func (h *PracticeSessionHandler) CreatePracticeSession(ctx context.Context, req 
 	}
 	defer tx.Rollback() // Rollback if not committed
 
-	// Insert the practice session
+	var activeCount int
+	if err := tx.QueryRowContext(ctx, "SELECT COUNT(1) FROM practice_sessions WHERE active = 1").Scan(&activeCount); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to check for active practice session: %v", err)
+	}
+	if activeCount > 0 {
+		return nil, status.Error(codes.AlreadyExists, "cannot create session while there is a currently active one")
+	}
+
+	// Insert the practice session, set active to true
 	result, err := tx.ExecContext(
 		ctx,
-		"INSERT INTO practice_sessions (start_time, end_time, notes) VALUES (?, ?, ?)",
+		"INSERT INTO practice_sessions (start_time, end_time, notes, active) VALUES (?, ?, ?, 1)",
 		startTime, endTime, req.Notes,
 	)
 	if err != nil {
@@ -90,6 +98,7 @@ func (h *PracticeSessionHandler) CreatePracticeSession(ctx context.Context, req 
 		Notes:     req.Notes,
 		CreatedAt: timestamppb.New(createdAt),
 		UpdatedAt: timestamppb.New(updatedAt),
+		Active:    true,
 	}, nil
 }
 
@@ -109,12 +118,13 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 	// Query the session
 	var session pb.PracticeSession
 	var startTime, endTime, createdAt, updatedAt time.Time
+	var active int
 
 	err = tx.QueryRowContext(
 		ctx,
-		"SELECT id, start_time, end_time, notes, created_at, updated_at FROM practice_sessions WHERE id = ?",
+		"SELECT id, start_time, end_time, notes, created_at, updated_at, active FROM practice_sessions WHERE id = ?",
 		req.Id,
-	).Scan(&session.Id, &startTime, &endTime, &session.Notes, &createdAt, &updatedAt)
+	).Scan(&session.Id, &startTime, &endTime, &session.Notes, &createdAt, &updatedAt, &active)
 
 	if err == sql.ErrNoRows {
 		return nil, status.Errorf(codes.NotFound, "practice session with ID %d not found", req.Id)
@@ -122,6 +132,7 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 		return nil, status.Errorf(codes.Internal, "failed to retrieve practice session: %v", err)
 	}
 
+	session.Active = active == 1
 	session.StartTime = timestamppb.New(startTime)
 	session.EndTime = timestamppb.New(endTime)
 	session.CreatedAt = timestamppb.New(createdAt)
@@ -221,7 +232,7 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
 
 	// Build the query based on filters
 	baseQuery := `
-        SELECT id, start_time, end_time, notes, created_at, updated_at
+        SELECT id, start_time, end_time, notes, created_at, updated_at, active
         FROM practice_sessions
     `
 	countQuery := `
@@ -255,13 +266,22 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
 		queryParams = append(queryParams, req.ExerciseId)
 	}
 
+	if req.Active {
+		if whereClause == "" {
+			whereClause = " WHERE"
+		} else {
+			whereClause += " AND"
+		}
+		whereClause += " active = 1"
+	}
+
 	// Add order by, limit, and offset
 	fullQuery := baseQuery + whereClause + " ORDER BY start_time DESC LIMIT ? OFFSET ?"
 	queryParams = append(queryParams, pageSize+1, offset) // Query one more to check if there are more pages
 
 	// Query total count
 	var totalCount int32
-	countQueryParams := make([]interface{}, len(queryParams)-2) // Exclude limit and offset
+	countQueryParams := make([]any, len(queryParams)-2) // Exclude limit and offset
 	copy(countQueryParams, queryParams[:len(queryParams)-2])
 
 	err := h.db.QueryRowContext(ctx, countQuery+whereClause, countQueryParams...).Scan(&totalCount)
@@ -289,14 +309,14 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
 
 		var session pb.PracticeSession
 		var startTime, endTime, createdAt, updatedAt time.Time
+		var active int
 
-		err := rows.Scan(
-			&session.Id, &startTime, &endTime, &session.Notes, &createdAt, &updatedAt,
-		)
+		err := rows.Scan(&session.Id, &startTime, &endTime, &session.Notes, &createdAt, &updatedAt, &active)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse practice session: %v", err)
 		}
 
+		session.Active = active == 1
 		session.StartTime = timestamppb.New(startTime)
 		session.EndTime = timestamppb.New(endTime)
 		session.CreatedAt = timestamppb.New(createdAt)
@@ -348,12 +368,14 @@ func (h *PracticeSessionHandler) UpdatePracticeSession(ctx context.Context, req 
 	updateStartTime := false
 	updateEndTime := false
 	updateNotes := false
+	updateActive := false
 
 	if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
 		// If no update mask is provided, update all fields
 		updateStartTime = true
 		updateEndTime = true
 		updateNotes = true
+		updateActive = true
 	} else {
 		for _, path := range req.UpdateMask.Paths {
 			switch path {
@@ -363,6 +385,8 @@ func (h *PracticeSessionHandler) UpdatePracticeSession(ctx context.Context, req 
 				updateEndTime = true
 			case "notes":
 				updateNotes = true
+			case "active":
+				updateActive = true
 			}
 		}
 	}
@@ -400,6 +424,23 @@ func (h *PracticeSessionHandler) UpdatePracticeSession(ctx context.Context, req 
 		}
 	}
 
+	tx, err := h.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to start transaction: %v", err)
+	}
+	defer tx.Rollback() // Rollback if not committed
+
+	// Check for other active sessions if attempting to activate this one.
+	if updateActive && req.Session.Active {
+		var activeCount int
+		if err := tx.QueryRowContext(ctx, "SELECT COUNT(1) FROM practice_sessions WHERE active = 1").Scan(&activeCount); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to check for active practice session: %v", err)
+		}
+		if activeCount > 0 {
+			return nil, status.Error(codes.AlreadyExists, "cannot activate session while there is a currently active one")
+		}
+	}
+
 	// Build update SQL
 	sql := "UPDATE practice_sessions SET"
 	params := []interface{}{}
@@ -432,6 +473,18 @@ func (h *PracticeSessionHandler) UpdatePracticeSession(ctx context.Context, req 
 		}
 		sql += " notes = ?"
 		params = append(params, req.Session.Notes)
+	}
+
+	if updateActive {
+		val := 0
+		if req.Session.Active {
+			val = 1
+		}
+		if !first {
+			sql += ","
+		}
+		sql += " active = ?"
+		params = append(params, val)
 	}
 
 	if len(params) == 0 {

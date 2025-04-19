@@ -786,10 +786,11 @@ async function completeSession() {
     // Update the session with the end time and notes
     const sessionData = {
       end_time: endTime.toISOString(),
-      notes: notes.value || ''
+      notes: notes.value || '',
+      active: false
     }
     
-    await sessionsStore.updateSession(sessionId.value, sessionData, 'endTime,notes')
+    await sessionsStore.updateSession(sessionId.value, sessionData, 'endTime,notes,active')
     
     appStore.showSuccessMessage('Practice session saved successfully!')
     
@@ -927,7 +928,68 @@ onMounted(async () => {
       }
     }
   }
+
+  // Check for active session
+  const activeSession = await sessionsStore.checkForActiveSession();
+  if (activeSession) {
+    // Populate the session data
+    sessionId.value = activeSession.id;
+    startTime.value = new Date(activeSession.startTime);
+    notes.value = activeSession.notes || '';
+    
+    // Set session as started
+    sessionStarted.value = true;
+    
+    // Load associated exercises
+    await loadSessionExercises(activeSession.id);
+    
+    // Restart the timer
+    startDurationTimer();
+    
+    // Show notification
+    appStore.showInfoMessage('Resumed active practice session');
+  }
 })
+
+async function loadSessionExercises(sessionId) {
+  loadingSessionExercises.value = true;
+  try {
+    const session = await sessionsStore.fetchSession(sessionId);
+    if (session && session.exercises) {
+      // Map exercises to the local format
+      sessionExercises.value = session.exercises.map(exercise => ({
+        ...exercise.exercise,
+        addedAt: new Date(exercise.startTime),
+        bpms: exercise.bpms || [],
+        timeSignature: exercise.timeSignature || '4/4',
+        notes: exercise.notes || '',
+        startTime: new Date(exercise.startTime),
+        endTime: exercise.endTime ? new Date(exercise.endTime) : null,
+        isActive: false, // No active exercises on resume
+        completed: exercise.endTime ? true : false,
+        duration: exercise.endTime ? calculateDuration(exercise.startTime, exercise.endTime) : null,
+        historyID: exercise.id
+      }));
+    }
+  } catch (error) {
+    console.error('Error loading session exercises:', error);
+    appStore.showErrorMessage('Failed to load session exercises');
+  } finally {
+    loadingSessionExercises.value = false;
+  }
+}
+
+function calculateDuration(start, end) {
+  const startTime = new Date(start);
+  const endTime = new Date(end);
+  const diffMs = endTime - startTime;
+  
+  const seconds = Math.floor((diffMs / 1000) % 60);
+  const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
 
 function handleBeforeUnload(event) {
   if (sessionStarted.value) {

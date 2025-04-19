@@ -460,6 +460,7 @@ type PracticeSession struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Exercises     []*ExerciseHistory     `protobuf:"bytes,7,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	Active        bool                   `protobuf:"varint,8,opt,name=active,proto3" json:"active,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -541,6 +542,13 @@ func (x *PracticeSession) GetExercises() []*ExerciseHistory {
 		return x.Exercises
 	}
 	return nil
+}
+
+func (x *PracticeSession) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
 }
 
 // ExerciseHistory represents a historical record of exercise performance
@@ -2004,6 +2012,7 @@ type ListPracticeSessionsRequest struct {
 	StartDate     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_date,json=startDate,proto3" json:"start_date,omitempty"`     // Optional: filter by date range
 	EndDate       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_date,json=endDate,proto3" json:"end_date,omitempty"`           // Optional: filter by date range
 	ExerciseId    int32                  `protobuf:"varint,5,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"` // Optional: filter by exercise
+	Active        bool                   `protobuf:"varint,6,opt,name=active,proto3" json:"active,omitempty"`                           // Optional: filter for active
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2071,6 +2080,13 @@ func (x *ListPracticeSessionsRequest) GetExerciseId() int32 {
 		return x.ExerciseId
 	}
 	return 0
+}
+
+func (x *ListPracticeSessionsRequest) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
 }
 
 // ListPracticeSessionsResponse contains a list of practice sessions and
@@ -3260,7 +3276,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x03url\x18\x03 \x01(\tR\x03url\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xda\x02\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xf2\x02\n" +
 	"\x0fPracticeSession\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x129\n" +
 	"\n" +
@@ -3271,7 +3287,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
-	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.ExerciseHistoryR\texercises\"\xee\x02\n" +
+	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.ExerciseHistoryR\texercises\x12\x16\n" +
+	"\x06active\x18\b \x01(\bR\x06active\"\xee\x02\n" +
 	"\x0fExerciseHistory\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
 	"\vexercise_id\x18\x02 \x01(\x05R\n" +
@@ -3383,7 +3400,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\bend_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12\x14\n" +
 	"\x05notes\x18\x03 \x01(\tR\x05notes\"+\n" +
 	"\x19GetPracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xec\x01\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\x84\x02\n" +
 	"\x1bListPracticeSessionsRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
@@ -3392,7 +3409,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"start_date\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tstartDate\x125\n" +
 	"\bend_date\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\aendDate\x12\x1f\n" +
 	"\vexercise_id\x18\x05 \x01(\x05R\n" +
-	"exerciseId\"\xa0\x01\n" +
+	"exerciseId\x12\x16\n" +
+	"\x06active\x18\x06 \x01(\bR\x06active\"\xa0\x01\n" +
 	"\x1cListPracticeSessionsResponse\x127\n" +
 	"\bsessions\x18\x01 \x03(\v2\x1b.drummer.v1.PracticeSessionR\bsessions\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +

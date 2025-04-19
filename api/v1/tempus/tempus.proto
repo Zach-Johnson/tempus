@@ -68,6 +68,7 @@ message PracticeSession {
     google.protobuf.Timestamp created_at = 5;
     google.protobuf.Timestamp updated_at = 6;
     repeated ExerciseHistory exercises = 7;
+    bool active = 8;
 }
 
 // ExerciseHistory represents a historical record of exercise performance
@@ -251,6 +252,7 @@ message ListPracticeSessionsRequest {
     google.protobuf.Timestamp start_date = 3;  // Optional: filter by date range
     google.protobuf.Timestamp end_date = 4;    // Optional: filter by date range
     int32 exercise_id = 5;                     // Optional: filter by exercise
+    bool active = 6;                           // Optional: filter for active
 }
 
 // ListPracticeSessionsResponse contains a list of practice sessions and

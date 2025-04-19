@@ -835,6 +835,13 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "active",
+            "description": "Optional: filter for active",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
           }
         ],
         "tags": [
@@ -1860,6 +1867,9 @@
             "type": "object",
             "$ref": "#/definitions/v1ExerciseHistory"
           }
+        },
+        "active": {
+          "type": "boolean"
         }
       },
       "title": "PracticeSession represents a drumming practice session"

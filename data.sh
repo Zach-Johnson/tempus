@@ -155,6 +155,7 @@ curl -X POST \
     "notes": "Morning practice session"
   }' | jq
 
+# Should fail because there is a currently active one
 curl -X POST \
   http://localhost:8080/api/v1/sessions \
   -H 'Content-Type: application/json' \
@@ -178,6 +179,9 @@ curl -X GET "http://localhost:8080/api/v1/sessions?start_date=2025-04-01T00:00:0
 # Filter by exercise ID
 curl -X GET "http://localhost:8080/api/v1/sessions?exercise_id=1" | jq
 
+# Filter by active
+curl -X GET "http://localhost:8080/api/v1/sessions?active=1" | jq
+
 # Update session notes
 curl -X PATCH \
   http://localhost:8080/api/v1/sessions/1 \
@@ -199,6 +203,37 @@ curl -X PATCH \
       "endTime": "2025-04-10T11:45:02Z"
     },
     "update_mask": "startTime,endTime"
+  }' | jq
+
+# End the session
+curl -X PATCH \
+  http://localhost:8080/api/v1/sessions/1 \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "session": {
+        "active": false
+    },
+    "update_mask": "active"
+  }' | jq
+
+# Create another
+curl -X POST \
+  http://localhost:8080/api/v1/sessions \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "start_time": "2025-04-10T18:00:00Z",
+    "end_time": "2025-04-10T20:30:00Z",
+    "notes": "Evening practice session"
+  }' | jq
+
+curl -X PATCH \
+  http://localhost:8080/api/v1/sessions/2 \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "session": {
+        "active": false
+    },
+    "update_mask": "active"
   }' | jq
 
 # Delete session with ID 1

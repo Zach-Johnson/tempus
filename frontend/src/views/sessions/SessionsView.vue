@@ -171,6 +171,7 @@ const headers = [
   { title: 'Duration', key: 'duration' },
   { title: 'Exercises', key: 'exercises' },
   { title: 'Notes', key: 'notes' },
+  { title: 'Active', key: 'active', value: item => { return item.active ? 'yes' : 'no' }},
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
 ]
 
