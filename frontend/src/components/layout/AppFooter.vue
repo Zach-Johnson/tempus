@@ -8,6 +8,8 @@
           :icon="icon.icon"
           class="mx-2"
           variant="text"
+          target="_blank"
+          :href="icon.url"
         ></v-btn>
       </v-card-text>
 
@@ -22,8 +24,6 @@
 
 <script setup>
 const socialIcons = [
-  { icon: 'mdi-github' },
-  { icon: 'mdi-twitter' },
-  { icon: 'mdi-instagram' }
+  { icon: 'mdi-github', url: 'https://github.com/Zach-Johnson/tempus' },
 ]
 </script>
