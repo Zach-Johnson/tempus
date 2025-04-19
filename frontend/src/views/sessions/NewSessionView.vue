@@ -67,7 +67,22 @@
           </v-col>
 
           <v-col cols="12" md="6">
-            <div class="text-h6 mb-2">Exercises in this Session</div>
+            <div class="d-flex align-center mb-2">
+              <div class="text-h6">Exercises in this Session</div>
+              <v-btn
+                v-if="sessionStarted"
+                icon
+                variant="text"
+                size="small"
+                color="primary"
+                class="ml-2"
+                @click="openCreateExerciseDialog"
+                title="Create new exercise"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </div>
+            
             <v-skeleton-loader
               v-if="loadingSessionExercises"
               type="list-item-two-line"
@@ -85,6 +100,16 @@
                 :disabled="!sessionStarted"
               >
                 Add Exercises
+              </v-btn>
+              <p class="text-body-2 text-grey mt-2">or</p>
+              <v-btn 
+                color="primary"
+                prepend-icon="mdi-music-note-plus"
+                variant="text"
+                @click="openCreateExerciseDialog"
+                :disabled="!sessionStarted"
+              >
+                Create New Exercise
               </v-btn>
             </div>
 
@@ -203,6 +228,16 @@
                   :disabled="!sessionStarted"
                 >
                   Add More
+                </v-btn>
+                <v-btn 
+                  color="primary"
+                  prepend-icon="mdi-music-note-plus"
+                  variant="text"
+                  class="ml-2"
+                  @click="openCreateExerciseDialog"
+                  :disabled="!sessionStarted"
+                >
+                  Create New
                 </v-btn>
               </div>
             </div>
@@ -329,6 +364,14 @@
       </v-card>
     </v-dialog>
 
+    <!-- Create Exercise Dialog -->
+    <exercise-form-dialog
+      v-model="createExerciseDialog"
+      :exercise="newExercise"
+      :is-edit="false"
+      @save="saveNewExercise"
+    />
+
     <!-- Cancel Session Dialog -->
     <v-dialog v-model="cancelDialog" max-width="500">
       <v-card>
@@ -391,7 +434,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useExercisesStore } from '@/stores/exercises.js'
 import { useCategoriesStore } from '@/stores/categories.js'
@@ -402,6 +445,7 @@ import { useAppStore } from '@/stores/app.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
 import TagChip from '@/components/tags/TagChip.vue'
 import ExerciseList from '@/components/exercises/ExerciseList.vue'
+import ExerciseFormDialog from '@/components/exercises/ExerciseFormDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -436,6 +480,15 @@ const cancelDialog = ref(false)
 const finishSessionDialog = ref(false)
 const finishForm = ref(null)
 const finishFormValid = ref(true)
+
+// Create Exercise dialog
+const createExerciseDialog = ref(false)
+const newExercise = ref({
+  name: '',
+  description: '',
+  tagIds: [],
+  links: []
+})
 
 // Time signature options
 const timeSignatureOptions = [
@@ -626,6 +679,33 @@ function openAddExerciseDialog() {
   dialogCategoryFilter.value = null
   dialogTagFilter.value = null
   addExerciseDialog.value = true
+}
+
+function openCreateExerciseDialog() {
+  newExercise.value = {
+    name: '',
+    description: '',
+    tagIds: [],
+    links: []
+  }
+  createExerciseDialog.value = true
+}
+
+async function saveNewExercise(exerciseData) {
+  try {
+    // Create the exercise
+    const newExercise = await exercisesStore.createExercise(exerciseData)
+    appStore.showSuccessMessage(`Exercise "${exerciseData.name}" created successfully`)
+    
+    // Close the dialog
+    createExerciseDialog.value = false
+    
+    // Add the new exercise to the session
+    addExerciseToSession(newExercise)
+    
+  } catch (error) {
+    appStore.showErrorMessage(`Error creating exercise: ${error.message}`)
+  }
 }
 
 async function startSession() {
@@ -849,20 +929,28 @@ onMounted(async () => {
   }
 })
 
+function handleBeforeUnload(event) {
+  if (sessionStarted.value) {
+    // Standard way to show dialog before leaving page
+    event.preventDefault()
+    event.returnValue = ''
+    return ''
+  }
+}
+
+// Add the event listener
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
 // Clean up the timer when component is destroyed
 onBeforeUnmount(() => {
   if (durationInterval.value) {
     clearInterval(durationInterval.value)
   }
-})
-
-// Handle browser back button or leaving the page
-window.addEventListener('beforeunload', (event) => {
-  if (sessionStarted.value) {
-    // Standard way to show dialog before leaving page
-    event.preventDefault()
-    event.returnValue = ''
-  }
+  
+  // Remove beforeunload event listener
+  window.removeEventListener('beforeunload', handleBeforeUnload)
 })
 </script>
 
