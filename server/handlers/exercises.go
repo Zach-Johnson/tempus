@@ -523,7 +523,7 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 			return status.Errorf(codes.Internal, "failed to parse exercise last practice: %v", err)
 		}
 
-		const layout = "2006-01-02 15:04:05.999"
+		const layout = "2006-01-02 15:04:05.999+00:00"
 
 		// Parse the string into a time.Time
 		parsedTime, err := time.Parse(layout, lastPracticeS)
