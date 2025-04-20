@@ -13,6 +13,7 @@
       <div v-if="displayType === 'table'" class="exercise-table-container">
         <v-data-table
           :headers="tableHeaders"
+          v-model:sort-by="sortBy"
           :items="exercises"
           :items-per-page="itemsPerPage"
           density="compact"
@@ -25,20 +26,26 @@
           
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
-              <template v-for="categoryId in item.categoryIds || []" :key="categoryId">
-                <span v-if="getCategoryById(categoryId)" class="text-caption">
-                  {{ getCategoryById(categoryId).name }}
-                </span>
+              <template v-for="categoryId in exercisesStore.getCategoryIdsForExercise(item.id)" :key="categoryId">
+                <category-chip
+                  v-if="getCategoryById(categoryId)"
+                  :category="getCategoryById(categoryId)"
+                  size="small"
+                  class="mr-1"
+                ></category-chip>
               </template>
             </v-chip-group>
           </template>
-          
+
           <template v-slot:item.tags="{ item }">
             <v-chip-group>
               <template v-for="tagId in item.tagIds || []" :key="tagId">
-                <span v-if="getTagById(tagId)" class="text-caption">
-                  {{ getTagById(tagId).name }}
-                </span>
+                <tag-chip
+                  v-if="getTagById(tagId)"
+                  :tag="getTagById(tagId)"
+                  size="small"
+                  class="mr-1"
+                ></tag-chip>
               </template>
             </v-chip-group>
           </template>
@@ -49,22 +56,10 @@
               variant="text"
               size="small"
               color="primary"
-              :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: item.id }}"
               class="mr-1"
-              @click="allowSelect ? selectExercise(item) : undefined"
-            >
-              <v-icon>{{ allowSelect ? 'mdi-plus' : 'mdi-eye' }}</v-icon>
-            </v-btn>
-            
-            <v-btn
-              v-if="allowSelect"
-              icon
-              variant="text"
-              size="small"
-              color="primary"
               @click="selectExercise(item)"
             >
-              <v-icon>mdi-plus</v-icon>
+              <v-icon>{{ 'mdi-plus' }}</v-icon>
             </v-btn>
           </template>
         </v-data-table>
@@ -75,8 +70,7 @@
           <v-list-item
             v-for="exercise in exercises"
             :key="exercise.id"
-            :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
-            @click="allowSelect ? selectExercise(exercise) : undefined"
+            @click="selectExercise(exercise)"
           >
             <template v-slot:prepend>
               <v-avatar size="32" color="primary" class="text-white">
@@ -104,11 +98,10 @@
           >
             <exercise-card
               :exercise="exercise"
-              :to="allowSelect ? undefined : { name: 'exercise-detail', params: { id: exercise.id }}"
               variant="outlined"
-              @click="handleCardClick(exercise)"
+              @click="selectExercise(exercise)"
               :selected="isExerciseSelected(exercise)"
-              :selectable="allowSelect"
+              :selectable=true
             ></exercise-card>
           </v-col>
         </v-row>
@@ -130,7 +123,10 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useExercisesStore } from '@/stores/exercises.js'
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
+import { useAppStore } from '@/stores/app.js'
 import ExerciseCard from '@/components/exercises/ExerciseCard.vue'
+import CategoryChip from '@/components/categories/CategoryChip.vue'
+import TagChip from '@/components/tags/TagChip.vue'
 
 const props = defineProps({
   exercises: {
@@ -178,10 +174,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  allowSelect: {
-    type: Boolean, 
-    default: false
-  },
   selectedExerciseIds: {
     type: Array,
     default: () => []
@@ -194,16 +186,19 @@ const emit = defineEmits(['update:page', 'select-exercise'])
 const exercisesStore = useExercisesStore()
 const categoriesStore = useCategoriesStore()
 const tagsStore = useTagsStore()
+const appStore = useAppStore()
 
 // Local state
 const localPage = ref(props.page)
 
 // Table headers
+const sortBy = ref([{ key: 'lastPractice', order: 'desc' }])
 const tableHeaders = [
   { title: 'Name', key: 'name' },
   { title: 'Description', key: 'description' },
   { title: 'Categories', key: 'categories' },
   { title: 'Tags', key: 'tags' },
+  { title: 'Last', key: 'lastPractice', value: item => { return appStore.formatDate(item.lastPractice)} },
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
 ]
 
@@ -239,14 +234,6 @@ function selectExercise(exercise) {
 
 function isExerciseSelected(exercise) {
   return props.selectedExerciseIds.includes(exercise.id)
-}
-
-function handleCardClick(exercise) {
-  if (props.allowSelect) {
-    // If in select mode, just emit the selection event
-    selectExercise(exercise)
-  }
-  // If not in select mode, the to property will handle navigation
 }
 
 // Ensure categories and tags are loaded

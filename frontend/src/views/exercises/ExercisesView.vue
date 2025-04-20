@@ -80,7 +80,7 @@
           
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
-              <template v-for="categoryId in getCategoriesForExercise(item)" :key="categoryId">
+              <template v-for="categoryId in exercisesStore.getCategoryIdsForExercise(item.id)" :key="categoryId">
                 <category-chip
                   v-if="getCategoryById(categoryId)"
                   :category="getCategoryById(categoryId)"
@@ -289,25 +289,6 @@ function getCategoryById(categoryId) {
 
 function getTagById(tagId) {
   return tagsStore.tagById(tagId)
-}
-
-// Get derived categories for an exercise based on its tags
-function getCategoriesForExercise(exercise) {
-  if (!exercise || !exercise.tagIds || exercise.tagIds.length === 0) {
-    return []
-  }
-  
-  // Get all unique category IDs from the exercise's tags
-  const categoryIdsSet = new Set()
-  
-  exercise.tagIds.forEach(tagId => {
-    const tag = tagsStore.tagById(tagId)
-    if (tag && tag.categoryIds) {
-      tag.categoryIds.forEach(catId => categoryIdsSet.add(catId))
-    }
-  })
-  
-  return Array.from(categoryIdsSet)
 }
 
 function openCreateDialog() {

@@ -37,6 +37,7 @@ message Exercise {
     repeated int32 category_ids = 7;  // Related category IDs
     repeated ExerciseImage images = 8;
     repeated ExerciseLink links = 9;
+    google.protobuf.Timestamp last_practice = 10;
 }
 
 // ExerciseImage represents an image associated with an exercise
@@ -395,6 +396,9 @@ message PracticeTimePoint {
 }
 
 // ========== Services ==========
+//
+// TODO change all the raw proto responses to proper message response types per
+// rpc
 
 service CategoryService {
     // Create a new category

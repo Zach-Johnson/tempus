@@ -69,18 +69,6 @@
           <v-col cols="12" md="6">
             <div class="d-flex align-center mb-2">
               <div class="text-h6">Exercises in this Session</div>
-              <v-btn
-                v-if="sessionStarted"
-                icon
-                variant="text"
-                size="small"
-                color="primary"
-                class="ml-2"
-                @click="openCreateExerciseDialog"
-                title="Create new exercise"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
             </div>
             
             <v-skeleton-loader
@@ -117,7 +105,7 @@
               <v-expansion-panels variant="accordion">
                 <v-expansion-panel
                   v-for="(exercise, index) in sessionExercises"
-                  :key="exercise.id"
+                  :key="index"
                 >
                   <v-expansion-panel-title>
                     <div class="d-flex align-center">
@@ -140,7 +128,7 @@
                         variant="text"
                         size="small"
                         color="error"
-                        @click.stop="removeExercise(exercise)"
+                        @click.stop="removeExercise(index)"
                         :disabled="exercise.isActive"
                       >
                         <v-icon>mdi-delete</v-icon>
@@ -294,9 +282,8 @@
         <exercise-list
           :exercises="filteredExercises"
           :loading="exercisesStore.loading"
-          display-type="grid"
-          :allow-select="true"
-          @select-exercise="toggleExerciseInSession"
+          display-type="table"
+          @select-exercise="addExerciseToSession"
           :selected-exercise-ids="sessionExerciseIds"
           class="mt-4"
         />
@@ -304,7 +291,7 @@
     </v-card>
 
     <!-- Add Exercise Dialog -->
-    <v-dialog v-model="addExerciseDialog" max-width="800">
+    <v-dialog v-model="addExerciseDialog" max-width="1400">
       <v-card>
         <v-card-title>Add Exercises to Session</v-card-title>
         <v-card-text>
@@ -348,9 +335,8 @@
           <exercise-list
             :exercises="dialogFilteredExercises"
             :loading="exercisesStore.loading"
-            display-type="grid"
-            :allow-select="true"
-            @select-exercise="toggleExerciseInSession"
+            display-type="table"
+            @select-exercise="addExerciseToSession"
             :selected-exercise-ids="sessionExerciseIds"
             class="mt-4"
           />
@@ -506,7 +492,7 @@ const sessionExerciseIds = computed(() => {
 })
 
 const filteredExercises = computed(() => {
-  let result = exercisesStore.exercises
+  let result = exercisesStore.exercisesWithDerivedCategories
   
   // Search filter
   if (exerciseSearch.value) {
@@ -520,7 +506,7 @@ const filteredExercises = computed(() => {
   // Category filter
   if (categoryFilter.value) {
     result = result.filter(exercise => 
-      exercise.categoryIds && exercise.categoryIds.includes(parseInt(categoryFilter.value))
+      exercise.derivedCategoryIds && exercise.derivedCategoryIds.includes(parseInt(categoryFilter.value))
     )
   }
   
@@ -616,11 +602,6 @@ function getExerciseStatusColor(exercise) {
 }
 
 function addExerciseToSession(exercise) {
-  if (isExerciseInSession(exercise)) {
-    removeExercise(exercise)
-    return
-  }
-  
   // Add the exercise with default values and current time
   sessionExercises.value.push({
     ...exercise,
@@ -645,30 +626,20 @@ function removeSessionTag(exercise, index) {
   }
 }
 
-function toggleExerciseInSession(exercise) {
-  if (isExerciseInSession(exercise)) {
-    removeExercise(exercise)
-  } else {
-    addExerciseToSession(exercise)
-  }
-}
-
-async function removeExercise(exercise) {
-  // The exercise passed in may come from one of the sub-components, which doesn't have the full local context
-  // of the hisotryID
-  const fullExercise = sessionExercises.value.find(e => e.id === exercise.id)
+async function removeExercise(index) {
+  const exercise = sessionExercises.value[index]
 
   // Don't allow removing active exercises
   if (exercise.isActive) {
     appStore.showWarningMessage(`Can't remove an active exercise. Stop it first.`)
     return
   }
-  
-  sessionExercises.value = sessionExercises.value.filter(e => e.id !== exercise.id)
 
+  sessionExercises.value.splice(index, 1)
+  
   // Also remove from the backend
-  if (fullExercise.completed && fullExercise.historyID) {
-      await historyStore.deleteHistoryEntry(fullExercise.historyID)
+  if (exercise.completed && exercise.historyID) {
+      await historyStore.deleteHistoryEntry(exercise.historyID)
   }
   
   appStore.showInfoMessage(`Removed ${exercise.name} from session`)

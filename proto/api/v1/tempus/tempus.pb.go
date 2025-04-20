@@ -183,6 +183,7 @@ type Exercise struct {
 	CategoryIds   []int32                `protobuf:"varint,7,rep,packed,name=category_ids,json=categoryIds,proto3" json:"category_ids,omitempty"` // Related category IDs
 	Images        []*ExerciseImage       `protobuf:"bytes,8,rep,name=images,proto3" json:"images,omitempty"`
 	Links         []*ExerciseLink        `protobuf:"bytes,9,rep,name=links,proto3" json:"links,omitempty"`
+	LastPractice  *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=last_practice,json=lastPractice,proto3" json:"last_practice,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -276,6 +277,13 @@ func (x *Exercise) GetImages() []*ExerciseImage {
 func (x *Exercise) GetLinks() []*ExerciseLink {
 	if x != nil {
 		return x.Links
+	}
+	return nil
+}
+
+func (x *Exercise) GetLastPractice() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastPractice
 	}
 	return nil
 }
@@ -3245,7 +3253,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12!\n" +
-	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\"\xe5\x02\n" +
+	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\"\xa6\x03\n" +
 	"\bExercise\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -3257,7 +3265,9 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\atag_ids\x18\x06 \x03(\x05R\x06tagIds\x12!\n" +
 	"\fcategory_ids\x18\a \x03(\x05R\vcategoryIds\x121\n" +
 	"\x06images\x18\b \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
-	"\x05links\x18\t \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\"\xf5\x01\n" +
+	"\x05links\x18\t \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\x12?\n" +
+	"\rlast_practice\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\flastPractice\"\xf5\x01\n" +
 	"\rExerciseImage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
 	"\vexercise_id\x18\x02 \x01(\x05R\n" +
@@ -3631,119 +3641,120 @@ var file_api_v1_tempus_tempus_proto_depIdxs = []int32{
 	49, // 4: drummer.v1.Exercise.updated_at:type_name -> google.protobuf.Timestamp
 	3,  // 5: drummer.v1.Exercise.images:type_name -> drummer.v1.ExerciseImage
 	4,  // 6: drummer.v1.Exercise.links:type_name -> drummer.v1.ExerciseLink
-	49, // 7: drummer.v1.ExerciseImage.created_at:type_name -> google.protobuf.Timestamp
-	49, // 8: drummer.v1.ExerciseLink.created_at:type_name -> google.protobuf.Timestamp
-	49, // 9: drummer.v1.PracticeSession.start_time:type_name -> google.protobuf.Timestamp
-	49, // 10: drummer.v1.PracticeSession.end_time:type_name -> google.protobuf.Timestamp
-	49, // 11: drummer.v1.PracticeSession.created_at:type_name -> google.protobuf.Timestamp
-	49, // 12: drummer.v1.PracticeSession.updated_at:type_name -> google.protobuf.Timestamp
-	6,  // 13: drummer.v1.PracticeSession.exercises:type_name -> drummer.v1.ExerciseHistory
-	49, // 14: drummer.v1.ExerciseHistory.start_time:type_name -> google.protobuf.Timestamp
-	49, // 15: drummer.v1.ExerciseHistory.end_time:type_name -> google.protobuf.Timestamp
-	2,  // 16: drummer.v1.ExerciseHistory.exercise:type_name -> drummer.v1.Exercise
-	0,  // 17: drummer.v1.ListCategoriesResponse.categories:type_name -> drummer.v1.Category
-	0,  // 18: drummer.v1.UpdateCategoryRequest.category:type_name -> drummer.v1.Category
-	50, // 19: drummer.v1.UpdateCategoryRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 20: drummer.v1.ListTagsResponse.tags:type_name -> drummer.v1.Tag
-	1,  // 21: drummer.v1.UpdateTagRequest.tag:type_name -> drummer.v1.Tag
-	50, // 22: drummer.v1.UpdateTagRequest.update_mask:type_name -> google.protobuf.FieldMask
-	3,  // 23: drummer.v1.CreateExerciseRequest.images:type_name -> drummer.v1.ExerciseImage
-	4,  // 24: drummer.v1.CreateExerciseRequest.links:type_name -> drummer.v1.ExerciseLink
-	2,  // 25: drummer.v1.ListExercisesResponse.exercises:type_name -> drummer.v1.Exercise
-	2,  // 26: drummer.v1.UpdateExerciseRequest.exercise:type_name -> drummer.v1.Exercise
-	50, // 27: drummer.v1.UpdateExerciseRequest.update_mask:type_name -> google.protobuf.FieldMask
-	49, // 28: drummer.v1.CreatePracticeSessionRequest.start_time:type_name -> google.protobuf.Timestamp
-	49, // 29: drummer.v1.CreatePracticeSessionRequest.end_time:type_name -> google.protobuf.Timestamp
-	49, // 30: drummer.v1.ListPracticeSessionsRequest.start_date:type_name -> google.protobuf.Timestamp
-	49, // 31: drummer.v1.ListPracticeSessionsRequest.end_date:type_name -> google.protobuf.Timestamp
-	5,  // 32: drummer.v1.ListPracticeSessionsResponse.sessions:type_name -> drummer.v1.PracticeSession
-	5,  // 33: drummer.v1.UpdatePracticeSessionRequest.session:type_name -> drummer.v1.PracticeSession
-	50, // 34: drummer.v1.UpdatePracticeSessionRequest.update_mask:type_name -> google.protobuf.FieldMask
-	49, // 35: drummer.v1.CreateExerciseHistoryRequest.start_time:type_name -> google.protobuf.Timestamp
-	49, // 36: drummer.v1.CreateExerciseHistoryRequest.end_time:type_name -> google.protobuf.Timestamp
-	49, // 37: drummer.v1.ListExerciseHistoryRequest.start_date:type_name -> google.protobuf.Timestamp
-	49, // 38: drummer.v1.ListExerciseHistoryRequest.end_date:type_name -> google.protobuf.Timestamp
-	6,  // 39: drummer.v1.ListExerciseHistoryResponse.history_entries:type_name -> drummer.v1.ExerciseHistory
-	6,  // 40: drummer.v1.UpdateExerciseHistoryRequest.history:type_name -> drummer.v1.ExerciseHistory
-	50, // 41: drummer.v1.UpdateExerciseHistoryRequest.update_mask:type_name -> google.protobuf.FieldMask
-	49, // 42: drummer.v1.GetExerciseStatsRequest.start_date:type_name -> google.protobuf.Timestamp
-	49, // 43: drummer.v1.GetExerciseStatsRequest.end_date:type_name -> google.protobuf.Timestamp
-	43, // 44: drummer.v1.ExerciseStats.bpm_progress:type_name -> drummer.v1.BpmProgressPoint
-	49, // 45: drummer.v1.BpmProgressPoint.date:type_name -> google.protobuf.Timestamp
-	49, // 46: drummer.v1.GetPracticeStatsRequest.start_date:type_name -> google.protobuf.Timestamp
-	49, // 47: drummer.v1.GetPracticeStatsRequest.end_date:type_name -> google.protobuf.Timestamp
-	46, // 48: drummer.v1.PracticeStats.exercise_distribution:type_name -> drummer.v1.ExerciseTimeDistribution
-	47, // 49: drummer.v1.PracticeStats.category_distribution:type_name -> drummer.v1.CategoryTimeDistribution
-	48, // 50: drummer.v1.PracticeStats.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
-	48, // 51: drummer.v1.CategoryTimeDistribution.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
-	49, // 52: drummer.v1.PracticeTimePoint.date:type_name -> google.protobuf.Timestamp
-	7,  // 53: drummer.v1.CategoryService.CreateCategory:input_type -> drummer.v1.CreateCategoryRequest
-	8,  // 54: drummer.v1.CategoryService.GetCategory:input_type -> drummer.v1.GetCategoryRequest
-	9,  // 55: drummer.v1.CategoryService.ListCategories:input_type -> drummer.v1.ListCategoriesRequest
-	11, // 56: drummer.v1.CategoryService.UpdateCategory:input_type -> drummer.v1.UpdateCategoryRequest
-	12, // 57: drummer.v1.CategoryService.DeleteCategory:input_type -> drummer.v1.DeleteCategoryRequest
-	13, // 58: drummer.v1.TagService.CreateTag:input_type -> drummer.v1.CreateTagRequest
-	14, // 59: drummer.v1.TagService.GetTag:input_type -> drummer.v1.GetTagRequest
-	15, // 60: drummer.v1.TagService.ListTags:input_type -> drummer.v1.ListTagsRequest
-	17, // 61: drummer.v1.TagService.UpdateTag:input_type -> drummer.v1.UpdateTagRequest
-	18, // 62: drummer.v1.TagService.DeleteTag:input_type -> drummer.v1.DeleteTagRequest
-	19, // 63: drummer.v1.ExerciseService.CreateExercise:input_type -> drummer.v1.CreateExerciseRequest
-	20, // 64: drummer.v1.ExerciseService.GetExercise:input_type -> drummer.v1.GetExerciseRequest
-	21, // 65: drummer.v1.ExerciseService.ListExercises:input_type -> drummer.v1.ListExercisesRequest
-	23, // 66: drummer.v1.ExerciseService.UpdateExercise:input_type -> drummer.v1.UpdateExerciseRequest
-	24, // 67: drummer.v1.ExerciseService.DeleteExercise:input_type -> drummer.v1.DeleteExerciseRequest
-	25, // 68: drummer.v1.ExerciseService.AddExerciseImage:input_type -> drummer.v1.AddExerciseImageRequest
-	26, // 69: drummer.v1.ExerciseService.DeleteExerciseImage:input_type -> drummer.v1.DeleteExerciseImageRequest
-	27, // 70: drummer.v1.ExerciseService.AddExerciseLink:input_type -> drummer.v1.AddExerciseLinkRequest
-	28, // 71: drummer.v1.ExerciseService.DeleteExerciseLink:input_type -> drummer.v1.DeleteExerciseLinkRequest
-	41, // 72: drummer.v1.ExerciseService.GetExerciseStats:input_type -> drummer.v1.GetExerciseStatsRequest
-	29, // 73: drummer.v1.PracticeSessionService.CreatePracticeSession:input_type -> drummer.v1.CreatePracticeSessionRequest
-	30, // 74: drummer.v1.PracticeSessionService.GetPracticeSession:input_type -> drummer.v1.GetPracticeSessionRequest
-	31, // 75: drummer.v1.PracticeSessionService.ListPracticeSessions:input_type -> drummer.v1.ListPracticeSessionsRequest
-	33, // 76: drummer.v1.PracticeSessionService.UpdatePracticeSession:input_type -> drummer.v1.UpdatePracticeSessionRequest
-	34, // 77: drummer.v1.PracticeSessionService.DeletePracticeSession:input_type -> drummer.v1.DeletePracticeSessionRequest
-	44, // 78: drummer.v1.PracticeSessionService.GetPracticeStats:input_type -> drummer.v1.GetPracticeStatsRequest
-	35, // 79: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:input_type -> drummer.v1.CreateExerciseHistoryRequest
-	36, // 80: drummer.v1.ExerciseHistoryService.GetExerciseHistory:input_type -> drummer.v1.GetExerciseHistoryRequest
-	37, // 81: drummer.v1.ExerciseHistoryService.ListExerciseHistory:input_type -> drummer.v1.ListExerciseHistoryRequest
-	39, // 82: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:input_type -> drummer.v1.UpdateExerciseHistoryRequest
-	40, // 83: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:input_type -> drummer.v1.DeleteExerciseHistoryRequest
-	0,  // 84: drummer.v1.CategoryService.CreateCategory:output_type -> drummer.v1.Category
-	0,  // 85: drummer.v1.CategoryService.GetCategory:output_type -> drummer.v1.Category
-	10, // 86: drummer.v1.CategoryService.ListCategories:output_type -> drummer.v1.ListCategoriesResponse
-	0,  // 87: drummer.v1.CategoryService.UpdateCategory:output_type -> drummer.v1.Category
-	51, // 88: drummer.v1.CategoryService.DeleteCategory:output_type -> google.protobuf.Empty
-	1,  // 89: drummer.v1.TagService.CreateTag:output_type -> drummer.v1.Tag
-	1,  // 90: drummer.v1.TagService.GetTag:output_type -> drummer.v1.Tag
-	16, // 91: drummer.v1.TagService.ListTags:output_type -> drummer.v1.ListTagsResponse
-	1,  // 92: drummer.v1.TagService.UpdateTag:output_type -> drummer.v1.Tag
-	51, // 93: drummer.v1.TagService.DeleteTag:output_type -> google.protobuf.Empty
-	2,  // 94: drummer.v1.ExerciseService.CreateExercise:output_type -> drummer.v1.Exercise
-	2,  // 95: drummer.v1.ExerciseService.GetExercise:output_type -> drummer.v1.Exercise
-	22, // 96: drummer.v1.ExerciseService.ListExercises:output_type -> drummer.v1.ListExercisesResponse
-	2,  // 97: drummer.v1.ExerciseService.UpdateExercise:output_type -> drummer.v1.Exercise
-	51, // 98: drummer.v1.ExerciseService.DeleteExercise:output_type -> google.protobuf.Empty
-	3,  // 99: drummer.v1.ExerciseService.AddExerciseImage:output_type -> drummer.v1.ExerciseImage
-	51, // 100: drummer.v1.ExerciseService.DeleteExerciseImage:output_type -> google.protobuf.Empty
-	4,  // 101: drummer.v1.ExerciseService.AddExerciseLink:output_type -> drummer.v1.ExerciseLink
-	51, // 102: drummer.v1.ExerciseService.DeleteExerciseLink:output_type -> google.protobuf.Empty
-	42, // 103: drummer.v1.ExerciseService.GetExerciseStats:output_type -> drummer.v1.ExerciseStats
-	5,  // 104: drummer.v1.PracticeSessionService.CreatePracticeSession:output_type -> drummer.v1.PracticeSession
-	5,  // 105: drummer.v1.PracticeSessionService.GetPracticeSession:output_type -> drummer.v1.PracticeSession
-	32, // 106: drummer.v1.PracticeSessionService.ListPracticeSessions:output_type -> drummer.v1.ListPracticeSessionsResponse
-	5,  // 107: drummer.v1.PracticeSessionService.UpdatePracticeSession:output_type -> drummer.v1.PracticeSession
-	51, // 108: drummer.v1.PracticeSessionService.DeletePracticeSession:output_type -> google.protobuf.Empty
-	45, // 109: drummer.v1.PracticeSessionService.GetPracticeStats:output_type -> drummer.v1.PracticeStats
-	6,  // 110: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	6,  // 111: drummer.v1.ExerciseHistoryService.GetExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	38, // 112: drummer.v1.ExerciseHistoryService.ListExerciseHistory:output_type -> drummer.v1.ListExerciseHistoryResponse
-	6,  // 113: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
-	51, // 114: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:output_type -> google.protobuf.Empty
-	84, // [84:115] is the sub-list for method output_type
-	53, // [53:84] is the sub-list for method input_type
-	53, // [53:53] is the sub-list for extension type_name
-	53, // [53:53] is the sub-list for extension extendee
-	0,  // [0:53] is the sub-list for field type_name
+	49, // 7: drummer.v1.Exercise.last_practice:type_name -> google.protobuf.Timestamp
+	49, // 8: drummer.v1.ExerciseImage.created_at:type_name -> google.protobuf.Timestamp
+	49, // 9: drummer.v1.ExerciseLink.created_at:type_name -> google.protobuf.Timestamp
+	49, // 10: drummer.v1.PracticeSession.start_time:type_name -> google.protobuf.Timestamp
+	49, // 11: drummer.v1.PracticeSession.end_time:type_name -> google.protobuf.Timestamp
+	49, // 12: drummer.v1.PracticeSession.created_at:type_name -> google.protobuf.Timestamp
+	49, // 13: drummer.v1.PracticeSession.updated_at:type_name -> google.protobuf.Timestamp
+	6,  // 14: drummer.v1.PracticeSession.exercises:type_name -> drummer.v1.ExerciseHistory
+	49, // 15: drummer.v1.ExerciseHistory.start_time:type_name -> google.protobuf.Timestamp
+	49, // 16: drummer.v1.ExerciseHistory.end_time:type_name -> google.protobuf.Timestamp
+	2,  // 17: drummer.v1.ExerciseHistory.exercise:type_name -> drummer.v1.Exercise
+	0,  // 18: drummer.v1.ListCategoriesResponse.categories:type_name -> drummer.v1.Category
+	0,  // 19: drummer.v1.UpdateCategoryRequest.category:type_name -> drummer.v1.Category
+	50, // 20: drummer.v1.UpdateCategoryRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 21: drummer.v1.ListTagsResponse.tags:type_name -> drummer.v1.Tag
+	1,  // 22: drummer.v1.UpdateTagRequest.tag:type_name -> drummer.v1.Tag
+	50, // 23: drummer.v1.UpdateTagRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,  // 24: drummer.v1.CreateExerciseRequest.images:type_name -> drummer.v1.ExerciseImage
+	4,  // 25: drummer.v1.CreateExerciseRequest.links:type_name -> drummer.v1.ExerciseLink
+	2,  // 26: drummer.v1.ListExercisesResponse.exercises:type_name -> drummer.v1.Exercise
+	2,  // 27: drummer.v1.UpdateExerciseRequest.exercise:type_name -> drummer.v1.Exercise
+	50, // 28: drummer.v1.UpdateExerciseRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 29: drummer.v1.CreatePracticeSessionRequest.start_time:type_name -> google.protobuf.Timestamp
+	49, // 30: drummer.v1.CreatePracticeSessionRequest.end_time:type_name -> google.protobuf.Timestamp
+	49, // 31: drummer.v1.ListPracticeSessionsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 32: drummer.v1.ListPracticeSessionsRequest.end_date:type_name -> google.protobuf.Timestamp
+	5,  // 33: drummer.v1.ListPracticeSessionsResponse.sessions:type_name -> drummer.v1.PracticeSession
+	5,  // 34: drummer.v1.UpdatePracticeSessionRequest.session:type_name -> drummer.v1.PracticeSession
+	50, // 35: drummer.v1.UpdatePracticeSessionRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 36: drummer.v1.CreateExerciseHistoryRequest.start_time:type_name -> google.protobuf.Timestamp
+	49, // 37: drummer.v1.CreateExerciseHistoryRequest.end_time:type_name -> google.protobuf.Timestamp
+	49, // 38: drummer.v1.ListExerciseHistoryRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 39: drummer.v1.ListExerciseHistoryRequest.end_date:type_name -> google.protobuf.Timestamp
+	6,  // 40: drummer.v1.ListExerciseHistoryResponse.history_entries:type_name -> drummer.v1.ExerciseHistory
+	6,  // 41: drummer.v1.UpdateExerciseHistoryRequest.history:type_name -> drummer.v1.ExerciseHistory
+	50, // 42: drummer.v1.UpdateExerciseHistoryRequest.update_mask:type_name -> google.protobuf.FieldMask
+	49, // 43: drummer.v1.GetExerciseStatsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 44: drummer.v1.GetExerciseStatsRequest.end_date:type_name -> google.protobuf.Timestamp
+	43, // 45: drummer.v1.ExerciseStats.bpm_progress:type_name -> drummer.v1.BpmProgressPoint
+	49, // 46: drummer.v1.BpmProgressPoint.date:type_name -> google.protobuf.Timestamp
+	49, // 47: drummer.v1.GetPracticeStatsRequest.start_date:type_name -> google.protobuf.Timestamp
+	49, // 48: drummer.v1.GetPracticeStatsRequest.end_date:type_name -> google.protobuf.Timestamp
+	46, // 49: drummer.v1.PracticeStats.exercise_distribution:type_name -> drummer.v1.ExerciseTimeDistribution
+	47, // 50: drummer.v1.PracticeStats.category_distribution:type_name -> drummer.v1.CategoryTimeDistribution
+	48, // 51: drummer.v1.PracticeStats.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
+	48, // 52: drummer.v1.CategoryTimeDistribution.practice_frequency:type_name -> drummer.v1.PracticeTimePoint
+	49, // 53: drummer.v1.PracticeTimePoint.date:type_name -> google.protobuf.Timestamp
+	7,  // 54: drummer.v1.CategoryService.CreateCategory:input_type -> drummer.v1.CreateCategoryRequest
+	8,  // 55: drummer.v1.CategoryService.GetCategory:input_type -> drummer.v1.GetCategoryRequest
+	9,  // 56: drummer.v1.CategoryService.ListCategories:input_type -> drummer.v1.ListCategoriesRequest
+	11, // 57: drummer.v1.CategoryService.UpdateCategory:input_type -> drummer.v1.UpdateCategoryRequest
+	12, // 58: drummer.v1.CategoryService.DeleteCategory:input_type -> drummer.v1.DeleteCategoryRequest
+	13, // 59: drummer.v1.TagService.CreateTag:input_type -> drummer.v1.CreateTagRequest
+	14, // 60: drummer.v1.TagService.GetTag:input_type -> drummer.v1.GetTagRequest
+	15, // 61: drummer.v1.TagService.ListTags:input_type -> drummer.v1.ListTagsRequest
+	17, // 62: drummer.v1.TagService.UpdateTag:input_type -> drummer.v1.UpdateTagRequest
+	18, // 63: drummer.v1.TagService.DeleteTag:input_type -> drummer.v1.DeleteTagRequest
+	19, // 64: drummer.v1.ExerciseService.CreateExercise:input_type -> drummer.v1.CreateExerciseRequest
+	20, // 65: drummer.v1.ExerciseService.GetExercise:input_type -> drummer.v1.GetExerciseRequest
+	21, // 66: drummer.v1.ExerciseService.ListExercises:input_type -> drummer.v1.ListExercisesRequest
+	23, // 67: drummer.v1.ExerciseService.UpdateExercise:input_type -> drummer.v1.UpdateExerciseRequest
+	24, // 68: drummer.v1.ExerciseService.DeleteExercise:input_type -> drummer.v1.DeleteExerciseRequest
+	25, // 69: drummer.v1.ExerciseService.AddExerciseImage:input_type -> drummer.v1.AddExerciseImageRequest
+	26, // 70: drummer.v1.ExerciseService.DeleteExerciseImage:input_type -> drummer.v1.DeleteExerciseImageRequest
+	27, // 71: drummer.v1.ExerciseService.AddExerciseLink:input_type -> drummer.v1.AddExerciseLinkRequest
+	28, // 72: drummer.v1.ExerciseService.DeleteExerciseLink:input_type -> drummer.v1.DeleteExerciseLinkRequest
+	41, // 73: drummer.v1.ExerciseService.GetExerciseStats:input_type -> drummer.v1.GetExerciseStatsRequest
+	29, // 74: drummer.v1.PracticeSessionService.CreatePracticeSession:input_type -> drummer.v1.CreatePracticeSessionRequest
+	30, // 75: drummer.v1.PracticeSessionService.GetPracticeSession:input_type -> drummer.v1.GetPracticeSessionRequest
+	31, // 76: drummer.v1.PracticeSessionService.ListPracticeSessions:input_type -> drummer.v1.ListPracticeSessionsRequest
+	33, // 77: drummer.v1.PracticeSessionService.UpdatePracticeSession:input_type -> drummer.v1.UpdatePracticeSessionRequest
+	34, // 78: drummer.v1.PracticeSessionService.DeletePracticeSession:input_type -> drummer.v1.DeletePracticeSessionRequest
+	44, // 79: drummer.v1.PracticeSessionService.GetPracticeStats:input_type -> drummer.v1.GetPracticeStatsRequest
+	35, // 80: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:input_type -> drummer.v1.CreateExerciseHistoryRequest
+	36, // 81: drummer.v1.ExerciseHistoryService.GetExerciseHistory:input_type -> drummer.v1.GetExerciseHistoryRequest
+	37, // 82: drummer.v1.ExerciseHistoryService.ListExerciseHistory:input_type -> drummer.v1.ListExerciseHistoryRequest
+	39, // 83: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:input_type -> drummer.v1.UpdateExerciseHistoryRequest
+	40, // 84: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:input_type -> drummer.v1.DeleteExerciseHistoryRequest
+	0,  // 85: drummer.v1.CategoryService.CreateCategory:output_type -> drummer.v1.Category
+	0,  // 86: drummer.v1.CategoryService.GetCategory:output_type -> drummer.v1.Category
+	10, // 87: drummer.v1.CategoryService.ListCategories:output_type -> drummer.v1.ListCategoriesResponse
+	0,  // 88: drummer.v1.CategoryService.UpdateCategory:output_type -> drummer.v1.Category
+	51, // 89: drummer.v1.CategoryService.DeleteCategory:output_type -> google.protobuf.Empty
+	1,  // 90: drummer.v1.TagService.CreateTag:output_type -> drummer.v1.Tag
+	1,  // 91: drummer.v1.TagService.GetTag:output_type -> drummer.v1.Tag
+	16, // 92: drummer.v1.TagService.ListTags:output_type -> drummer.v1.ListTagsResponse
+	1,  // 93: drummer.v1.TagService.UpdateTag:output_type -> drummer.v1.Tag
+	51, // 94: drummer.v1.TagService.DeleteTag:output_type -> google.protobuf.Empty
+	2,  // 95: drummer.v1.ExerciseService.CreateExercise:output_type -> drummer.v1.Exercise
+	2,  // 96: drummer.v1.ExerciseService.GetExercise:output_type -> drummer.v1.Exercise
+	22, // 97: drummer.v1.ExerciseService.ListExercises:output_type -> drummer.v1.ListExercisesResponse
+	2,  // 98: drummer.v1.ExerciseService.UpdateExercise:output_type -> drummer.v1.Exercise
+	51, // 99: drummer.v1.ExerciseService.DeleteExercise:output_type -> google.protobuf.Empty
+	3,  // 100: drummer.v1.ExerciseService.AddExerciseImage:output_type -> drummer.v1.ExerciseImage
+	51, // 101: drummer.v1.ExerciseService.DeleteExerciseImage:output_type -> google.protobuf.Empty
+	4,  // 102: drummer.v1.ExerciseService.AddExerciseLink:output_type -> drummer.v1.ExerciseLink
+	51, // 103: drummer.v1.ExerciseService.DeleteExerciseLink:output_type -> google.protobuf.Empty
+	42, // 104: drummer.v1.ExerciseService.GetExerciseStats:output_type -> drummer.v1.ExerciseStats
+	5,  // 105: drummer.v1.PracticeSessionService.CreatePracticeSession:output_type -> drummer.v1.PracticeSession
+	5,  // 106: drummer.v1.PracticeSessionService.GetPracticeSession:output_type -> drummer.v1.PracticeSession
+	32, // 107: drummer.v1.PracticeSessionService.ListPracticeSessions:output_type -> drummer.v1.ListPracticeSessionsResponse
+	5,  // 108: drummer.v1.PracticeSessionService.UpdatePracticeSession:output_type -> drummer.v1.PracticeSession
+	51, // 109: drummer.v1.PracticeSessionService.DeletePracticeSession:output_type -> google.protobuf.Empty
+	45, // 110: drummer.v1.PracticeSessionService.GetPracticeStats:output_type -> drummer.v1.PracticeStats
+	6,  // 111: drummer.v1.ExerciseHistoryService.CreateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	6,  // 112: drummer.v1.ExerciseHistoryService.GetExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	38, // 113: drummer.v1.ExerciseHistoryService.ListExerciseHistory:output_type -> drummer.v1.ListExerciseHistoryResponse
+	6,  // 114: drummer.v1.ExerciseHistoryService.UpdateExerciseHistory:output_type -> drummer.v1.ExerciseHistory
+	51, // 115: drummer.v1.ExerciseHistoryService.DeleteExerciseHistory:output_type -> google.protobuf.Empty
+	85, // [85:116] is the sub-list for method output_type
+	54, // [54:85] is the sub-list for method input_type
+	54, // [54:54] is the sub-list for extension type_name
+	54, // [54:54] is the sub-list for extension extendee
+	0,  // [0:54] is the sub-list for field type_name
 }
 
 func init() { file_api_v1_tempus_tempus_proto_init() }

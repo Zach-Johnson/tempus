@@ -1563,6 +1563,10 @@
             "type": "object",
             "$ref": "#/definitions/v1ExerciseLink"
           }
+        },
+        "lastPractice": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "title": "Exercise represents a drumming exercise"

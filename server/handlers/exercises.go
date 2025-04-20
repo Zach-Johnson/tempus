@@ -189,13 +189,18 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 
 	// Query the exercise
 	var exercise pb.Exercise
-	var createdAt, updatedAt time.Time
+	var createdAt, updatedAt, lastPractice time.Time
 
 	err := h.db.QueryRowContext(
 		ctx,
-		"SELECT id, name, description, created_at, updated_at FROM exercises WHERE id = ?",
+		`SELECT e.id, e.name, e.description, e.created_at, e.updated_at, eh.start_time AS last_practice 
+		FROM exercises e
+		JOIN exercise_history eh ON e.id = eh.exercise_id
+		WHERE e.id = ?
+		ORDER BY eh.start_time DESC
+		LIMIT 1`,
 		req.Id,
-	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt)
+	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt, &lastPractice)
 
 	if err == sql.ErrNoRows {
 		return nil, status.Errorf(codes.NotFound, "exercise with ID %d not found", req.Id)
@@ -205,6 +210,7 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 
 	exercise.CreatedAt = timestamppb.New(createdAt)
 	exercise.UpdatedAt = timestamppb.New(updatedAt)
+	exercise.LastPractice = timestamppb.New(lastPractice)
 
 	// Get associated tag IDs
 	tagRows, err := h.db.QueryContext(
@@ -436,7 +442,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Exercise) error {
 	// Map for quick lookup of exercises by ID
 	exerciseMap := make(map[int32]*pb.Exercise)
-	exerciseIDs := make([]interface{}, 0, len(exercises))
+	exerciseIDs := make([]any, 0, len(exercises))
 
 	// Build query params and map
 	placeholders := ""
@@ -496,6 +502,41 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	}
 	if err = linkRows.Err(); err != nil {
 		return status.Errorf(codes.Internal, "error reading exercise links: %v", err)
+	}
+
+	// Get last practice
+	lastPracticeQuery := `SELECT exercise_id, MAX(start_time)
+	FROM exercise_history 
+	WHERE exercise_id IN (` + placeholders + `)
+	GROUP BY exercise_id`
+	lastPracticeRows, err := h.db.QueryContext(ctx, lastPracticeQuery, exerciseIDs...)
+	if err != nil {
+		return status.Errorf(codes.Internal, "failed to retrieve exercise last practice: %v", err)
+	}
+	defer lastPracticeRows.Close()
+
+	for lastPracticeRows.Next() {
+		var lastPracticeS string
+		var exerciseID int32
+
+		if err := lastPracticeRows.Scan(&exerciseID, &lastPracticeS); err != nil {
+			return status.Errorf(codes.Internal, "failed to parse exercise last practice: %v", err)
+		}
+
+		const layout = "2006-01-02 15:04:05.999"
+
+		// Parse the string into a time.Time
+		parsedTime, err := time.Parse(layout, lastPracticeS)
+		if err != nil {
+			return status.Errorf(codes.Internal, "failed to parse last practice time: %v", err)
+		}
+
+		if exercise, ok := exerciseMap[exerciseID]; ok {
+			exercise.LastPractice = timestamppb.New(parsedTime)
+		}
+	}
+	if err = lastPracticeRows.Err(); err != nil {
+		return status.Errorf(codes.Internal, "error reading exercise last practice: %v", err)
 	}
 
 	return nil
