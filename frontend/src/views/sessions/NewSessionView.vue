@@ -164,6 +164,19 @@
                           :disabled="!sessionStarted || !exercise.isActive"
                         ></v-select>
                       </v-col>
+                      <v-col cols="12" md="6">
+                      <v-text-field
+                          v-model="exercise.manualDuration"
+                          label="Manual Duration (minutes)"
+                          type="number"
+                          variant="outlined"
+                          min="0"
+                          step="1"
+                          hide-details
+                          :disabled="!sessionStarted || !exercise.isActive"
+                          placeholder="Override duration manually"
+                      ></v-text-field>
+                      </v-col>
                       <v-col cols="12">
                         <v-textarea
                           v-model="exercise.notes"
@@ -799,6 +812,12 @@ async function stopExercisePractice(exercise) {
   exercise.completed = true
   
   try {
+    // Calculate duration from start/end times
+    const durationFromTimes = (exercise.endTime - exercise.startTime) / 1000; // in seconds
+    
+    // Use manual duration if provided (convert from minutes to seconds)
+    const manualDurationSeconds = exercise.manualDuration ? Math.round(parseFloat(exercise.manualDuration) * 60) : null;
+
     // Save the exercise history entry immediately
     const exerciseData = {
       session_id: sessionId.value,
@@ -807,7 +826,8 @@ async function stopExercisePractice(exercise) {
       end_time: exercise.endTime.toISOString(),
       bpms: exercise.bpms ? exercise.bpms : [],
       time_signature: exercise.timeSignature || '4/4',
-      notes: exercise.notes || ''
+      notes: exercise.notes || '',
+      duration_seconds: manualDurationSeconds
     }
     
     const newHistoryEntry = await historyStore.createHistoryEntry(exerciseData)
@@ -938,7 +958,7 @@ async function loadSessionExercises(sessionId) {
         endTime: exercise.endTime ? new Date(exercise.endTime) : null,
         isActive: false, // No active exercises on resume
         completed: exercise.endTime ? true : false,
-        duration: exercise.endTime ? calculateDuration(exercise.startTime, exercise.endTime) : null,
+        duration: exercise.endTime ? exercisesStore.getExerciseDuration(exercise) : null,
         historyID: exercise.id
       }));
     }
@@ -948,18 +968,6 @@ async function loadSessionExercises(sessionId) {
   } finally {
     loadingSessionExercises.value = false;
   }
-}
-
-function calculateDuration(start, end) {
-  const startTime = new Date(start);
-  const endTime = new Date(end);
-  const diffMs = endTime - startTime;
-  
-  const seconds = Math.floor((diffMs / 1000) % 60);
-  const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function handleBeforeUnload(event) {

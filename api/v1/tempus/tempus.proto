@@ -84,6 +84,7 @@ message ExerciseHistory {
     int32 rating = 8;       // User rating (1-5)
     Exercise exercise = 9;  // Full exercise details
     int32 session_id = 10;
+    int32 duration_seconds = 11;  // Optional manual duration override
 }
 
 // ========== Category Service ==========
@@ -288,6 +289,7 @@ message CreateExerciseHistoryRequest {
     string notes = 6;
     int32 rating = 7;
     int32 session_id = 8;
+    int32 duration_seconds = 9;
 }
 
 // GetExerciseHistoryRequest is used to retrieve a specific exercise history

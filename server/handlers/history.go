@@ -88,9 +88,9 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 	// Insert the exercise history entry
 	result, err := tx.ExecContext(
 		ctx,
-		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		req.ExerciseId, req.SessionId, startTime, endTime, bpmJSON, req.TimeSignature, req.Notes, req.Rating,
+		`INSERT INTO exercise_history (exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating, duration_seconds)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		req.ExerciseId, req.SessionId, startTime, endTime, bpmJSON, req.TimeSignature, req.Notes, req.Rating, req.DurationSeconds,
 	)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create exercise history entry: %v", err)
@@ -115,15 +115,16 @@ func (h *ExerciseHistoryHandler) CreateExerciseHistory(ctx context.Context, req 
 
 	// Return the created history entry
 	return &pb.ExerciseHistory{
-		Id:            int32(historyId),
-		ExerciseId:    req.ExerciseId,
-		StartTime:     req.StartTime,
-		EndTime:       req.EndTime,
-		Bpms:          req.Bpms,
-		TimeSignature: req.TimeSignature,
-		Notes:         req.Notes,
-		Rating:        req.Rating,
-		Exercise:      exercise,
+		Id:              int32(historyId),
+		ExerciseId:      req.ExerciseId,
+		StartTime:       req.StartTime,
+		EndTime:         req.EndTime,
+		Bpms:            req.Bpms,
+		TimeSignature:   req.TimeSignature,
+		Notes:           req.Notes,
+		Rating:          req.Rating,
+		Exercise:        exercise,
+		DurationSeconds: req.DurationSeconds,
 	}, nil
 }
 
@@ -148,7 +149,7 @@ func (h *ExerciseHistoryHandler) GetExerciseHistory(ctx context.Context, req *pb
 
 	err = tx.QueryRowContext(
 		ctx,
-		`SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating
+		`SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating, duration_seconds
      FROM exercise_history
      WHERE id = ?`,
 		req.Id,
@@ -162,6 +163,7 @@ func (h *ExerciseHistoryHandler) GetExerciseHistory(ctx context.Context, req *pb
 		&history.TimeSignature,
 		&history.Notes,
 		&history.Rating,
+		&history.DurationSeconds,
 	)
 
 	if bpmJSON != "" {
@@ -216,7 +218,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 
 	// Build the query based on filters
 	baseQuery := `
-        SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating
+        SELECT id, exercise_id, session_id, start_time, end_time, bpms, time_signature, notes, rating, duration_seconds
         FROM exercise_history
     `
 	countQuery := `
@@ -278,7 +280,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 
 	// Query total count
 	var totalCount int32
-	countQueryParams := make([]interface{}, len(queryParams)-2) // Exclude limit and offset
+	countQueryParams := make([]any, len(queryParams)-2) // Exclude limit and offset
 	copy(countQueryParams, queryParams[:len(queryParams)-2])
 
 	err = tx.QueryRowContext(ctx, countQuery+whereClause, countQueryParams...).Scan(&totalCount)
@@ -321,6 +323,7 @@ func (h *ExerciseHistoryHandler) ListExerciseHistory(ctx context.Context, req *p
 			&history.TimeSignature,
 			&history.Notes,
 			&history.Rating,
+			&history.DurationSeconds,
 		)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse exercise history: %v", err)
@@ -413,6 +416,7 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 	updateTimeSignature := false
 	updateNotes := false
 	updateRating := false
+	updateDurationSeconds := false
 
 	if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
 		// If no update mask is provided, update all fields
@@ -437,6 +441,8 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 				updateNotes = true
 			case "rating":
 				updateRating = true
+			case "duration_seconds":
+				updateDurationSeconds = true
 			}
 		}
 	}
@@ -538,6 +544,14 @@ func (h *ExerciseHistoryHandler) UpdateExerciseHistory(ctx context.Context, req 
 		}
 		sql += " rating = ?"
 		params = append(params, req.History.Rating)
+	}
+
+	if updateDurationSeconds {
+		if !first {
+			sql += ","
+		}
+		sql += " duration_seconds = ?"
+		params = append(params, req.History.DurationSeconds)
 	}
 
 	tx, err := h.db.BeginTx(ctx, nil)
@@ -679,7 +693,7 @@ func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx,
 
 	// Build placeholders for the IN clause
 	placeholders := make([]string, len(ids))
-	args := make([]interface{}, len(ids))
+	args := make([]any, len(ids))
 	for i, id := range ids {
 		placeholders[i] = "?"
 		args[i] = id
@@ -739,7 +753,7 @@ func (h *ExerciseHistoryHandler) fetchExercises(ctx context.Context, tx *sql.Tx,
 func (h *ExerciseHistoryHandler) fetchExerciseRelations(ctx context.Context, tx *sql.Tx, exercises map[int32]*pb.Exercise, exerciseIDs []int32) error {
 	// Build placeholders for the IN clause
 	placeholders := make([]string, len(exerciseIDs))
-	args := make([]interface{}, len(exerciseIDs))
+	args := make([]any, len(exerciseIDs))
 	for i, id := range exerciseIDs {
 		placeholders[i] = "?"
 		args[i] = id

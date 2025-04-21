@@ -28,7 +28,7 @@
                 placeholder="Provide a description for this exercise (optional)"
               ></v-textarea>
             </v-col>
-            
+
             <v-col cols="12">
               <div class="mb-2">
                 <v-select

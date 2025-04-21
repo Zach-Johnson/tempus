@@ -1442,6 +1442,10 @@
         "sessionId": {
           "type": "integer",
           "format": "int32"
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "format": "int32"
         }
       },
       "title": "CreateExerciseHistoryRequest is used to create a new exercise history entry"
@@ -1615,6 +1619,11 @@
         "sessionId": {
           "type": "integer",
           "format": "int32"
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Optional manual duration override"
         }
       },
       "title": "ExerciseHistory represents a historical record of exercise performance"

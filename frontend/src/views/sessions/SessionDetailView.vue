@@ -131,7 +131,7 @@
                 </div>
                 
                 <div class="text-body-2 font-weight-medium mb-1">Duration</div>
-                <div class="text-body-2 mb-2">{{ formatDuration(exercise.startTime, exercise.endTime) }}</div>
+                <div class="text-body-2 mb-2">{{ exercisesStore.getExerciseDuration(exercise) }}</div>
                 
                 <div class="text-body-2 font-weight-medium mb-1">Notes</div>
                 <div class="text-body-2">{{ exercise.notes || 'No notes provided' }}</div>
@@ -183,6 +183,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useSessionsStore } from '@/stores/sessions.js'
 import { useAppStore } from '@/stores/app.js'
 import { useCategoriesStore } from '@/stores/categories.js'
+import { useExercisesStore } from '@/stores/exercises.js'
 import CategoryChip from '@/components/categories/CategoryChip.vue'
 
 const router = useRouter()
@@ -190,6 +191,7 @@ const route = useRoute()
 const sessionsStore = useSessionsStore()
 const appStore = useAppStore()
 const categoriesStore = useCategoriesStore()
+const exercisesStore = useExercisesStore()
 
 // Data
 const loading = ref(true)

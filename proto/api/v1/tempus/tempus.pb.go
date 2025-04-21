@@ -561,19 +561,20 @@ func (x *PracticeSession) GetActive() bool {
 
 // ExerciseHistory represents a historical record of exercise performance
 type ExerciseHistory struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ExerciseId    int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpms          []int32                `protobuf:"varint,5,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
-	TimeSignature string                 `protobuf:"bytes,6,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
-	Notes         string                 `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
-	Rating        int32                  `protobuf:"varint,8,opt,name=rating,proto3" json:"rating,omitempty"`    // User rating (1-5)
-	Exercise      *Exercise              `protobuf:"bytes,9,opt,name=exercise,proto3" json:"exercise,omitempty"` // Full exercise details
-	SessionId     int32                  `protobuf:"varint,10,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ExerciseId      int32                  `protobuf:"varint,2,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	StartTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime         *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Bpms            []int32                `protobuf:"varint,5,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
+	TimeSignature   string                 `protobuf:"bytes,6,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
+	Notes           string                 `protobuf:"bytes,7,opt,name=notes,proto3" json:"notes,omitempty"`
+	Rating          int32                  `protobuf:"varint,8,opt,name=rating,proto3" json:"rating,omitempty"`    // User rating (1-5)
+	Exercise        *Exercise              `protobuf:"bytes,9,opt,name=exercise,proto3" json:"exercise,omitempty"` // Full exercise details
+	SessionId       int32                  `protobuf:"varint,10,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,11,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // Optional manual duration override
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ExerciseHistory) Reset() {
@@ -672,6 +673,13 @@ func (x *ExerciseHistory) GetExercise() *Exercise {
 func (x *ExerciseHistory) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
+	}
+	return 0
+}
+
+func (x *ExerciseHistory) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
 	}
 	return 0
 }
@@ -2267,17 +2275,18 @@ func (x *DeletePracticeSessionRequest) GetId() int32 {
 
 // CreateExerciseHistoryRequest is used to create a new exercise history entry
 type CreateExerciseHistoryRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ExerciseId    int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime       *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Bpms          []int32                `protobuf:"varint,4,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
-	TimeSignature string                 `protobuf:"bytes,5,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
-	Notes         string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
-	Rating        int32                  `protobuf:"varint,7,opt,name=rating,proto3" json:"rating,omitempty"`
-	SessionId     int32                  `protobuf:"varint,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ExerciseId      int32                  `protobuf:"varint,1,opt,name=exercise_id,json=exerciseId,proto3" json:"exercise_id,omitempty"`
+	StartTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime         *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Bpms            []int32                `protobuf:"varint,4,rep,packed,name=bpms,proto3" json:"bpms,omitempty"`
+	TimeSignature   string                 `protobuf:"bytes,5,opt,name=time_signature,json=timeSignature,proto3" json:"time_signature,omitempty"`
+	Notes           string                 `protobuf:"bytes,6,opt,name=notes,proto3" json:"notes,omitempty"`
+	Rating          int32                  `protobuf:"varint,7,opt,name=rating,proto3" json:"rating,omitempty"`
+	SessionId       int32                  `protobuf:"varint,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,9,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CreateExerciseHistoryRequest) Reset() {
@@ -2362,6 +2371,13 @@ func (x *CreateExerciseHistoryRequest) GetRating() int32 {
 func (x *CreateExerciseHistoryRequest) GetSessionId() int32 {
 	if x != nil {
 		return x.SessionId
+	}
+	return 0
+}
+
+func (x *CreateExerciseHistoryRequest) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
 	}
 	return 0
 }
@@ -3298,7 +3314,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\texercises\x18\a \x03(\v2\x1b.drummer.v1.ExerciseHistoryR\texercises\x12\x16\n" +
-	"\x06active\x18\b \x01(\bR\x06active\"\xee\x02\n" +
+	"\x06active\x18\b \x01(\bR\x06active\"\x99\x03\n" +
 	"\x0fExerciseHistory\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
 	"\vexercise_id\x18\x02 \x01(\x05R\n" +
@@ -3313,7 +3329,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\bexercise\x18\t \x01(\v2\x14.drummer.v1.ExerciseR\bexercise\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\n" +
-	" \x01(\x05R\tsessionId\"M\n" +
+	" \x01(\x05R\tsessionId\x12)\n" +
+	"\x10duration_seconds\x18\v \x01(\x05R\x0fdurationSeconds\"M\n" +
 	"\x15CreateCategoryRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"$\n" +
@@ -3432,7 +3449,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\".\n" +
 	"\x1cDeletePracticeSessionRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x05R\x02id\"\xb9\x02\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xe4\x02\n" +
 	"\x1cCreateExerciseHistoryRequest\x12\x1f\n" +
 	"\vexercise_id\x18\x01 \x01(\x05R\n" +
 	"exerciseId\x129\n" +
@@ -3444,7 +3461,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x05notes\x18\x06 \x01(\tR\x05notes\x12\x16\n" +
 	"\x06rating\x18\a \x01(\x05R\x06rating\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\b \x01(\x05R\tsessionId\"+\n" +
+	"session_id\x18\b \x01(\x05R\tsessionId\x12)\n" +
+	"\x10duration_seconds\x18\t \x01(\x05R\x0fdurationSeconds\"+\n" +
 	"\x19GetExerciseHistoryRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\"\x8a\x02\n" +
 	"\x1aListExerciseHistoryRequest\x12\x1b\n" +

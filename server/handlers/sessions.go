@@ -141,7 +141,7 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 	// Query exercise history
 	exerciseRows, err := tx.QueryContext(
 		ctx,
-		`SELECT id, exercise_id, start_time, end_time, bpms, time_signature, notes
+		`SELECT id, exercise_id, start_time, end_time, bpms, time_signature, notes, duration_seconds
          FROM exercise_history
          WHERE session_id = ?
          ORDER BY start_time`,
@@ -170,6 +170,7 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 			&bpmJSON,
 			&sessionExercise.TimeSignature,
 			&sessionExercise.Notes,
+			&sessionExercise.DurationSeconds,
 		)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse session exercise: %v", err)
@@ -241,7 +242,7 @@ func (h *PracticeSessionHandler) ListPracticeSessions(ctx context.Context, req *
     `
 
 	var whereClause string
-	var queryParams []interface{}
+	var queryParams []any
 
 	// Add filter by date range if provided
 	if req.StartDate != nil && req.EndDate != nil {
@@ -582,7 +583,14 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		SELECT 
 			e.id, 
 			e.name, 
-			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
+			COALESCE(
+				SUM(
+					CASE 
+						WHEN duration_seconds > 0 THEN duration_seconds
+						ELSE strftime('%s', eh.end_time) - strftime('%s', eh.start_time)
+					END
+				), 0
+			) as duration,
 			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
 		FROM 
 			exercises e
@@ -674,7 +682,14 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 		SELECT 
 			c.id, 
 			c.name, 
-			COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) as duration,
+			COALESCE(
+				SUM(
+					CASE 
+						WHEN duration_seconds > 0 THEN duration_seconds
+						ELSE strftime('%s', eh.end_time) - strftime('%s', eh.start_time)
+					END
+				), 0
+			) as duration,
 			ROUND(COALESCE(SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)), 0) * 100.0 / ?, 2) as percentage
 		FROM 
 			categories c
@@ -736,12 +751,19 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 }
 
 // getCategoryDailyPractice retrieves the daily practice data for a specific category
-func (h *PracticeSessionHandler) getCategoryDailyPractice(ctx context.Context, categoryId int32, baseWhereClause string, baseParams []interface{}) ([]*pb.PracticeTimePoint, error) {
+func (h *PracticeSessionHandler) getCategoryDailyPractice(ctx context.Context, categoryId int32, baseWhereClause string, baseParams []any) ([]*pb.PracticeTimePoint, error) {
 	// Build the query for category daily practice
 	categoryDailyQuery := `
 		SELECT 
 			date(ps.start_time) as practice_date,
-			SUM(strftime('%s', eh.end_time) - strftime('%s', eh.start_time)) as duration
+			COALESCE(
+				SUM(
+					CASE 
+						WHEN duration_seconds > 0 THEN duration_seconds
+						ELSE strftime('%s', eh.end_time) - strftime('%s', eh.start_time)
+					END
+				), 0
+			) as duration
 		FROM 
 			exercise_history eh
 		JOIN 
@@ -753,7 +775,7 @@ func (h *PracticeSessionHandler) getCategoryDailyPractice(ctx context.Context, c
 	`
 
 	// Create parameters for query, starting with category ID
-	categoryDailyParams := []interface{}{categoryId}
+	categoryDailyParams := []any{categoryId}
 
 	// Add date range filters if they exist in the base query
 	if baseWhereClause != "" {

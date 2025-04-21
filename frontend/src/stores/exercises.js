@@ -94,6 +94,34 @@ export const useExercisesStore = defineStore("exercises", () => {
         });
     });
 
+    const getExerciseDuration = (exercise) => {
+        if (exercise.durationSeconds > 0) {
+            // Use manual duration if available
+            const seconds = exercise.durationSeconds % 60;
+            const minutes = Math.floor((exercise.durationSeconds / 60) % 60);
+            const hours = Math.floor(exercise.durationSeconds / 3600);
+
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${
+                seconds.toString().padStart(2, "0")
+            }`;
+        } else if (exercise.startTime && exercise.endTime) {
+            // Fall back to calculated duration
+            const startTime = new Date(exercise.startTime);
+            const endTime = new Date(exercise.endTime);
+            const diffMs = endTime - startTime;
+
+            const seconds = Math.floor((diffMs / 1000) % 60);
+            const minutes = Math.floor((diffMs / (1000 * 60)) % 60);
+            const hours = Math.floor(diffMs / (1000 * 60 * 60));
+
+            return `${hours}:${minutes.toString().padStart(2, "0")}:${
+                seconds.toString().padStart(2, "0")
+            }`;
+        }
+
+        return "0:00:00";
+    };
+
     // Actions
     async function fetchExercises(params = {}) {
         loading.value = true;
@@ -422,6 +450,7 @@ export const useExercisesStore = defineStore("exercises", () => {
         exercisesByTag,
         exercisesWithDerivedCategories,
         getCategoryIdsForExercise,
+        getExerciseDuration,
 
         // Actions
         fetchExercises,
