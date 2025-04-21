@@ -255,6 +255,29 @@
       </v-card-text>
     </v-card>
 
+    <!-- Exercise images card -->
+    <v-container>
+    <v-row v-if="exerciseImages.length > 0" class="justify-center">
+        <v-col
+        cols="12"
+        sm="8"
+        md="6"
+        v-for="(image, index) in exerciseImages"
+        :key="index"
+        class="d-flex justify-center"
+        >
+        <v-card class="mb-4" width="100%" max-width="1000">
+            <v-img
+            :src="'data:image/jpeg;base64,' + image.imageData"
+            :aspect-ratio="16/9"
+            class="bg-grey-lighten-4"
+            contain
+            ></v-img>
+        </v-card>
+        </v-col>
+    </v-row>
+    </v-container>
+
     <!-- Exercise search and selection -->
     <v-card class="mb-4">
       <v-card-title>
@@ -474,6 +497,7 @@ const loadingSessionExercises = ref(false)
 const sessionDuration = ref('0:00:00')
 const durationInterval = ref(null)
 const sessionId = ref(null)
+const exerciseImages = ref([])
 
 // Dialog controls
 const addExerciseDialog = ref(false)
@@ -809,6 +833,9 @@ function startExercisePractice(exercise) {
   exercise.isActive = true
   exercise.startTime = new Date()
   exercise.duration = '0:00:00'
+  if (exercise.images.length > 0) {
+    exerciseImages.value = exercise.images
+  }
   
   appStore.showSuccessMessage(`Started practice: ${exercise.name}`)
 }
@@ -818,6 +845,7 @@ async function stopExercisePractice(exercise) {
   exercise.isActive = false
   exercise.endTime = new Date()
   exercise.completed = true
+  exerciseImages.value = []
   
   try {
     // Calculate duration from start/end times

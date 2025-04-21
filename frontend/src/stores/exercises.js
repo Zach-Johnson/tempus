@@ -172,11 +172,15 @@ export const useExercisesStore = defineStore("exercises", () => {
         error.value = null;
 
         try {
-            // Prepare exercise data - remove categoryIds if they exist in the
-            // data
-            const { categoryIds, ...cleanedData } = exerciseData;
+            const apiData = {
+                name: exerciseData.name,
+                description: exerciseData.description || "",
+                tag_ids: exerciseData.tagIds || [],
+                links: exerciseData.links || [],
+                images: exerciseData.images || [],
+            };
 
-            const response = await exercisesAPI.create(cleanedData);
+            const response = await exercisesAPI.create(apiData);
             const newExercise = response.data;
             exercises.value.push(newExercise);
             return newExercise;

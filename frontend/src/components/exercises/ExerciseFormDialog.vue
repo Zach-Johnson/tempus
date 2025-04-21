@@ -100,6 +100,58 @@
                 </v-select>
               </div>
             </v-col>
+
+            <v-col cols="12">
+            <div class="d-flex align-center mb-2">
+                <div class="text-body-1 font-weight-medium">Exercise Images</div>
+            </div>
+            
+            <div 
+                class="paste-area pa-4 text-center mb-4" 
+                tabindex="0"
+                @paste="handlePaste"
+                @focus="$event.target.classList.add('focused')"
+                @blur="$event.target.classList.remove('focused')"
+            >
+                <div v-if="imagePreviewUrls.length === 0">
+                <v-icon icon="mdi-image-plus" size="48" color="grey-lighten-1" class="mb-2"></v-icon>
+                <p class="text-body-2">Click here and paste an image from your clipboard</p>
+                <p class="text-caption text-grey">Press Ctrl+V or Cmd+V after clicking this area</p>
+                </div>
+                
+                <v-row v-else>
+                <v-col
+                    v-for="(preview, index) in imagePreviewUrls"
+                    :key="index"
+                    cols="6" sm="4" md="3"
+                >
+                    <v-card class="mb-2">
+                    <v-img
+                        :src="preview.url"
+                        height="120"
+                        cover
+                    ></v-img>
+                    <v-card-text class="pa-2">
+                        <div class="text-caption text-truncate">{{ preview.name }}</div>
+                        <div class="text-caption text-grey">{{ preview.size }}</div>
+                    </v-card-text>
+                    <v-card-actions class="pa-2 pt-0">
+                        <v-spacer></v-spacer>
+                        <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        color="error"
+                        @click="removeImage(index)"
+                        >
+                        <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                    </v-card>
+                </v-col>
+                </v-row>
+            </div>
+            </v-col>
             
             <!-- External Resources Section -->
             <v-col cols="12">
@@ -275,6 +327,10 @@ const linkFormData = ref({
   description: ''
 })
 
+// Image stuff
+const imageFiles = ref([])
+const imagePreviewUrls = ref([])
+
 // Tag Form Dialog
 const tagFormDialog = ref(false)
 
@@ -328,7 +384,24 @@ async function save() {
       links: formData.value.links
     }
     
-    // Emit save event with the form data
+    // Add images if there are any
+    if (imageFiles.value.length > 0) {
+      exerciseData.images = await Promise.all(imageFiles.value.map(async (file) => {
+        const arrayBuffer = await file.arrayBuffer()
+        const base64 = btoa(
+          new Uint8Array(arrayBuffer)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        )
+        return {
+          imageData: base64,
+          filename: file.name || 'pasted-image.png',
+          mimeType: file.type || 'image/png',
+          description: ''
+        }
+      }))
+    }
+    
+    // Emit save event with the complete data
     emit('save', exerciseData)
   } catch (error) {
     console.error('Error saving exercise:', error)
@@ -392,7 +465,49 @@ function onTagCreated(tagData) {
   })
 }
 
+function handlePaste(event) {
+  const items = (event.clipboardData || event.originalEvent.clipboardData).items
+  
+  for (const item of items) {
+    if (item.kind === 'file' && item.type.startsWith('image/')) {
+      const file = item.getAsFile()
+      if (!file) continue
+      
+      // Add file to the array
+      imageFiles.value.push(file)
+      
+      // Create a preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        imagePreviewUrls.value.push({
+          url: e.target.result,
+          name: file.name || `pasted-image.${file.type.split('/')[1]}`,
+          size: formatFileSize(file.size),
+          type: file.type
+        })
+      }
+      reader.readAsDataURL(file)
+      
+      break // Only process one image at a time
+    }
+  }
+}
+
+// Helper function to format file sizes
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' bytes'
+  else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB'
+  else return (bytes / 1048576).toFixed(1) + ' MB'
+}
+
+// Remove an image
+function removeImage(index) {
+  imageFiles.value.splice(index, 1)
+  imagePreviewUrls.value.splice(index, 1)
+}
+
 // Reset form when dialog opens/closes
+// Extend your existing watch function
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.exercise) {
     // Clone the exercise to avoid modifying the original
@@ -431,3 +546,19 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.paste-area {
+  border: 2px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  min-height: 120px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paste-area:hover, .paste-area.focused {
+  border-color: rgb(var(--v-theme-primary));
+  outline: none;
+  background-color: rgba(var(--v-theme-primary), 0.05);
+}
+</style>

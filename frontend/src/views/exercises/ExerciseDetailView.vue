@@ -126,6 +126,29 @@
             </v-row>
           </v-card-text>
         </v-card>
+
+        <!-- Exercise images card -->
+        <v-container>
+        <v-row v-if="exercisesStore.currentExercise.images.length > 0" class="justify-center">
+            <v-col
+            cols="12"
+            sm="8"
+            md="6"
+            v-for="(image, index) in exercisesStore.currentExercise.images"
+            :key="index"
+            class="d-flex justify-center"
+            >
+            <v-card class="mb-4" width="100%" max-width="1000">
+                <v-img
+                :src="'data:image/jpeg;base64,' + image.imageData"
+                :aspect-ratio="16/9"
+                class="bg-grey-lighten-4"
+                contain
+                ></v-img>
+            </v-card>
+            </v-col>
+        </v-row>
+        </v-container>
         
         <!-- Practice Statistics Card -->
         <v-row>

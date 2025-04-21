@@ -84,7 +84,6 @@
                   <v-list-item
                     v-for="exercise in sessionsStore.currentSession.exercises"
                     :key="exercise.id"
-                    :to="`/exercises/${exercise.exerciseId}`"
                   >
                     <v-list-item-title>{{ exercise.exercise ? exercise.exercise.name : `Exercise #${exercise.exerciseId}` }}</v-list-item-title>
                     <v-list-item-subtitle>
@@ -108,8 +107,8 @@
         </h2>
         <v-row v-if="sessionsStore.currentSession.exercises && sessionsStore.currentSession.exercises.length > 0">
           <v-col 
-            v-for="exercise in sessionsStore.currentSession.exercises" 
-            :key="exercise.id"
+            v-for="(exercise, index) in sessionsStore.currentSession.exercises"
+            :key="index"
             cols="12" 
             md="6" 
             lg="4"

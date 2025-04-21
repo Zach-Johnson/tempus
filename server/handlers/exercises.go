@@ -189,20 +189,21 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 	}
 
 	// Query the exercise
-	var exercise pb.Exercise
-	var createdAt, updatedAt, lastPractice time.Time
-	var lastBPMJSON string
+	var (
+		exercise             pb.Exercise
+		createdAt, updatedAt time.Time
+		histCount            int
+	)
 
 	err := h.db.QueryRowContext(
 		ctx,
-		`SELECT e.id, e.name, e.description, e.created_at, e.updated_at, eh.start_time AS last_practice, eh.bpms AS last_bpms
-		FROM exercises e
-		JOIN exercise_history eh ON e.id = eh.exercise_id
-		WHERE e.id = ?
-		ORDER BY eh.start_time DESC
-		LIMIT 1`,
+		`SELECT id, name, description, created_at, updated_at, (
+			SELECT COUNT(1) FROM exercise_history WHERE exercise_id = $1
+		)
+		FROM exercises
+		WHERE id = $1`,
 		req.Id,
-	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt, &lastPractice, &lastBPMJSON)
+	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt, &histCount)
 
 	if err == sql.ErrNoRows {
 		return nil, status.Errorf(codes.NotFound, "exercise with ID %d not found", req.Id)
@@ -210,17 +211,38 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 		return nil, status.Errorf(codes.Internal, "failed to retrieve exercise: %v", err)
 	}
 
-	if lastBPMJSON != "" {
-		var bpms []int32
-		if err := json.Unmarshal([]byte(lastBPMJSON), &bpms); err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+	if histCount > 0 {
+		var (
+			lastPractice time.Time
+			lastBPMJSON  string
+		)
+		err := h.db.QueryRowContext(
+			ctx,
+			`SELECT start_time, bpms
+		FROM exercise_history
+		WHERE exercise_id = ?
+		ORDER BY start_time DESC
+		LIMIT 1`,
+			req.Id,
+		).Scan(&lastPractice, &lastBPMJSON)
+
+		if err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to retrieve exercise history: %v", err)
 		}
-		exercise.LastBpms = bpms
+
+		if lastBPMJSON != "" {
+			var bpms []int32
+			if err := json.Unmarshal([]byte(lastBPMJSON), &bpms); err != nil {
+				return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+			}
+			exercise.LastBpms = bpms
+		}
+
+		exercise.LastPractice = timestamppb.New(lastPractice)
 	}
 
 	exercise.CreatedAt = timestamppb.New(createdAt)
 	exercise.UpdatedAt = timestamppb.New(updatedAt)
-	exercise.LastPractice = timestamppb.New(lastPractice)
 
 	// Get associated tag IDs
 	tagRows, err := h.db.QueryContext(
@@ -512,6 +534,33 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	}
 	if err = linkRows.Err(); err != nil {
 		return status.Errorf(codes.Internal, "error reading exercise links: %v", err)
+	}
+
+	// Get images for all exercises
+	imageQuery := `SELECT id, exercise_id, image_data, filename, mime_type, description, created_at
+	FROM exercise_images WHERE exercise_id IN (` + placeholders + `)`
+	imageRows, err := h.db.QueryContext(ctx, imageQuery, exerciseIDs...)
+	if err != nil {
+		return status.Errorf(codes.Internal, "failed to retrieve exercise images: %v", err)
+	}
+	defer imageRows.Close()
+
+	for imageRows.Next() {
+		var (
+			image     pb.ExerciseImage
+			createdAt time.Time
+		)
+		if err := imageRows.Scan(&image.Id, &image.ExerciseId, &image.ImageData, &image.Filename, &image.MimeType, &image.Description, &createdAt); err != nil {
+			return status.Errorf(codes.Internal, "failed to parse exercise image: %v", err)
+		}
+		image.CreatedAt = timestamppb.New(createdAt)
+
+		if exercise, ok := exerciseMap[image.ExerciseId]; ok {
+			exercise.Images = append(exercise.Images, &image)
+		}
+	}
+	if err = imageRows.Err(); err != nil {
+		return status.Errorf(codes.Internal, "error reading exercise images: %v", err)
 	}
 
 	// Get last practice
@@ -1022,9 +1071,9 @@ func (h *ExerciseHandler) GetExerciseStats(ctx context.Context, req *pb.GetExerc
 
 	// Get BPM progress over time - taking the max BPM value per day
 	bpmProgressQuery := `
-		SELECT date, MAX(bpm_value) as bpm
+		SELECT date, COALESCE(MAX(bpm_value), 0) as bpm
 		FROM (
-			SELECT 
+			SELECT
 				CAST(strftime('%Y-%m-%d', start_time) AS TEXT) as date,
 				CAST(json_extract(value, '$') AS INTEGER) AS bpm_value
 			FROM exercise_history, json_each(bpms)
