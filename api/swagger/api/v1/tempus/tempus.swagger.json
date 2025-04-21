@@ -1571,6 +1571,13 @@
         "lastPractice": {
           "type": "string",
           "format": "date-time"
+        },
+        "lastBpms": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int32"
+          }
         }
       },
       "title": "Exercise represents a drumming exercise"

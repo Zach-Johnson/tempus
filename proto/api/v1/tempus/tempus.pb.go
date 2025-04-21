@@ -184,6 +184,7 @@ type Exercise struct {
 	Images        []*ExerciseImage       `protobuf:"bytes,8,rep,name=images,proto3" json:"images,omitempty"`
 	Links         []*ExerciseLink        `protobuf:"bytes,9,rep,name=links,proto3" json:"links,omitempty"`
 	LastPractice  *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=last_practice,json=lastPractice,proto3" json:"last_practice,omitempty"`
+	LastBpms      []int32                `protobuf:"varint,11,rep,packed,name=last_bpms,json=lastBpms,proto3" json:"last_bpms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -284,6 +285,13 @@ func (x *Exercise) GetLinks() []*ExerciseLink {
 func (x *Exercise) GetLastPractice() *timestamppb.Timestamp {
 	if x != nil {
 		return x.LastPractice
+	}
+	return nil
+}
+
+func (x *Exercise) GetLastBpms() []int32 {
+	if x != nil {
+		return x.LastBpms
 	}
 	return nil
 }
@@ -3269,7 +3277,7 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12!\n" +
-	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\"\xa6\x03\n" +
+	"\fcategory_ids\x18\x04 \x03(\x05R\vcategoryIds\"\xc3\x03\n" +
 	"\bExercise\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -3283,7 +3291,8 @@ const file_api_v1_tempus_tempus_proto_rawDesc = "" +
 	"\x06images\x18\b \x03(\v2\x19.drummer.v1.ExerciseImageR\x06images\x12.\n" +
 	"\x05links\x18\t \x03(\v2\x18.drummer.v1.ExerciseLinkR\x05links\x12?\n" +
 	"\rlast_practice\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\flastPractice\"\xf5\x01\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\flastPractice\x12\x1b\n" +
+	"\tlast_bpms\x18\v \x03(\x05R\blastBpms\"\xf5\x01\n" +
 	"\rExerciseImage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1f\n" +
 	"\vexercise_id\x18\x02 \x01(\x05R\n" +

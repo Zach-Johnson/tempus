@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"strconv"
 	"time"
 
@@ -190,22 +191,31 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 	// Query the exercise
 	var exercise pb.Exercise
 	var createdAt, updatedAt, lastPractice time.Time
+	var lastBPMJSON string
 
 	err := h.db.QueryRowContext(
 		ctx,
-		`SELECT e.id, e.name, e.description, e.created_at, e.updated_at, eh.start_time AS last_practice 
+		`SELECT e.id, e.name, e.description, e.created_at, e.updated_at, eh.start_time AS last_practice, eh.bpms AS last_bpms
 		FROM exercises e
 		JOIN exercise_history eh ON e.id = eh.exercise_id
 		WHERE e.id = ?
 		ORDER BY eh.start_time DESC
 		LIMIT 1`,
 		req.Id,
-	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt, &lastPractice)
+	).Scan(&exercise.Id, &exercise.Name, &exercise.Description, &createdAt, &updatedAt, &lastPractice, &lastBPMJSON)
 
 	if err == sql.ErrNoRows {
 		return nil, status.Errorf(codes.NotFound, "exercise with ID %d not found", req.Id)
 	} else if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to retrieve exercise: %v", err)
+	}
+
+	if lastBPMJSON != "" {
+		var bpms []int32
+		if err := json.Unmarshal([]byte(lastBPMJSON), &bpms); err != nil {
+			return nil, status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+		}
+		exercise.LastBpms = bpms
 	}
 
 	exercise.CreatedAt = timestamppb.New(createdAt)
@@ -505,10 +515,15 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	}
 
 	// Get last practice
-	lastPracticeQuery := `SELECT exercise_id, MAX(start_time)
-	FROM exercise_history 
-	WHERE exercise_id IN (` + placeholders + `)
-	GROUP BY exercise_id`
+	lastPracticeQuery := `SELECT eh.exercise_id, latest.latest_start_time, latest.bpms
+	FROM exercise_history eh
+	INNER JOIN (
+		SELECT exercise_id, MAX(start_time) AS latest_start_time, bpms
+		FROM exercise_history
+		WHERE exercise_id IN (` + placeholders + `)
+		GROUP BY exercise_id
+	) latest ON eh.exercise_id = latest.exercise_id AND eh.start_time = latest.latest_start_time
+	`
 	lastPracticeRows, err := h.db.QueryContext(ctx, lastPracticeQuery, exerciseIDs...)
 	if err != nil {
 		return status.Errorf(codes.Internal, "failed to retrieve exercise last practice: %v", err)
@@ -518,8 +533,9 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	for lastPracticeRows.Next() {
 		var lastPracticeS string
 		var exerciseID int32
+		var lastBPMJSON string
 
-		if err := lastPracticeRows.Scan(&exerciseID, &lastPracticeS); err != nil {
+		if err := lastPracticeRows.Scan(&exerciseID, &lastPracticeS, &lastBPMJSON); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise last practice: %v", err)
 		}
 
@@ -533,6 +549,14 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 
 		if exercise, ok := exerciseMap[exerciseID]; ok {
 			exercise.LastPractice = timestamppb.New(parsedTime)
+
+			if lastBPMJSON != "" {
+				var bpms []int32
+				if err := json.Unmarshal([]byte(lastBPMJSON), &bpms); err != nil {
+					return status.Errorf(codes.Internal, "failed to unmarshal BPM values: %v", err)
+				}
+				exercise.LastBpms = bpms
+			}
 		}
 	}
 	if err = lastPracticeRows.Err(); err != nil {

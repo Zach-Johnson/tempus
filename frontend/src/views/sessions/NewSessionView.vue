@@ -117,6 +117,14 @@
                       >
                         {{ getExerciseStatus(exercise) }}
                       </v-chip>
+                      <v-chip
+                        v-if="exercise.lastBpms"
+                        size="small"
+                        class="ml-2"
+                        color="primary"
+                      >
+                        Last BPMs: {{ exercise.lastBpms.join(",") }}
+                      </v-chip>
                       <span v-if="exercise.duration" class="ml-2 text-caption">
                         {{ exercise.duration }}
                       </span>
