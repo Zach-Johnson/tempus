@@ -141,7 +141,7 @@ func (h *PracticeSessionHandler) GetPracticeSession(ctx context.Context, req *pb
 	// Query exercise history
 	exerciseRows, err := tx.QueryContext(
 		ctx,
-		`SELECT id, exercise_id, start_time, end_time, bpms, time_signature, notes, duration_seconds
+		`SELECT id, exercise_id, start_time, end_time, bpms, time_signature, notes, COALESCE(duration_seconds, 0)
          FROM exercise_history
          WHERE session_id = ?
          ORDER BY start_time`,
