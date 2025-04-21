@@ -59,7 +59,7 @@
           v-if="filteredTags.length > 0"
           :headers="headers"
           :items="filteredTags"
-          :items-per-page="10"
+          :items-per-page="50"
           class="elevation-1            "
         >
         <template #item.createdAt="{ item }">

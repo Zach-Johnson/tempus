@@ -70,7 +70,7 @@
           v-if="filteredExercises.length > 0"
           :headers="headers"
           :items="filteredExercises"
-          :items-per-page="10"
+          :items-per-page="50"
           class="elevation-1"
         >
           <template v-slot:item.description="{ item }">
