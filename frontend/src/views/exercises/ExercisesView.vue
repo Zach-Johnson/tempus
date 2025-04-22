@@ -302,10 +302,11 @@ function openCreateDialog() {
   dialogVisible.value = true
 }
 
-function openEditDialog(exercise) {
-  selectedExercise.value = { ...exercise }
-  isEdit.value = true
-  dialogVisible.value = true
+async function openEditDialog(exercise) {
+    await exercisesStore.fetchExercise(exercise.id)
+    selectedExercise.value = exercisesStore.currentExercise
+    isEdit.value = true
+    dialogVisible.value = true
 }
 
 async function saveExercise(exerciseData) {

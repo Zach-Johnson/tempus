@@ -260,8 +260,6 @@
     <v-row v-if="exerciseImages.length > 0" class="justify-center">
         <v-col
         cols="12"
-        sm="8"
-        md="6"
         v-for="(image, index) in exerciseImages"
         :key="index"
         class="d-flex justify-center"
@@ -269,7 +267,6 @@
         <v-card class="mb-4" width="100%" max-width="1000">
             <v-img
             :src="'data:image/jpeg;base64,' + image.imageData"
-            :aspect-ratio="16/9"
             class="bg-grey-lighten-4"
             contain
             ></v-img>

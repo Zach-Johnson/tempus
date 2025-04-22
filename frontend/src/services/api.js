@@ -75,17 +75,7 @@ const exercisesAPI = {
         ),
     delete: (id) => api.delete(`/exercises/${id}`),
     addImage: (exerciseId, imageData) => {
-        const formData = new FormData();
-        formData.append("image_data", imageData.blob);
-        formData.append("filename", imageData.filename);
-        formData.append("mime_type", imageData.mimeType);
-        formData.append("description", imageData.description || "");
-
-        return api.post(`/exercises/${exerciseId}/images`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+        return api.post(`/exercises/${exerciseId}/images`, imageData);
     },
     deleteImage: (id) => api.delete(`/exercise-images/${id}`),
     addLink: (exerciseId, data) =>

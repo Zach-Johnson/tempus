@@ -101,7 +101,7 @@
               </div>
             </v-col>
 
-            <v-col cols="12">
+            <v-col cols="12" v-if="!isEdit">
             <div class="d-flex align-center mb-2">
                 <div class="text-body-1 font-weight-medium">Exercise Images</div>
             </div>
@@ -201,7 +201,58 @@
                 </v-list>
               </div>
             </v-col>
+
+            <!-- Images Section -->
+            <v-col v-if="isEdit" cols="12">
+              <div class="d-flex align-center mb-2">
+                <div class="text-body-1 font-weight-medium">Images</div>
+                <v-btn
+                  variant="text"
+                  density="compact"
+                  icon="mdi-plus"
+                  size="small"
+                  color="primary"
+                  class="ml-2"
+                  @click="addImage"
+                  title="Add image"
+                ></v-btn>
+              </div>
+            </v-col>
           </v-row>
+            <!-- Exercise images card -->
+            <v-container v-if="exercise.images && exercise.images.length > 0">
+            <v-row class="justify-center">
+                <v-col
+                cols="12"
+                sm="8"
+                md="6"
+                v-for="(image, index) in exercise.images"
+                :key="index"
+                class="d-flex justify-center"
+                >
+                <v-card class="mb-4" width="100%" max-width="1000">
+                    <v-img
+                    :src="'data:image/jpeg;base64,' + image.imageData"
+                    :aspect-ratio="16/9"
+                    class="bg-grey-lighten-4"
+                    contain
+                    ></v-img>
+                    <v-card-actions class="pa-2 pt-0">
+                        <v-spacer></v-spacer>
+                        <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        color="error"
+                        @click="confirmDeleteImage(image)"
+                        >
+                        <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+                </v-col>
+            </v-row>
+            </v-container>
         </v-form>
       </v-card-text>
       
@@ -265,6 +316,26 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Image Dialog -->
+  <v-dialog v-model="imageDialog" max-width="600">
+    <v-card>
+    <v-card-title>Exercise Images</v-card-title>
+    <v-card-text>
+    <div 
+        class="paste-area pa-4 text-center mb-4" 
+        tabindex="0"
+        @paste="handlePasteAndSave"
+        @focus="$event.target.classList.add('focused')"
+        @blur="$event.target.classList.remove('focused')"
+    >
+        <v-icon icon="mdi-image-plus" size="48" color="grey-lighten-1" class="mb-2"></v-icon>
+        <p class="text-body-2">Click here and paste an image from your clipboard</p>
+        <p class="text-caption text-grey">Press Ctrl+V or Cmd+V after clicking this area</p>
+    </div>
+    </v-card-text>
+    </v-card>
+  </v-dialog>
   
   <!-- Tag Form Dialog -->
   <tag-form-dialog
@@ -273,12 +344,36 @@
     :is-edit="false"
     @save="onTagCreated"
   />
+
+    <!-- Delete Image Confirmation Dialog -->
+    <v-dialog v-model="deleteImageDialog" max-width="500">
+      <v-card>
+        <v-card-title class="text-h5">Delete Image</v-card-title>
+        <v-card-text>
+          Are you sure?
+          This action cannot be undone.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey-darken-1" variant="text" @click="deleteImageDialog = false">Cancel</v-btn>
+          <v-btn 
+            color="error" 
+            variant="flat" 
+            @click="deleteImage" 
+            :loading="deleteLoading"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useTagsStore } from '@/stores/tags.js'
 import { useCategoriesStore } from '@/stores/categories.js'
+import { useExercisesStore } from '@/stores/exercises.js'
 import { useAppStore } from '@/stores/app.js'
 import TagFormDialog from '@/components/tags/TagFormDialog.vue'
 
@@ -304,6 +399,7 @@ const emit = defineEmits(['update:modelValue', 'save'])
 // Stores
 const tagsStore = useTagsStore()
 const categoriesStore = useCategoriesStore()
+const exerciseStore = useExercisesStore()
 const appStore = useAppStore()
 
 // Data
@@ -327,9 +423,13 @@ const linkFormData = ref({
   description: ''
 })
 
-// Image stuff
+// Image creation
+const imageDialog = ref(false)
 const imageFiles = ref([])
 const imagePreviewUrls = ref([])
+const selectedImage = ref(null) // Used for deleting images
+const deleteImageDialog = ref(false)
+const deleteLoading = ref(false)
 
 // Tag Form Dialog
 const tagFormDialog = ref(false)
@@ -450,6 +550,10 @@ function removeLink(index) {
   formData.value.links.splice(index, 1)
 }
 
+function addImage() {
+  imageDialog.value = true
+}
+
 function openTagForm() {
   tagFormDialog.value = true
 }
@@ -493,6 +597,41 @@ function handlePaste(event) {
   }
 }
 
+async function handlePasteAndSave(event) {
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items
+  
+    saving.value = true
+    try {
+        for (const item of items) {
+            if (item.kind === 'file' && item.type.startsWith('image/')) {
+                const file = item.getAsFile()
+                if (!file) continue
+            
+                const arrayBuffer = await file.arrayBuffer()
+                const base64 = btoa(
+                new Uint8Array(arrayBuffer)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                )
+                const image = {
+                    image_data: base64,
+                    filename: file.name || 'pasted-image.png',
+                    mime_type: file.type || 'image/png',
+                    description: ''
+                }
+
+                await exerciseStore.addExerciseImage(props.exercise.id, image)
+
+                break // Only process one image at a time
+            }
+        }
+    } catch (error) {
+        appStore.showErrorMessage(`Error adding exercise image : ${error.message}`)
+    } finally {
+        imageDialog.value = false
+        saving.value = false
+    }
+}
+
 // Helper function to format file sizes
 function formatFileSize(bytes) {
   if (bytes < 1024) return bytes + ' bytes'
@@ -504,6 +643,24 @@ function formatFileSize(bytes) {
 function removeImage(index) {
   imageFiles.value.splice(index, 1)
   imagePreviewUrls.value.splice(index, 1)
+}
+
+function confirmDeleteImage(image) {
+  selectedImage.value = image
+  deleteImageDialog.value = true
+}
+
+async function deleteImage() {
+  deleteLoading.value = true
+  try {
+    await exerciseStore.deleteExerciseImage(selectedImage.value.id)
+    appStore.showSuccessMessage(`Image deleted successfully`)
+    deleteImageDialog.value = false
+  } catch (error) {
+    appStore.showErrorMessage(`Error deleting image: ${error.message}`)
+  } finally {
+    deleteLoading.value = false
+  }
 }
 
 // Reset form when dialog opens/closes
@@ -537,13 +694,14 @@ watch(() => props.modelValue, (isOpen) => {
 
 // Load tags and categories if needed
 onMounted(async () => {
-  if (tagsStore.tags.length === 0) {
-    await tagsStore.fetchTags()
-  }
-  
-  if (categoriesStore.categories.length === 0) {
-    await categoriesStore.fetchCategories()
-  }
+    // await exerciseStore.fetchExercise(props.exercise.id)
+    if (tagsStore.tags.length === 0) {
+        await tagsStore.fetchTags()
+    }
+    
+    if (categoriesStore.categories.length === 0) {
+        await categoriesStore.fetchCategories()
+    }
 })
 </script>
 

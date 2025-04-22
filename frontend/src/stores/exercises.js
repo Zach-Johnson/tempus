@@ -289,17 +289,6 @@ export const useExercisesStore = defineStore("exercises", () => {
                 exercise.images.push(response.data);
             }
 
-            // Update currentExercise if it's the relevant exercise
-            if (
-                currentExercise.value &&
-                currentExercise.value.id === exerciseId
-            ) {
-                if (!currentExercise.value.images) {
-                    currentExercise.value.images = [];
-                }
-                currentExercise.value.images.push(response.data);
-            }
-
             return response.data;
         } catch (err) {
             error.value = err.message ||

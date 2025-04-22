@@ -388,7 +388,7 @@ function formatDuration(startTime, endTime) {
 }
 
 function openEditDialog() {
-  dialogVisible.value = true
+    dialogVisible.value = true
 }
 
 function openAddResourceDialog() {

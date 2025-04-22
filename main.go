@@ -55,7 +55,7 @@ func main() {
 	}
 
 	// Initialize database
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite3", dbPath+"?_foreign_keys=1")
 	if err != nil {
 		log.Fatalf("Failed to open database: %v", err)
 	}
@@ -64,14 +64,6 @@ func main() {
 	// Ping database to verify connection
 	if err := db.Ping(); err != nil {
 		log.Fatalf("Failed to ping database: %v", err)
-	}
-
-	// Set pragmas for SQLite
-	if _, err := db.Exec("PRAGMA foreign_keys = ON"); err != nil {
-		log.Fatalf("Failed to set foreign_keys pragma: %v", err)
-	}
-	if _, err := db.Exec("PRAGMA journal_mode = WAL"); err != nil {
-		log.Fatalf("Failed to set journal_mode pragma: %v", err)
 	}
 
 	// Initialize the storage layer
