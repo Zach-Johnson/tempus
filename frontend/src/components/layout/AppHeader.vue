@@ -3,20 +3,23 @@
     <v-btn icon @click="toggleSidebar">
       <v-icon>{{ isSidebarOpen ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
     </v-btn>
-    
+
     <v-app-bar-title>
       <router-link to="/" class="text-decoration-none">
-        Tempus
+        <div class="d-flex align-center">
+          <v-img src="./logo.png" contain max-width="50" class="mr-2" />
+          <span class="text-h6">Tempus</span>
+        </div>
       </router-link>
     </v-app-bar-title>
-    
+
     <v-spacer></v-spacer>
-    
+
     <v-btn icon @click="toggleTheme">
       <v-icon>{{ isDarkTheme ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
     </v-btn>
   </v-app-bar>
-  
+
   <v-navigation-drawer :model-value="isSidebarOpen" @update:model-value="updateSidebarState">
     <v-list-item class="pa-4">
       <v-list-item-title class="text-h6">
@@ -26,9 +29,9 @@
         Drum Practice Tracker
       </v-list-item-subtitle>
     </v-list-item>
-    
+
     <v-divider></v-divider>
-    
+
     <v-list density="compact" nav>
       <v-list-item v-for="item in menuItems" :key="item.title" :to="item.to" :prepend-icon="item.icon">
         {{ item.title }}
@@ -77,7 +80,7 @@ onMounted(() => {
   // Initialize theme
   appStore.initDarkMode()
   theme.global.name.value = appStore.darkMode ? 'dark' : 'light'
-  
+
   // Initialize sidebar state from localStorage
   const storedOpen = localStorage.getItem("sidebarOpen");
   if (storedOpen !== null) {

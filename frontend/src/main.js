@@ -15,42 +15,42 @@ import App from "./App.vue";
 import router from "./router/index.js";
 
 const vuetify = createVuetify({
-    components,
-    directives,
-    icons: {
-        defaultSet: "mdi",
-    },
-    theme: {
-        defaultTheme: "light",
-        themes: {
-            light: {
-                dark: false,
-                colors: {
-                    primary: "#1976D2",
-                    secondary: "#424242",
-                    accent: "#82B1FF",
-                    error: "#FF5252",
-                    info: "#2196F3",
-                    success: "#4CAF50",
-                    warning: "#FFC107",
-                    background: "#F5F5F5",
-                },
-            },
-            dark: {
-                dark: true,
-                colors: {
-                    primary: "#2196F3",
-                    secondary: "#616161",
-                    accent: "#82B1FF",
-                    error: "#FF5252",
-                    info: "#2196F3",
-                    success: "#4CAF50",
-                    warning: "#FFC107",
-                    background: "#121212",
-                },
-            },
+  components,
+  directives,
+  icons: {
+    defaultSet: "mdi",
+  },
+  theme: {
+    defaultTheme: "light",
+    themes: {
+      light: {
+        dark: false,
+        colors: {
+          primary: "#1976D2", // blue-darken-2
+          secondary: "#424242", // grey-darken-3
+          accent: "#82B1FF", // blue-accent-1
+          error: "#FF5252", // red-accent-2
+          info: "#2196F3", // blue
+          success: "#4CAF50", // green
+          warning: "#FFC107", // Amber
+          background: "#F5F5F5", // grey-lighten-4
         },
+      },
+      dark: {
+        dark: true,
+        colors: {
+          primary: "#2196F3",
+          secondary: "#616161",
+          accent: "#82B1FF",
+          error: "#FF5252",
+          info: "#2196F3",
+          success: "#4CAF50",
+          warning: "#FFC107",
+          background: "#121212",
+        },
+      },
     },
+  },
 });
 
 // Create and mount the app
