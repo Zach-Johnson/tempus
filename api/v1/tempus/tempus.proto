@@ -39,6 +39,7 @@ message Exercise {
     repeated ExerciseLink links = 9;
     google.protobuf.Timestamp last_practice = 10;
     repeated int32 last_bpms = 11;
+    string last_notes = 12;
 }
 
 // ExerciseImage represents an image associated with an exercise

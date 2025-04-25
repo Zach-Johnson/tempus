@@ -1578,6 +1578,9 @@
             "type": "integer",
             "format": "int32"
           }
+        },
+        "lastNotes": {
+          "type": "string"
         }
       },
       "title": "Exercise represents a drumming exercise"

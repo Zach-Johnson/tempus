@@ -218,14 +218,13 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 		)
 		err := h.db.QueryRowContext(
 			ctx,
-			`SELECT start_time, bpms
+			`SELECT start_time, bpms, notes
 		FROM exercise_history
 		WHERE exercise_id = ?
 		ORDER BY start_time DESC
 		LIMIT 1`,
 			req.Id,
-		).Scan(&lastPractice, &lastBPMJSON)
-
+		).Scan(&lastPractice, &lastBPMJSON, &exercise.LastNotes)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to retrieve exercise history: %v", err)
 		}
@@ -404,7 +403,7 @@ func (h *ExerciseHandler) ListExercises(ctx context.Context, req *pb.ListExercis
 
 	// Query total count
 	var totalCount int32
-	countQueryParams := make([]interface{}, len(queryParams)-2) // Exclude limit and offset
+	countQueryParams := make([]any, len(queryParams)-2) // Exclude limit and offset
 	copy(countQueryParams, queryParams[:len(queryParams)-2])
 
 	err := h.db.QueryRowContext(ctx, countQuery+whereClause, countQueryParams...).Scan(&totalCount)
@@ -564,10 +563,10 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	}
 
 	// Get last practice
-	lastPracticeQuery := `SELECT eh.exercise_id, latest.latest_start_time, latest.bpms
+	lastPracticeQuery := `SELECT eh.exercise_id, latest.latest_start_time, latest.bpms, latest.notes
 	FROM exercise_history eh
 	INNER JOIN (
-		SELECT exercise_id, MAX(start_time) AS latest_start_time, bpms
+		SELECT exercise_id, MAX(start_time) AS latest_start_time, bpms, notes
 		FROM exercise_history
 		WHERE exercise_id IN (` + placeholders + `)
 		GROUP BY exercise_id
@@ -580,11 +579,14 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	defer lastPracticeRows.Close()
 
 	for lastPracticeRows.Next() {
-		var lastPracticeS string
-		var exerciseID int32
-		var lastBPMJSON string
+		var (
+			lastPracticeS string
+			exerciseID    int32
+			lastBPMJSON   string
+			lastNotes     string
+		)
 
-		if err := lastPracticeRows.Scan(&exerciseID, &lastPracticeS, &lastBPMJSON); err != nil {
+		if err := lastPracticeRows.Scan(&exerciseID, &lastPracticeS, &lastBPMJSON, &lastNotes); err != nil {
 			return status.Errorf(codes.Internal, "failed to parse exercise last practice: %v", err)
 		}
 
@@ -598,6 +600,7 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 
 		if exercise, ok := exerciseMap[exerciseID]; ok {
 			exercise.LastPractice = timestamppb.New(parsedTime)
+			exercise.LastNotes = lastNotes
 
 			if lastBPMJSON != "" {
 				var bpms []int32
@@ -668,7 +671,7 @@ func (h *ExerciseHandler) UpdateExercise(ctx context.Context, req *pb.UpdateExer
 	// Update exercise fields
 	if updateName || updateDescription {
 		sql := "UPDATE exercises SET"
-		params := []interface{}{}
+		params := []any{}
 		needsComma := false
 
 		if updateName {

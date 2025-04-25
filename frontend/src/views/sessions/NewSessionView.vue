@@ -6,22 +6,11 @@
         <p class="text-body-1">Start tracking your practice time</p>
       </v-col>
       <v-col cols="12" sm="4" class="d-flex justify-end align-center">
-        <v-btn
-          v-if="!sessionStarted"
-          color="primary"
-          prepend-icon="mdi-play"
-          :loading="startingSession"
-          @click="startSession"
-        >
+        <v-btn v-if="!sessionStarted" color="primary" prepend-icon="mdi-play" :loading="startingSession"
+          @click="startSession">
           Start Session
         </v-btn>
-        <v-btn
-          v-else
-          color="success"
-          prepend-icon="mdi-check"
-          :loading="finishingSession"
-          @click="finishSession"
-        >
+        <v-btn v-else color="success" prepend-icon="mdi-check" :loading="finishingSession" @click="finishSession">
           Finish Session
         </v-btn>
       </v-col>
@@ -34,14 +23,9 @@
             <div class="text-h6 mb-2">Session Details</div>
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  v-model="notes"
-                  label="Session Notes"
-                  variant="outlined"
-                  rows="2"
+                <v-text-field v-model="notes" label="Session Notes" variant="outlined" rows="2"
                   placeholder="Add notes about this practice session (optional)"
-                  :disabled="finishingSession"
-                ></v-text-field>
+                  :disabled="finishingSession"></v-text-field>
               </v-col>
             </v-row>
 
@@ -70,60 +54,32 @@
             <div class="d-flex align-center mb-2">
               <div class="text-h6">Exercises in this Session</div>
             </div>
-            
-            <v-skeleton-loader
-              v-if="loadingSessionExercises"
-              type="list-item-two-line"
-              :loading="loadingSessionExercises"
-            ></v-skeleton-loader>
+
+            <v-skeleton-loader v-if="loadingSessionExercises" type="list-item-two-line"
+              :loading="loadingSessionExercises"></v-skeleton-loader>
 
             <div v-else-if="sessionExercises.length === 0" class="text-center pa-4">
               <v-icon icon="mdi-music-note-off" size="64" color="grey-lighten-1" class="mb-2"></v-icon>
               <p class="text-body-2 text-grey">No exercises added yet</p>
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-plus"
-                variant="text"
-                @click="openAddExerciseDialog"
-                :disabled="!sessionStarted"
-              >
+              <v-btn color="primary" prepend-icon="mdi-plus" variant="text" @click="openAddExerciseDialog"
+                :disabled="!sessionStarted">
                 Add Exercises
               </v-btn>
               <p class="text-body-2 text-grey mt-2">or</p>
-              <v-btn 
-                color="primary"
-                prepend-icon="mdi-music-note-plus"
-                variant="text"
-                @click="openCreateExerciseDialog"
-                :disabled="!sessionStarted"
-              >
+              <v-btn color="primary" prepend-icon="mdi-music-note-plus" variant="text" @click="openCreateExerciseDialog"
+                :disabled="!sessionStarted">
                 Create New Exercise
               </v-btn>
             </div>
 
             <div v-else>
               <v-expansion-panels variant="accordion">
-                <v-expansion-panel
-                  v-for="(exercise, index) in sessionExercises"
-                  :key="index"
-                >
+                <v-expansion-panel v-for="(exercise, index) in sessionExercises" :key="index">
                   <v-expansion-panel-title>
                     <div class="d-flex align-center">
                       <span>{{ exercise.name }}</span>
-                      <v-chip 
-                        size="small" 
-                        class="ml-2" 
-                        :color="getExerciseStatusColor(exercise)"
-                      >
+                      <v-chip size="small" class="ml-2" :color="getExerciseStatusColor(exercise)">
                         {{ getExerciseStatus(exercise) }}
-                      </v-chip>
-                      <v-chip
-                        v-if="exercise.lastBpms"
-                        size="small"
-                        class="ml-2"
-                        color="primary"
-                      >
-                        Last BPMs: {{ exercise.lastBpms.join(",") }}
                       </v-chip>
                       <span v-if="exercise.duration" class="ml-2 text-caption">
                         {{ exercise.duration }}
@@ -131,14 +87,8 @@
                     </div>
 
                     <template v-slot:actions>
-                      <v-btn
-                        icon
-                        variant="text"
-                        size="small"
-                        color="error"
-                        @click.stop="removeExercise(index)"
-                        :disabled="exercise.isActive"
-                      >
+                      <v-btn icon variant="text" size="small" color="error" @click.stop="removeExercise(index)"
+                        :disabled="exercise.isActive">
                         <v-icon>mdi-delete</v-icon>
                       </v-btn>
                     </template>
@@ -146,80 +96,41 @@
                   <v-expansion-panel-text>
                     <v-row>
                       <v-col cols="12" md="6">
-                        <v-combobox
-                          v-model="exercise.bpms"
-                          label="BPMs"
-                          multiple
-                          chips
-                          hide-selected
-                          clearable
-                          variant="outlined"
-                          hide-details
-                          class="mb-4"
+                        <v-combobox v-model="exercise.bpms"
+                          :label="'BPMs' + (exercise.lastBpms.length > 0 ? ' (' + exercise.lastBpms.join(',') + ')' : '')"
+                          multiple chips hide-selected clearable variant="outlined" hide-details class="mb-4"
                           :disabled="!sessionStarted || !exercise.isActive"
-                          placeholder="Enter BPM values (e.g. 100, 120)"
-                          @update:model-value="validateBpms(exercise)"
-                        />
+                          :placeholder="exercise.lastBpms.length > 0 ? exercise.lastBpms.join(',') : 'Enter BPM values (e.g. 100, 120)'"
+                          @update:model-value="validateBpms(exercise)" />
                       </v-col>
                       <v-col cols="12" md="6">
-                        <v-select
-                          v-model="exercise.timeSignature"
-                          :items="timeSignatureOptions"
-                          label="Time Signature"
-                          variant="outlined"
-                          hide-details
-                          class="mb-4"
-                          :disabled="!sessionStarted || !exercise.isActive"
-                        ></v-select>
+                        <v-select v-model="exercise.timeSignature" :items="timeSignatureOptions" label="Time Signature"
+                          variant="outlined" hide-details class="mb-4"
+                          :disabled="!sessionStarted || !exercise.isActive"></v-select>
                       </v-col>
                       <v-col cols="12" md="6">
-                      <v-text-field
-                          v-model="exercise.manualDuration"
-                          label="Manual Duration (minutes)"
-                          type="number"
-                          variant="outlined"
-                          min="0"
-                          step="1"
-                          hide-details
+                        <v-text-field v-model="exercise.manualDuration" label="Manual Duration (minutes)" type="number"
+                          variant="outlined" min="0" step="1" hide-details
                           :disabled="!sessionStarted || !exercise.isActive"
-                          placeholder="Override duration manually"
-                      ></v-text-field>
+                          placeholder="Override duration manually"></v-text-field>
                       </v-col>
                       <v-col cols="12">
-                        <v-textarea
-                          v-model="exercise.notes"
-                          label="Notes for this exercise"
-                          variant="outlined"
-                          rows="2"
-                          placeholder="Add specific notes about this exercise (optional)"
+                        <v-textarea v-model="exercise.notes" label="Notes for this exercise" variant="outlined" rows="2"
                           hide-details
-                          :disabled="!sessionStarted || !exercise.isActive"
-                        ></v-textarea>
+                          :placeholder="exercise.lastNotes !== '' ? exercise.lastNotes : 'Add specific notes about this exercise (optional)'"
+                          :disabled="!sessionStarted || !exercise.isActive"></v-textarea>
                       </v-col>
                       <v-col cols="12" class="d-flex justify-end">
-                        <v-btn
-                          v-if="!exercise.isActive && !exercise.completed"
-                          color="primary"
-                          prepend-icon="mdi-play"
+                        <v-btn v-if="!exercise.isActive && !exercise.completed" color="primary" prepend-icon="mdi-play"
                           @click="startExercisePractice(exercise)"
-                          :disabled="!sessionStarted || (hasActiveExercise && !exercise.isActive)"
-                        >
+                          :disabled="!sessionStarted || (hasActiveExercise && !exercise.isActive)">
                           Start Practice
                         </v-btn>
-                        <v-btn
-                          v-else-if="exercise.isActive"
-                          color="error"
-                          prepend-icon="mdi-stop"
-                          @click="stopExercisePractice(exercise)"
-                        >
+                        <v-btn v-else-if="exercise.isActive" color="error" prepend-icon="mdi-stop"
+                          @click="stopExercisePractice(exercise)">
                           Stop Practice
                         </v-btn>
-                        <v-btn
-                          v-else
-                          color="success"
-                          prepend-icon="mdi-check"
-                          disabled
-                        >
+                        <v-btn v-else color="success" prepend-icon="mdi-check" disabled>
                           Completed
                         </v-btn>
                       </v-col>
@@ -229,23 +140,12 @@
               </v-expansion-panels>
 
               <div class="d-flex justify-end mt-2">
-                <v-btn
-                  color="primary"
-                  prepend-icon="mdi-plus"
-                  variant="text"
-                  @click="openAddExerciseDialog"
-                  :disabled="!sessionStarted"
-                >
+                <v-btn color="primary" prepend-icon="mdi-plus" variant="text" @click="openAddExerciseDialog"
+                  :disabled="!sessionStarted">
                   Add More
                 </v-btn>
-                <v-btn 
-                  color="primary"
-                  prepend-icon="mdi-music-note-plus"
-                  variant="text"
-                  class="ml-2"
-                  @click="openCreateExerciseDialog"
-                  :disabled="!sessionStarted"
-                >
+                <v-btn color="primary" prepend-icon="mdi-music-note-plus" variant="text" class="ml-2"
+                  @click="openCreateExerciseDialog" :disabled="!sessionStarted">
                   Create New
                 </v-btn>
               </div>
@@ -257,22 +157,13 @@
 
     <!-- Exercise images card -->
     <v-container>
-    <v-row v-if="exerciseImages.length > 0" class="justify-center">
-        <v-col
-        cols="12"
-        v-for="(image, index) in exerciseImages"
-        :key="index"
-        class="d-flex justify-center"
-        >
-        <v-card class="mb-4" width="100%" max-width="1000">
-            <v-img
-            :src="'data:image/jpeg;base64,' + image.imageData"
-            class="bg-grey-lighten-4"
-            contain
-            ></v-img>
-        </v-card>
+      <v-row v-if="exerciseImages.length > 0" class="justify-center">
+        <v-col cols="12" v-for="(image, index) in exerciseImages" :key="index" class="d-flex justify-center">
+          <v-card class="mb-4" width="100%" max-width="1000">
+            <v-img :src="'data:image/jpeg;base64,' + image.imageData" class="bg-grey-lighten-4" contain></v-img>
+          </v-card>
         </v-col>
-    </v-row>
+      </v-row>
     </v-container>
 
     <!-- Exercise search and selection -->
@@ -285,49 +176,22 @@
         <!-- Filters -->
         <v-row>
           <v-col cols="12" sm="4">
-            <v-text-field
-              v-model="exerciseSearch"
-              label="Search exercises"
-              variant="outlined"
-              density="compact"
-              prepend-inner-icon="mdi-magnify"
-              hide-details
-              clearable
-            ></v-text-field>
+            <v-text-field v-model="exerciseSearch" label="Search exercises" variant="outlined" density="compact"
+              prepend-inner-icon="mdi-magnify" hide-details clearable></v-text-field>
           </v-col>
           <v-col cols="12" sm="4">
-            <v-select
-              v-model="categoryFilter"
-              :items="categoriesForSelect"
-              label="Filter by category"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-            ></v-select>
+            <v-select v-model="categoryFilter" :items="categoriesForSelect" label="Filter by category"
+              variant="outlined" density="compact" hide-details clearable></v-select>
           </v-col>
           <v-col cols="12" sm="4">
-            <v-select
-              v-model="tagFilter"
-              :items="tagsForSelect"
-              label="Filter by tag"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-            ></v-select>
+            <v-select v-model="tagFilter" :items="tagsForSelect" label="Filter by tag" variant="outlined"
+              density="compact" hide-details clearable></v-select>
           </v-col>
         </v-row>
 
         <!-- Exercise List -->
-        <exercise-list
-          :exercises="filteredExercises"
-          :loading="exercisesStore.loading"
-          display-type="table"
-          @select-exercise="addExerciseToSession"
-          :selected-exercise-ids="sessionExerciseIds"
-          class="mt-4"
-        />
+        <exercise-list :exercises="filteredExercises" :loading="exercisesStore.loading" display-type="table"
+          @select-exercise="addExerciseToSession" :selected-exercise-ids="sessionExerciseIds" class="mt-4" />
       </v-card-text>
     </v-card>
 
@@ -338,49 +202,21 @@
         <v-card-text>
           <v-row>
             <v-col cols="12" sm="4">
-              <v-text-field
-                v-model="dialogExerciseSearch"
-                label="Search exercises"
-                variant="outlined"
-                density="compact"
-                prepend-inner-icon="mdi-magnify"
-                hide-details
-                clearable
-                class="mb-4"
-              ></v-text-field>
+              <v-text-field v-model="dialogExerciseSearch" label="Search exercises" variant="outlined" density="compact"
+                prepend-inner-icon="mdi-magnify" hide-details clearable class="mb-4"></v-text-field>
             </v-col>
             <v-col cols="12" sm="4">
-              <v-select
-                v-model="dialogCategoryFilter"
-                :items="categoriesForSelect"
-                label="Filter by category"
-                variant="outlined"
-                density="compact"
-                hide-details
-                clearable
-              ></v-select>
+              <v-select v-model="dialogCategoryFilter" :items="categoriesForSelect" label="Filter by category"
+                variant="outlined" density="compact" hide-details clearable></v-select>
             </v-col>
             <v-col cols="12" sm="4">
-              <v-select
-                v-model="dialogTagFilter"
-                :items="tagsForSelect"
-                label="Filter by tag"
-                variant="outlined"
-                density="compact"
-                hide-details
-                clearable
-              ></v-select>
+              <v-select v-model="dialogTagFilter" :items="tagsForSelect" label="Filter by tag" variant="outlined"
+                density="compact" hide-details clearable></v-select>
             </v-col>
           </v-row>
 
-          <exercise-list
-            :exercises="dialogFilteredExercises"
-            :loading="exercisesStore.loading"
-            display-type="table"
-            @select-exercise="addExerciseToSession"
-            :selected-exercise-ids="sessionExerciseIds"
-            class="mt-4"
-          />
+          <exercise-list :exercises="dialogFilteredExercises" :loading="exercisesStore.loading" display-type="table"
+            @select-exercise="addExerciseToSession" :selected-exercise-ids="sessionExerciseIds" class="mt-4" />
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -392,12 +228,8 @@
     </v-dialog>
 
     <!-- Create Exercise Dialog -->
-    <exercise-form-dialog
-      v-model="createExerciseDialog"
-      :exercise="newExercise"
-      :is-edit="false"
-      @save="saveNewExercise"
-    />
+    <exercise-form-dialog v-model="createExerciseDialog" :exercise="newExercise" :is-edit="false"
+      @save="saveNewExercise" />
 
     <!-- Cancel Session Dialog -->
     <v-dialog v-model="cancelDialog" max-width="500">
@@ -409,11 +241,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey-darken-1" variant="text" @click="cancelDialog = false">No, Continue</v-btn>
-          <v-btn 
-            color="error" 
-            variant="flat" 
-            @click="confirmCancelSession"
-          >
+          <v-btn color="error" variant="flat" @click="confirmCancelSession">
             Yes, Cancel Session
           </v-btn>
         </v-card-actions>
@@ -426,17 +254,11 @@
         <v-card-title class="text-h5">Complete Practice Session</v-card-title>
         <v-card-text>
           <v-form ref="finishForm" v-model="finishFormValid">
-            <v-textarea
-              v-model="notes"
-              label="Session Notes"
-              variant="outlined"
-              rows="4"
-              placeholder="Add any final notes about this practice session (optional)"
-              class="mb-4"
-            ></v-textarea>
-            
+            <v-textarea v-model="notes" label="Session Notes" variant="outlined" rows="4"
+              placeholder="Add any final notes about this practice session (optional)" class="mb-4"></v-textarea>
+
             <p class="text-body-2 mt-4">
-              This will complete your practice session with {{ sessionExercises.length }} exercises 
+              This will complete your practice session with {{ sessionExercises.length }} exercises
               and a total duration of {{ sessionDuration }}.
             </p>
           </v-form>
@@ -446,12 +268,7 @@
           <v-btn color="grey-darken-1" variant="text" @click="finishSessionDialog = false">
             Back to Session
           </v-btn>
-          <v-btn
-            color="success"
-            variant="flat"
-            @click="completeSession"
-            :loading="finishingSession"
-          >
+          <v-btn color="success" variant="flat" @click="completeSession" :loading="finishingSession">
             Complete Session
           </v-btn>
         </v-card-actions>
@@ -535,59 +352,59 @@ const sessionExerciseIds = computed(() => {
 
 const filteredExercises = computed(() => {
   let result = exercisesStore.exercisesWithDerivedCategories
-  
+
   // Search filter
   if (exerciseSearch.value) {
     const searchLower = exerciseSearch.value.toLowerCase()
-    result = result.filter(exercise => 
-      exercise.name.toLowerCase().includes(searchLower) || 
+    result = result.filter(exercise =>
+      exercise.name.toLowerCase().includes(searchLower) ||
       (exercise.description && exercise.description.toLowerCase().includes(searchLower))
     )
   }
-  
+
   // Category filter
   if (categoryFilter.value) {
-    result = result.filter(exercise => 
+    result = result.filter(exercise =>
       exercise.derivedCategoryIds && exercise.derivedCategoryIds.includes(parseInt(categoryFilter.value))
     )
   }
-  
+
   // Tag filter
   if (tagFilter.value) {
-    result = result.filter(exercise => 
+    result = result.filter(exercise =>
       exercise.tagIds && exercise.tagIds.includes(parseInt(tagFilter.value))
     )
   }
-  
+
   return result
 })
 
 const dialogFilteredExercises = computed(() => {
   let result = exercisesStore.exercises
-  
+
   // Search filter
   if (dialogExerciseSearch.value) {
     const search = dialogExerciseSearch.value.toLowerCase()
-    result = result.filter(exercise => 
-      exercise.name.toLowerCase().includes(search) || 
+    result = result.filter(exercise =>
+      exercise.name.toLowerCase().includes(search) ||
       (exercise.description && exercise.description.toLowerCase().includes(search))
     )
   }
-  
+
   // Category filter
   if (dialogCategoryFilter.value) {
-    result = result.filter(exercise => 
+    result = result.filter(exercise =>
       exercise.categoryIds && exercise.categoryIds.includes(parseInt(dialogCategoryFilter.value))
     )
   }
-  
+
   // Tag filter
   if (dialogTagFilter.value) {
-    result = result.filter(exercise => 
+    result = result.filter(exercise =>
       exercise.tagIds && exercise.tagIds.includes(parseInt(dialogTagFilter.value))
     )
   }
-  
+
   return result
 })
 
@@ -613,7 +430,7 @@ function formatDateTime(dateTime) {
 
 function formatTime(time) {
   if (!time) return ''
-  
+
   const date = new Date(time)
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
@@ -658,7 +475,7 @@ function addExerciseToSession(exercise) {
     completed: false,
     duration: null
   })
-  
+
   appStore.showSuccessMessage(`Added ${exercise.name} to session`)
 }
 
@@ -678,12 +495,12 @@ async function removeExercise(index) {
   }
 
   sessionExercises.value.splice(index, 1)
-  
+
   // Also remove from the backend
   if (exercise.completed && exercise.historyID) {
-      await historyStore.deleteHistoryEntry(exercise.historyID)
+    await historyStore.deleteHistoryEntry(exercise.historyID)
   }
-  
+
   appStore.showInfoMessage(`Removed ${exercise.name} from session`)
 }
 
@@ -709,13 +526,13 @@ async function saveNewExercise(exerciseData) {
     // Create the exercise
     const newExercise = await exercisesStore.createExercise(exerciseData)
     appStore.showSuccessMessage(`Exercise "${exerciseData.name}" created successfully`)
-    
+
     // Close the dialog
     createExerciseDialog.value = false
-    
+
     // Add the new exercise to the session
     addExerciseToSession(newExercise)
-    
+
   } catch (error) {
     appStore.showErrorMessage(`Error creating exercise: ${error.message}`)
   }
@@ -723,24 +540,24 @@ async function saveNewExercise(exerciseData) {
 
 async function startSession() {
   startingSession.value = true
-  
+
   try {
     // Set start time to now
     startTime.value = new Date()
-    
+
     // Create session in the database immediately
     const sessionData = {
       start_time: startTime.value.toISOString(),
       end_time: startTime.value.toISOString(), // Temporary end time, will be updated later
       notes: notes.value || ''
     }
-    
+
     const newSession = await sessionsStore.createSession(sessionData)
     sessionId.value = newSession.id
-    
+
     // Start the timer to show elapsed time
     startDurationTimer()
-    
+
     sessionStarted.value = true
     appStore.showSuccessMessage('Practice session started!')
   } catch (error) {
@@ -756,14 +573,14 @@ function startDurationTimer() {
     if (startTime.value) {
       const now = new Date()
       const diffMs = now - startTime.value
-      
+
       // Format the duration
       const seconds = Math.floor((diffMs / 1000) % 60)
       const minutes = Math.floor((diffMs / (1000 * 60)) % 60)
       const hours = Math.floor(diffMs / (1000 * 60 * 60))
-      
+
       sessionDuration.value = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-      
+
       // Update duration for active exercises
       sessionExercises.value.forEach(exercise => {
         if (exercise.isActive && exercise.startTime) {
@@ -771,7 +588,7 @@ function startDurationTimer() {
           const exSeconds = Math.floor((exDiffMs / 1000) % 60)
           const exMinutes = Math.floor((exDiffMs / (1000 * 60)) % 60)
           const exHours = Math.floor(exDiffMs / (1000 * 60 * 60))
-          
+
           exercise.duration = `${exHours}:${exMinutes.toString().padStart(2, '0')}:${exSeconds.toString().padStart(2, '0')}`
         }
       })
@@ -786,27 +603,27 @@ function finishSession() {
     appStore.showWarningMessage(`Please stop the active exercise "${activeExercise.name}" before finishing the session.`)
     return
   }
-  
+
   finishSessionDialog.value = true
 }
 
 async function completeSession() {
   finishingSession.value = true
-  
+
   try {
     const endTime = new Date()
-    
+
     // Update the session with the end time and notes
     const sessionData = {
       end_time: endTime.toISOString(),
       notes: notes.value || '',
       active: false
     }
-    
+
     await sessionsStore.updateSession(sessionId.value, sessionData, 'endTime,notes,active')
-    
+
     appStore.showSuccessMessage('Practice session saved successfully!')
-    
+
     // Navigate to session detail
     router.push({
       name: 'session-detail',
@@ -825,7 +642,7 @@ function startExercisePractice(exercise) {
     appStore.showWarningMessage('Please finish the current exercise first.')
     return
   }
-  
+
   // Set exercise as active and record start time
   exercise.isActive = true
   exercise.startTime = new Date()
@@ -833,7 +650,7 @@ function startExercisePractice(exercise) {
   if (exercise.images.length > 0) {
     exerciseImages.value = exercise.images
   }
-  
+
   appStore.showSuccessMessage(`Started practice: ${exercise.name}`)
 }
 
@@ -843,11 +660,11 @@ async function stopExercisePractice(exercise) {
   exercise.endTime = new Date()
   exercise.completed = true
   exerciseImages.value = []
-  
+
   try {
     // Calculate duration from start/end times
     const durationFromTimes = (exercise.endTime - exercise.startTime) / 1000; // in seconds
-    
+
     // Use manual duration if provided (convert from minutes to seconds)
     const manualDurationSeconds = exercise.manualDuration ? Math.round(parseFloat(exercise.manualDuration) * 60) : null;
 
@@ -862,7 +679,7 @@ async function stopExercisePractice(exercise) {
       notes: exercise.notes || '',
       duration_seconds: manualDurationSeconds
     }
-    
+
     const newHistoryEntry = await historyStore.createHistoryEntry(exerciseData)
     exercise.historyID = newHistoryEntry.id
     appStore.showSuccessMessage(`Completed practice: ${exercise.name}`)
@@ -899,7 +716,7 @@ function openCancelDialog() {
 
 async function confirmCancelSession() {
   cancelDialog.value = false
-  
+
   // If we have created a session in the database, delete it
   if (sessionId.value) {
     try {
@@ -908,12 +725,12 @@ async function confirmCancelSession() {
       console.error('Error deleting session:', error)
     }
   }
-  
+
   // Clean up
   if (durationInterval.value) {
     clearInterval(durationInterval.value)
   }
-  
+
   // Navigate back
   router.push({ name: 'sessions' })
 }
@@ -924,15 +741,15 @@ onMounted(async () => {
   if (exercisesStore.exercises.length === 0) {
     await exercisesStore.fetchExercises()
   }
-  
+
   if (categoriesStore.categories.length === 0) {
     await categoriesStore.fetchCategories()
   }
-  
+
   if (tagsStore.tags.length === 0) {
     await tagsStore.fetchTags()
   }
-  
+
   // Check for exercise ID in URL
   const exerciseId = Number(route.query.exercise)
   if (exerciseId) {
@@ -960,16 +777,16 @@ onMounted(async () => {
     sessionId.value = activeSession.id;
     startTime.value = new Date(activeSession.startTime);
     notes.value = activeSession.notes || '';
-    
+
     // Set session as started
     sessionStarted.value = true;
-    
+
     // Load associated exercises
     await loadSessionExercises(activeSession.id);
-    
+
     // Restart the timer
     startDurationTimer();
-    
+
     // Show notification
     appStore.showInfoMessage('Resumed active practice session');
   }
@@ -1022,7 +839,7 @@ onBeforeUnmount(() => {
   if (durationInterval.value) {
     clearInterval(durationInterval.value)
   }
-  
+
   // Remove beforeunload event listener
   window.removeEventListener('beforeunload', handleBeforeUnload)
 })
