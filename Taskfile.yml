@@ -33,6 +33,12 @@ tasks:
     cmds:
       - ./{{.BUILD_DIR}}/tempus-server
 
+  run-frontend:
+    desc: Runs the frontend in dev mode
+    cmds:
+      - cd frontend
+      - npm run dev
+
   pop-data:
     desc: Populate some data
     cmds:
