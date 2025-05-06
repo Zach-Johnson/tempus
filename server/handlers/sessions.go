@@ -551,7 +551,7 @@ func (h *PracticeSessionHandler) GetPracticeStats(ctx context.Context, req *pb.G
 	// Add category filter if provided
 	var categoryJoin, categoryFilter string
 	if req.CategoryId > 0 {
-		categoryJoin = ` JOIN exercise_history eh ON eh.session_id = ps.id 
+		categoryJoin = `JOIN exercise_history eh ON eh.session_id = ps.id 
 						JOIN exercise_tags ec ON eh.exercise_id = ec.exercise_id
 						JOIN tag_categories tc ON tc.tag_id = ec.tag_id`
 		if whereClause == "" {

@@ -20,10 +20,7 @@
           </v-card-text>
           <v-list v-else>
             <template v-if="recentSessions.length > 0">
-              <v-list-item 
-                v-for="session in recentSessions" 
-                :key="session.id" 
-                :to="`/sessions/${session.id}`">
+              <v-list-item v-for="session in recentSessions" :key="session.id" :to="`/sessions/${session.id}`">
                 <v-list-item-title>{{ formatDate(session.startTime) }}</v-list-item-title>
                 <v-list-item-subtitle>
                   {{ formatDuration(session.startTime, session.endTime) }}
@@ -84,9 +81,7 @@
           </v-card-text>
           <v-list v-else density="compact">
             <template v-if="statsStore.topExercises.length > 0">
-              <v-list-item 
-                v-for="exercise in statsStore.topExercises" 
-                :key="exercise.id"
+              <v-list-item v-for="exercise in statsStore.topExercises" :key="exercise.id"
                 :to="`/exercises/${exercise.id}`">
                 <v-list-item-title>{{ exercise.name }}</v-list-item-title>
                 <v-list-item-subtitle>
@@ -109,54 +104,17 @@
           <v-card-title class="d-flex align-center text-h6">
             Practice Time (Last 30 Days)
             <v-spacer></v-spacer>
-            <v-btn
-              variant="text"
-              prepend-icon="mdi-refresh"
-              @click="loadStats"
-              :loading="statsStore.loading"
-              size="small"
-            >
+            <v-btn variant="text" prepend-icon="mdi-refresh" @click="loadStats" :loading="statsStore.loading"
+              size="small">
               Refresh
             </v-btn>
           </v-card-title>
           <v-card-text style="height: 300px">
-            <category-practice-time-chart
-              :loading="statsStore.loading"
-            />
+            <category-practice-time-chart :loading="statsStore.loading" />
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- Detailed Statistics -->
-    <!-- <v-row class="mt-4"> -->
-    <!--   <v-col cols="12" md="6"> -->
-    <!--     <v-card> -->
-    <!--       <v-card-title class="text-h6"> -->
-    <!--         Practice by Category -->
-    <!--       </v-card-title> -->
-    <!--       <v-card-text> -->
-    <!--         <category-summary-stats -->
-    <!--           :loading="statsStore.loading" -->
-    <!--         /> -->
-    <!--       </v-card-text> -->
-    <!--     </v-card> -->
-    <!--   </v-col> -->
-    <!---->
-    <!--   <v-col cols="12" md="6"> -->
-    <!--     <v-card> -->
-    <!--       <v-card-title class="text-h6"> -->
-    <!--         Top Exercises -->
-    <!--       </v-card-title> -->
-    <!--       <v-card-text> -->
-    <!--         <top-exercises-stats -->
-    <!--           :loading="statsStore.loading" -->
-    <!--           :limit="5" -->
-    <!--         /> -->
-    <!--       </v-card-text> -->
-    <!--     </v-card> -->
-    <!--   </v-col> -->
-    <!-- </v-row> -->
 
     <!-- Quick Actions -->
     <v-row class="mt-5">
@@ -164,43 +122,22 @@
         <h2 class="text-h5 mb-4">Quick Actions</h2>
       </v-col>
       <v-col cols="6" md="3">
-        <v-btn
-          block
-          color="primary"
-          size="large"
-          to="/sessions/new"
-          prepend-icon="mdi-calendar-plus"
-        >
+        <v-btn block color="primary" size="large" to="/sessions/new" prepend-icon="mdi-calendar-plus">
           New Session
         </v-btn>
       </v-col>
       <v-col cols="6" md="3">
-        <v-btn
-          block
-          size="large"
-          to="/exercises"
-          prepend-icon="mdi-music-note"
-        >
+        <v-btn block size="large" to="/exercises" prepend-icon="mdi-music-note">
           Exercises
         </v-btn>
       </v-col>
       <v-col cols="6" md="3">
-        <v-btn
-          block
-          size="large"
-          to="/categories"
-          prepend-icon="mdi-folder"
-        >
+        <v-btn block size="large" to="/categories" prepend-icon="mdi-folder">
           Categories
         </v-btn>
       </v-col>
       <v-col cols="6" md="3">
-        <v-btn
-          block
-          size="large"
-          to="/tags"
-          prepend-icon="mdi-tag-multiple"
-        >
+        <v-btn block size="large" to="/tags" prepend-icon="mdi-tag-multiple">
           Tags
         </v-btn>
       </v-col>
@@ -216,8 +153,6 @@ import { useExercisesStore } from '@/stores/exercises.js';
 import { useCategoriesStore } from '@/stores/categories.js';
 import { useStatsStore } from '@/stores/stats.js';
 import CategoryPracticeTimeChart from '@/components/charts/CategoryPracticeTimeChart.vue';
-import CategorySummaryStats from '@/components/stats/CategorySummaryStats.vue';
-import TopExercisesStats from '@/components/stats/TopExercisesStats.vue';
 
 const appStore = useAppStore();
 const sessionsStore = useSessionsStore();
@@ -277,30 +212,30 @@ async function loadStats() {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
-    
+
     // Format dates for the API
     const params = {
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString()
     };
-    
-    console.log('Fetching practice stats with params:', params);
+
+    // console.log('Fetching practice stats with params:', params);
     const result = await statsStore.fetchPracticeStats(params);
-    
+
     // Debug logs
-    console.log('Practice stats API response:', result);
-    console.log('Practice frequency in store:', statsStore.practiceFrequency);
-    console.log('Category distribution in store:', statsStore.categoryDistribution);
-    
+    // console.log('Practice stats API response:', result);
+    // console.log('Practice frequency in store:', statsStore.practiceFrequency);
+    // console.log('Category distribution in store:', statsStore.categoryDistribution);
+
     // Check for empty data
     if (!statsStore.practiceFrequency || statsStore.practiceFrequency.length === 0) {
       console.warn('No practice frequency data available');
     }
-    
+
     if (!statsStore.categoryDistribution || statsStore.categoryDistribution.length === 0) {
       console.warn('No category distribution data available');
     }
-    
+
     return result;
   } catch (error) {
     console.error('Error loading statistics:', error);

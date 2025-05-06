@@ -324,7 +324,7 @@ const nameRules = [
 
 const urlRules = [
   v => !!v || 'URL is required',
-  v => /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/.test(v) || 'Enter a valid URL'
+  v => /^(https?:\/\/)?[\da-z.-]+\.[a-z.]{2,6}.*\/?$/.test(v) || 'Enter a valid URL'
 ]
 
 // Methods
