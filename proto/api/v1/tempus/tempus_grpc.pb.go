@@ -550,6 +550,7 @@ const (
 	ExerciseService_UpdateExercise_FullMethodName      = "/drummer.v1.ExerciseService/UpdateExercise"
 	ExerciseService_DeleteExercise_FullMethodName      = "/drummer.v1.ExerciseService/DeleteExercise"
 	ExerciseService_AddExerciseImage_FullMethodName    = "/drummer.v1.ExerciseService/AddExerciseImage"
+	ExerciseService_GetExerciseImage_FullMethodName    = "/drummer.v1.ExerciseService/GetExerciseImage"
 	ExerciseService_DeleteExerciseImage_FullMethodName = "/drummer.v1.ExerciseService/DeleteExerciseImage"
 	ExerciseService_AddExerciseLink_FullMethodName     = "/drummer.v1.ExerciseService/AddExerciseLink"
 	ExerciseService_DeleteExerciseLink_FullMethodName  = "/drummer.v1.ExerciseService/DeleteExerciseLink"
@@ -572,6 +573,7 @@ type ExerciseServiceClient interface {
 	DeleteExercise(ctx context.Context, in *DeleteExerciseRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Add an image to an exercise
 	AddExerciseImage(ctx context.Context, in *AddExerciseImageRequest, opts ...grpc.CallOption) (*ExerciseImage, error)
+	GetExerciseImage(ctx context.Context, in *GetExerciseImageRequest, opts ...grpc.CallOption) (*ExerciseImage, error)
 	// Delete an image from an exercise
 	DeleteExerciseImage(ctx context.Context, in *DeleteExerciseImageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Add a link to an exercise
@@ -650,6 +652,16 @@ func (c *exerciseServiceClient) AddExerciseImage(ctx context.Context, in *AddExe
 	return out, nil
 }
 
+func (c *exerciseServiceClient) GetExerciseImage(ctx context.Context, in *GetExerciseImageRequest, opts ...grpc.CallOption) (*ExerciseImage, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ExerciseImage)
+	err := c.cc.Invoke(ctx, ExerciseService_GetExerciseImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *exerciseServiceClient) DeleteExerciseImage(ctx context.Context, in *DeleteExerciseImageRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -706,6 +718,7 @@ type ExerciseServiceServer interface {
 	DeleteExercise(context.Context, *DeleteExerciseRequest) (*emptypb.Empty, error)
 	// Add an image to an exercise
 	AddExerciseImage(context.Context, *AddExerciseImageRequest) (*ExerciseImage, error)
+	GetExerciseImage(context.Context, *GetExerciseImageRequest) (*ExerciseImage, error)
 	// Delete an image from an exercise
 	DeleteExerciseImage(context.Context, *DeleteExerciseImageRequest) (*emptypb.Empty, error)
 	// Add a link to an exercise
@@ -740,6 +753,9 @@ func (UnimplementedExerciseServiceServer) DeleteExercise(context.Context, *Delet
 }
 func (UnimplementedExerciseServiceServer) AddExerciseImage(context.Context, *AddExerciseImageRequest) (*ExerciseImage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddExerciseImage not implemented")
+}
+func (UnimplementedExerciseServiceServer) GetExerciseImage(context.Context, *GetExerciseImageRequest) (*ExerciseImage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExerciseImage not implemented")
 }
 func (UnimplementedExerciseServiceServer) DeleteExerciseImage(context.Context, *DeleteExerciseImageRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteExerciseImage not implemented")
@@ -881,6 +897,24 @@ func _ExerciseService_AddExerciseImage_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExerciseService_GetExerciseImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetExerciseImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExerciseServiceServer).GetExerciseImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExerciseService_GetExerciseImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExerciseServiceServer).GetExerciseImage(ctx, req.(*GetExerciseImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ExerciseService_DeleteExerciseImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteExerciseImageRequest)
 	if err := dec(in); err != nil {
@@ -983,6 +1017,10 @@ var ExerciseService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddExerciseImage",
 			Handler:    _ExerciseService_AddExerciseImage_Handler,
+		},
+		{
+			MethodName: "GetExerciseImage",
+			Handler:    _ExerciseService_GetExerciseImage_Handler,
 		},
 		{
 			MethodName: "DeleteExerciseImage",

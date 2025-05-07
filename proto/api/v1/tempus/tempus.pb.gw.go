@@ -596,6 +596,59 @@ func local_request_ExerciseService_AddExerciseImage_0(ctx context.Context, marsh
 	return msg, metadata, err
 }
 
+func request_ExerciseService_GetExerciseImage_0(ctx context.Context, marshaler runtime.Marshaler, client ExerciseServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetExerciseImageRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["exercise_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_id")
+	}
+	protoReq.ExerciseId, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_id", err)
+	}
+	val, ok = pathParams["image_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "image_id")
+	}
+	protoReq.ImageId, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "image_id", err)
+	}
+	msg, err := client.GetExerciseImage(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_ExerciseService_GetExerciseImage_0(ctx context.Context, marshaler runtime.Marshaler, server ExerciseServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetExerciseImageRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["exercise_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exercise_id")
+	}
+	protoReq.ExerciseId, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exercise_id", err)
+	}
+	val, ok = pathParams["image_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "image_id")
+	}
+	protoReq.ImageId, err = runtime.Int32(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "image_id", err)
+	}
+	msg, err := server.GetExerciseImage(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_ExerciseService_DeleteExerciseImage_0(ctx context.Context, marshaler runtime.Marshaler, client ExerciseServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq DeleteExerciseImageRequest
@@ -1488,6 +1541,26 @@ func RegisterExerciseServiceHandlerServer(ctx context.Context, mux *runtime.Serv
 		}
 		forward_ExerciseService_AddExerciseImage_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_ExerciseService_GetExerciseImage_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/drummer.v1.ExerciseService/GetExerciseImage", runtime.WithHTTPPathPattern("/v1/exercises/{exercise_id}/images/{image_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_ExerciseService_GetExerciseImage_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_ExerciseService_GetExerciseImage_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodDelete, pattern_ExerciseService_DeleteExerciseImage_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2230,6 +2303,23 @@ func RegisterExerciseServiceHandlerClient(ctx context.Context, mux *runtime.Serv
 		}
 		forward_ExerciseService_AddExerciseImage_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_ExerciseService_GetExerciseImage_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/drummer.v1.ExerciseService/GetExerciseImage", runtime.WithHTTPPathPattern("/v1/exercises/{exercise_id}/images/{image_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ExerciseService_GetExerciseImage_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_ExerciseService_GetExerciseImage_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodDelete, pattern_ExerciseService_DeleteExerciseImage_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -2308,6 +2398,7 @@ var (
 	pattern_ExerciseService_UpdateExercise_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "exercises", "id"}, ""))
 	pattern_ExerciseService_DeleteExercise_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "exercises", "id"}, ""))
 	pattern_ExerciseService_AddExerciseImage_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "exercises", "exercise_id", "images"}, ""))
+	pattern_ExerciseService_GetExerciseImage_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "exercises", "exercise_id", "images", "image_id"}, ""))
 	pattern_ExerciseService_DeleteExerciseImage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "exercise-images", "id"}, ""))
 	pattern_ExerciseService_AddExerciseLink_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3}, []string{"v1", "exercises", "exercise_id", "links"}, ""))
 	pattern_ExerciseService_DeleteExerciseLink_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "exercise-links", "id"}, ""))
@@ -2321,6 +2412,7 @@ var (
 	forward_ExerciseService_UpdateExercise_0      = runtime.ForwardResponseMessage
 	forward_ExerciseService_DeleteExercise_0      = runtime.ForwardResponseMessage
 	forward_ExerciseService_AddExerciseImage_0    = runtime.ForwardResponseMessage
+	forward_ExerciseService_GetExerciseImage_0    = runtime.ForwardResponseMessage
 	forward_ExerciseService_DeleteExerciseImage_0 = runtime.ForwardResponseMessage
 	forward_ExerciseService_AddExerciseLink_0     = runtime.ForwardResponseMessage
 	forward_ExerciseService_DeleteExerciseLink_0  = runtime.ForwardResponseMessage

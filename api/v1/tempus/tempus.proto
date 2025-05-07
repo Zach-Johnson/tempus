@@ -218,6 +218,12 @@ message AddExerciseImageRequest {
     string description = 5;
 }
 
+// GetExerciseImageRequest is used to get an image
+message GetExerciseImageRequest {
+    int32 exercise_id = 1;
+    int32 image_id = 2;
+}
+
 // DeleteExerciseImageRequest is used to delete an image from an exercise
 message DeleteExerciseImageRequest {
     int32 id = 1;
@@ -525,6 +531,12 @@ service ExerciseService {
         option (google.api.http) = {
             post: "/v1/exercises/{exercise_id}/images"
             body: "*"
+        };
+    }
+
+    rpc GetExerciseImage(GetExerciseImageRequest) returns (ExerciseImage) {
+        option (google.api.http) = {
+            get: "/v1/exercises/{exercise_id}/images/{image_id}"
         };
     }
 

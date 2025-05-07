@@ -77,7 +77,7 @@ func (h *ExerciseHandler) CreateExercise(ctx context.Context, req *pb.CreateExer
 		}
 	}
 
-	// Add images if provided
+	// Add images if provided, the actual image data is not included here to avoid giant responses.
 	images := make([]*pb.ExerciseImage, 0, len(req.Images))
 	for _, imageReq := range req.Images {
 		result, err := tx.ExecContext(
@@ -270,7 +270,7 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 	// Get images
 	imageRows, err := h.db.QueryContext(
 		ctx,
-		`SELECT id, image_data, filename, mime_type, description, created_at 
+		`SELECT id, filename, mime_type, description, created_at 
          FROM exercise_images WHERE exercise_id = ?`,
 		req.Id,
 	)
@@ -284,7 +284,7 @@ func (h *ExerciseHandler) GetExercise(ctx context.Context, req *pb.GetExerciseRe
 		var image pb.ExerciseImage
 		var imageCreatedAt time.Time
 		if err := imageRows.Scan(
-			&image.Id, &image.ImageData, &image.Filename, &image.MimeType, &image.Description, &imageCreatedAt,
+			&image.Id, &image.Filename, &image.MimeType, &image.Description, &imageCreatedAt,
 		); err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to parse exercise image: %v", err)
 		}
@@ -507,6 +507,33 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 	}
 	if err = tagRows.Err(); err != nil {
 		return status.Errorf(codes.Internal, "error reading exercise tags: %v", err)
+	}
+
+	// Get images for all exercises, the actual image data is not included here to avoid giant responses.
+	imageQuery := `SELECT id, exercise_id, filename, mime_type, description, created_at
+       FROM exercise_images WHERE exercise_id IN (` + placeholders + `)`
+	imageRows, err := h.db.QueryContext(ctx, imageQuery, exerciseIDs...)
+	if err != nil {
+		return status.Errorf(codes.Internal, "failed to retrieve exercise images: %v", err)
+	}
+	defer imageRows.Close()
+
+	for imageRows.Next() {
+		var (
+			image     pb.ExerciseImage
+			createdAt time.Time
+		)
+		if err := imageRows.Scan(&image.Id, &image.ExerciseId, &image.Filename, &image.MimeType, &image.Description, &createdAt); err != nil {
+			return status.Errorf(codes.Internal, "failed to parse exercise image: %v", err)
+		}
+		image.CreatedAt = timestamppb.New(createdAt)
+
+		if exercise, ok := exerciseMap[image.ExerciseId]; ok {
+			exercise.Images = append(exercise.Images, &image)
+		}
+	}
+	if err = imageRows.Err(); err != nil {
+		return status.Errorf(codes.Internal, "error reading exercise images: %v", err)
 	}
 
 	// Get links for all exercises
@@ -797,6 +824,40 @@ func (h *ExerciseHandler) AddExerciseImage(ctx context.Context, req *pb.AddExerc
 		Description: req.Description,
 		CreatedAt:   timestamppb.New(createdAt),
 	}, nil
+}
+
+// GetExerciseImage gets an image
+func (h *ExerciseHandler) GetExerciseImage(ctx context.Context, req *pb.GetExerciseImageRequest) (*pb.ExerciseImage, error) {
+	if req.ImageId <= 0 || req.ExerciseId <= 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid ID")
+	}
+
+	image := pb.ExerciseImage{
+		Id:         req.ImageId,
+		ExerciseId: req.ExerciseId,
+	}
+	createdAt := time.Time{}
+
+	err := h.db.QueryRowContext(ctx, `
+	SELECT image_data, filename, mime_type, description, created_at 
+	FROM exercise_images WHERE id = ? AND exercise_id = ?`,
+		req.ImageId, req.ExerciseId).
+		Scan(
+			&image.ImageData,
+			&image.Filename,
+			&image.MimeType,
+			&image.Description,
+			&createdAt,
+		)
+	if err == sql.ErrNoRows {
+		return nil, status.Errorf(codes.NotFound, "image with ID %d not found", req.ImageId)
+	} else if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to retrieve image: %v", err)
+	}
+
+	image.CreatedAt = timestamppb.New(createdAt)
+
+	return &image, nil
 }
 
 // DeleteExerciseImage deletes an image from an exercise

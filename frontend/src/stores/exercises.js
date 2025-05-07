@@ -146,6 +146,24 @@ export const useExercisesStore = defineStore("exercises", () => {
     try {
       const response = await exercisesAPI.get(id);
       currentExercise.value = response.data;
+      // Retrieve images separately, image data is not included in original
+      // exercise.
+      for (const img of response.data.images) {
+        try {
+          const imgResp = await exercisesAPI.getImage(
+            currentExercise.value.id,
+            img.id,
+          );
+          const index = currentExercise.value.images.findIndex((i) =>
+            i.id === img.id
+          );
+          if (index !== -1) {
+            currentExercise.value.images[index] = imgResp.data;
+          }
+        } catch (imgErr) {
+          console.warn(`Failed to fetch image ${img.id}:`, imgErr);
+        }
+      }
 
       // Also update the exercise in the exercises array if it exists
       const index = exercises.value.findIndex((e) => e.id === id);
