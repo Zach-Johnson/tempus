@@ -342,7 +342,6 @@ async function save() {
       name: formData.value.name,
       description: formData.value.description || '',
       tagIds: formData.value.tagIds.map(id => Number(id)),
-      links: formData.value.links
     }
 
     // Add images if there are any
@@ -396,19 +395,27 @@ function addExternalLink() {
   linkDialog.value = true
 }
 
-function saveLink() {
+async function saveLink() {
   if (!linkFormValid.value) return
 
-  formData.value.links.push({
+  linkDialog.value = false
+
+  const resp = await exerciseStore.addExerciseLink(props.exercise.id, {
     url: linkFormData.value.url,
     description: linkFormData.value.description
   })
 
-  linkDialog.value = false
+  formData.value.links.push({
+    id: resp.id,
+    url: linkFormData.value.url,
+    description: linkFormData.value.description
+  })
 }
 
-function removeLink(index) {
-  formData.value.links.splice(index, 1)
+async function removeLink(index) {
+  const del = formData.value.links.splice(index, 1)[0]
+
+  await exerciseStore.deleteExerciseLink(del.id)
 }
 
 function addImage() {
@@ -525,7 +532,6 @@ async function deleteImage() {
 }
 
 // Reset form when dialog opens/closes
-// Extend your existing watch function
 watch(() => props.modelValue, (isOpen) => {
   if (isOpen && props.exercise) {
     // Clone the exercise to avoid modifying the original

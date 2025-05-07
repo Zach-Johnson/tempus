@@ -4,35 +4,25 @@
       <v-progress-circular indeterminate size="20" width="2" color="primary" class="mr-2"></v-progress-circular>
       <span class="text-body-2">Loading exercises...</span>
     </div>
-    
+
     <div v-else-if="!exercises || exercises.length === 0" class="text-body-2 text-grey">
       {{ noExercisesMessage }}
     </div>
-    
+
     <div v-else>
       <div v-if="displayType === 'table'" class="exercise-table-container">
-        <v-data-table
-          :headers="tableHeaders"
-          v-model:sort-by="sortBy"
-          :items="exercises"
-          :items-per-page="itemsPerPage"
-          density="compact"
-          class="elevation-1"
-        >
+        <v-data-table :headers="tableHeaders" v-model:sort-by="sortBy" :items="exercises" :items-per-page="itemsPerPage"
+          density="compact" class="elevation-1">
           <template v-slot:item.description="{ item }">
             <span v-if="item.description">{{ truncateText(item.description, 80) }}</span>
             <span v-else class="text-grey">No description</span>
           </template>
-          
+
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
               <template v-for="categoryId in exercisesStore.getCategoryIdsForExercise(item.id)" :key="categoryId">
-                <category-chip
-                  v-if="getCategoryById(categoryId)"
-                  :category="getCategoryById(categoryId)"
-                  size="small"
-                  class="mr-1"
-                ></category-chip>
+                <category-chip v-if="getCategoryById(categoryId)" :category="getCategoryById(categoryId)" size="small"
+                  class="mr-1"></category-chip>
               </template>
             </v-chip-group>
           </template>
@@ -40,44 +30,28 @@
           <template v-slot:item.tags="{ item }">
             <v-chip-group>
               <template v-for="tagId in item.tagIds || []" :key="tagId">
-                <tag-chip
-                  v-if="getTagById(tagId)"
-                  :tag="getTagById(tagId)"
-                  size="small"
-                  class="mr-1"
-                ></tag-chip>
+                <tag-chip v-if="getTagById(tagId)" :tag="getTagById(tagId)" size="small" class="mr-1"></tag-chip>
               </template>
             </v-chip-group>
           </template>
-          
+
           <template v-slot:item.actions="{ item }">
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-              color="primary"
-              class="mr-1"
-              @click="selectExercise(item)"
-            >
+            <v-btn icon variant="text" size="small" color="primary" class="mr-1" @click="selectExercise(item)">
               <v-icon>{{ 'mdi-plus' }}</v-icon>
             </v-btn>
           </template>
         </v-data-table>
       </div>
-      
+
       <div v-else-if="displayType === 'list'" class="exercise-list-container">
         <v-list density="compact">
-          <v-list-item
-            v-for="exercise in exercises"
-            :key="exercise.id"
-            @click="selectExercise(exercise)"
-          >
+          <v-list-item v-for="exercise in exercises" :key="exercise.id" @click="selectExercise(exercise)">
             <template v-slot:prepend>
               <v-avatar size="32" color="primary" class="text-white">
                 {{ exercise.name.charAt(0).toUpperCase() }}
               </v-avatar>
             </template>
-            
+
             <v-list-item-title>{{ exercise.name }}</v-list-item-title>
             <v-list-item-subtitle v-if="exercise.description">
               {{ truncateText(exercise.description, 60) }}
@@ -85,41 +59,26 @@
           </v-list-item>
         </v-list>
       </div>
-      
+
       <div v-else class="exercise-grid-container">
         <v-row>
-          <v-col 
-            v-for="exercise in exercises" 
-            :key="exercise.id"
-            cols="12"
-            sm="6"
-            md="4"
-            lg="3"
-          >
-            <exercise-card
-              :exercise="exercise"
-              variant="outlined"
-              @click="selectExercise(exercise)"
-              :selected="isExerciseSelected(exercise)"
-              :selectable=true
-            ></exercise-card>
+          <v-col v-for="exercise in exercises" :key="exercise.id" cols="12" sm="6" md="4" lg="3">
+            <exercise-card :exercise="exercise" variant="outlined" @click="selectExercise(exercise)"
+              :selected="isExerciseSelected(exercise)" :selectable=true></exercise-card>
           </v-col>
         </v-row>
       </div>
-      
+
       <div v-if="showPagination && totalCount > itemsPerPage" class="pagination-container mt-4">
-        <v-pagination
-          v-model="localPage"
-          :length="Math.ceil(totalCount / itemsPerPage)"
-          :total-visible="7"
-        ></v-pagination>
+        <v-pagination v-model="localPage" :length="Math.ceil(totalCount / itemsPerPage)"
+          :total-visible="7"></v-pagination>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useExercisesStore } from '@/stores/exercises.js'
 import { useCategoriesStore } from '@/stores/categories.js'
 import { useTagsStore } from '@/stores/tags.js'
@@ -198,7 +157,7 @@ const tableHeaders = [
   { title: 'Description', key: 'description' },
   { title: 'Categories', key: 'categories' },
   { title: 'Tags', key: 'tags' },
-  { title: 'Last', key: 'lastPractice', value: item => { return appStore.formatDate(item.lastPractice)} },
+  { title: 'Last', key: 'lastPractice', value: item => { return appStore.formatDate(item.lastPractice) } },
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
 ]
 
@@ -215,8 +174,8 @@ watch(() => props.page, (newPage) => {
 // Methods
 function truncateText(text, maxLength) {
   if (!text) return ''
-  return text.length > maxLength 
-    ? text.substring(0, maxLength) + '...' 
+  return text.length > maxLength
+    ? text.substring(0, maxLength) + '...'
     : text
 }
 
@@ -241,7 +200,7 @@ onMounted(async () => {
   if (categoriesStore.categories.length === 0) {
     await categoriesStore.fetchCategories()
   }
-  
+
   if (tagsStore.tags.length === 0) {
     await tagsStore.fetchTags()
   }

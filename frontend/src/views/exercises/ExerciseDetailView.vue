@@ -48,7 +48,7 @@
               <v-col cols="12" md="6">
                 <div class="text-body-1 font-weight-medium mb-1">Description</div>
                 <div class="text-body-2 mb-4">{{ exercisesStore.currentExercise.description || 'No description provided'
-                }}</div>
+                  }}</div>
 
                 <div class="text-body-1 font-weight-medium mb-1">Categories</div>
                 <div v-if="exerciseCategories.length === 0" class="text-body-2 mb-4 text-grey">
@@ -334,7 +334,7 @@ function openAddResourceDialog() {
 
 async function saveExercise(exerciseData) {
   try {
-    await exercisesStore.updateExercise(exerciseId.value, exerciseData, 'name,description,categoryIds,tagIds')
+    await exercisesStore.updateExercise(exerciseId.value, exerciseData, 'name,description,tagIds,links')
     appStore.showSuccessMessage(`Exercise "${exerciseData.name}" updated successfully`)
     dialogVisible.value = false
   } catch (error) {

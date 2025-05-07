@@ -6,11 +6,7 @@
         <p class="text-body-1">Manage your drumming exercises</p>
       </v-col>
       <v-col cols="12" sm="4" class="d-flex justify-end align-center">
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-plus"
-          @click="openCreateDialog"
-        >
+        <v-btn color="primary" prepend-icon="mdi-plus" @click="openCreateDialog">
           New Exercise
         </v-btn>
       </v-col>
@@ -21,37 +17,16 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" sm="6" md="4">
-            <v-text-field
-              v-model="search"
-              label="Search exercises"
-              variant="outlined"
-              density="compact"
-              prepend-inner-icon="mdi-magnify"
-              hide-details
-              clearable
-            ></v-text-field>
+            <v-text-field v-model="search" label="Search exercises" variant="outlined" density="compact"
+              prepend-inner-icon="mdi-magnify" hide-details clearable></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" md="4">
-            <v-select
-              v-model="categoryFilter"
-              :items="categoriesForSelect"
-              label="Filter by category"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-            ></v-select>
+            <v-select v-model="categoryFilter" :items="categoriesForSelect" label="Filter by category"
+              variant="outlined" density="compact" hide-details clearable></v-select>
           </v-col>
           <v-col cols="12" sm="6" md="4">
-            <v-select
-              v-model="tagFilter"
-              :items="tagsForSelect"
-              label="Filter by tag"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-            ></v-select>
+            <v-select v-model="tagFilter" :items="tagsForSelect" label="Filter by tag" variant="outlined"
+              density="compact" hide-details clearable></v-select>
           </v-col>
         </v-row>
       </v-card-text>
@@ -64,91 +39,58 @@
           <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
       </v-card-text>
-      
+
       <template v-else>
-        <v-data-table
-          v-if="filteredExercises.length > 0"
-          :headers="headers"
-          :items="filteredExercises"
-          :items-per-page="50"
-          class="elevation-1"
-        >
+        <v-data-table v-if="filteredExercises.length > 0" :headers="headers" :items="filteredExercises"
+          :items-per-page="50" class="elevation-1">
           <template v-slot:item.description="{ item }">
             <span v-if="item.description">{{ truncateText(item.description, 80) }}</span>
             <span v-else class="text-grey">No description</span>
           </template>
-          
+
           <template v-slot:item.categories="{ item }">
             <v-chip-group>
               <template v-for="categoryId in exercisesStore.getCategoryIdsForExercise(item.id)" :key="categoryId">
-                <category-chip
-                  v-if="getCategoryById(categoryId)"
-                  :category="getCategoryById(categoryId)"
-                  size="small"
-                  class="mr-1"
-                ></category-chip>
+                <category-chip v-if="getCategoryById(categoryId)" :category="getCategoryById(categoryId)" size="small"
+                  class="mr-1"></category-chip>
               </template>
             </v-chip-group>
           </template>
-          
+
           <template v-slot:item.tags="{ item }">
             <v-chip-group>
               <template v-for="tagId in item.tagIds || []" :key="tagId">
-                <tag-chip
-                  v-if="getTagById(tagId)"
-                  :tag="getTagById(tagId)"
-                  size="small"
-                  class="mr-1"
-                ></tag-chip>
+                <tag-chip v-if="getTagById(tagId)" :tag="getTagById(tagId)" size="small" class="mr-1"></tag-chip>
               </template>
             </v-chip-group>
           </template>
-          
+
           <template v-slot:item.createdAt="{ item }">
             {{ formatDate(item.createdAt) }}
           </template>
 
           <template v-slot:item.actions="{ item }">
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-              color="primary"
-              @click="openEditDialog(item)"
-              class="mr-1"
-            >
+            <v-btn icon variant="text" size="small" color="primary" @click="openEditDialog(item)" class="mr-1">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-              color="primary"
-              :to="{ name: 'exercise-detail', params: { id: item.id }}"
-              class="mr-1"
-            >
+            <v-btn icon variant="text" size="small" color="primary"
+              :to="{ name: 'exercise-detail', params: { id: item.id } }" class="mr-1">
               <v-icon>mdi-eye</v-icon>
             </v-btn>
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-              color="error"
-              @click="confirmDelete(item)"
-            >
+            <v-btn icon variant="text" size="small" color="error" @click="confirmDelete(item)">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
           </template>
         </v-data-table>
-        
+
         <v-card-text v-else class="text-center py-8">
           <v-icon icon="mdi-music-note-off" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
           <h3 class="text-h6 mb-2">No exercises found</h3>
           <p class="text-body-2 text-grey">
-            {{ 
-              exercisesStore.exercises.length === 0 
-                ? "You haven't created any exercises yet" 
-                : "No exercises match your search criteria" 
+            {{
+              exercisesStore.exercises.length === 0
+                ? "You haven't created any exercises yet"
+                : "No exercises match your search criteria"
             }}
           </p>
         </v-card-text>
@@ -156,30 +98,20 @@
     </v-card>
 
     <!-- Create/Edit Dialog -->
-    <exercise-form-dialog
-      v-model="dialogVisible"
-      :exercise="selectedExercise"
-      :is-edit="isEdit"
-      @save="saveExercise"
-    />
+    <exercise-form-dialog v-model="dialogVisible" :exercise="selectedExercise" :is-edit="isEdit" @save="saveExercise" />
 
     <!-- Delete Confirmation Dialog -->
     <v-dialog v-model="deleteDialog" max-width="500">
       <v-card>
         <v-card-title class="text-h5">Delete Exercise</v-card-title>
         <v-card-text>
-          Are you sure you want to delete the exercise <strong>{{ selectedExercise?.name }}</strong>? 
+          Are you sure you want to delete the exercise <strong>{{ selectedExercise?.name }}</strong>?
           This action cannot be undone and will remove this exercise from all practice sessions.
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey-darken-1" variant="text" @click="deleteDialog = false">Cancel</v-btn>
-          <v-btn 
-            color="error" 
-            variant="flat" 
-            @click="deleteExercise" 
-            :loading="deleteLoading"
-          >
+          <v-btn color="error" variant="flat" @click="deleteExercise" :loading="deleteLoading">
             Delete
           </v-btn>
         </v-card-actions>
@@ -229,16 +161,16 @@ const headers = [
 // Computed
 const filteredExercises = computed(() => {
   let result = exercisesStore.exercises
-  
+
   // Search filter
   if (search.value) {
     const searchLower = search.value.toLowerCase()
-    result = result.filter(exercise => 
-      exercise.name.toLowerCase().includes(searchLower) || 
+    result = result.filter(exercise =>
+      exercise.name.toLowerCase().includes(searchLower) ||
       (exercise.description && exercise.description.toLowerCase().includes(searchLower))
     )
   }
-  
+
   // Category filter - using derived categories through tags
   if (categoryFilter.value) {
     result = result.filter(exercise => {
@@ -246,14 +178,14 @@ const filteredExercises = computed(() => {
       return categoryIds.includes(parseInt(categoryFilter.value))
     })
   }
-  
+
   // Tag filter
   if (tagFilter.value) {
-    result = result.filter(exercise => 
+    result = result.filter(exercise =>
       exercise.tagIds && exercise.tagIds.includes(parseInt(tagFilter.value))
     )
   }
-  
+
   return result
 })
 
@@ -278,8 +210,8 @@ function formatDate(dateString) {
 
 function truncateText(text, maxLength) {
   if (!text) return ''
-  return text.length > maxLength 
-    ? text.substring(0, maxLength) + '...' 
+  return text.length > maxLength
+    ? text.substring(0, maxLength) + '...'
     : text
 }
 
@@ -303,10 +235,10 @@ function openCreateDialog() {
 }
 
 async function openEditDialog(exercise) {
-    await exercisesStore.fetchExercise(exercise.id)
-    selectedExercise.value = exercisesStore.currentExercise
-    isEdit.value = true
-    dialogVisible.value = true
+  await exercisesStore.fetchExercise(exercise.id)
+  selectedExercise.value = exercisesStore.currentExercise
+  isEdit.value = true
+  dialogVisible.value = true
 }
 
 async function saveExercise(exerciseData) {
@@ -348,7 +280,7 @@ watch(() => route.query, (query) => {
   if (query.category) {
     categoryFilter.value = parseInt(query.category)
   }
-  
+
   if (query.tag) {
     tagFilter.value = parseInt(query.tag)
   }
@@ -360,11 +292,11 @@ onMounted(async () => {
   if (exercisesStore.exercises.length === 0) {
     await exercisesStore.fetchExercises()
   }
-  
+
   if (categoriesStore.categories.length === 0) {
     await categoriesStore.fetchCategories()
   }
-  
+
   if (tagsStore.tags.length === 0) {
     await tagsStore.fetchTags()
   }
