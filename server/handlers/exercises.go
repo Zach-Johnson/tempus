@@ -535,33 +535,6 @@ func (h *ExerciseHandler) addRelatedData(ctx context.Context, exercises []*pb.Ex
 		return status.Errorf(codes.Internal, "error reading exercise links: %v", err)
 	}
 
-	// Get images for all exercises
-	imageQuery := `SELECT id, exercise_id, image_data, filename, mime_type, description, created_at
-	FROM exercise_images WHERE exercise_id IN (` + placeholders + `)`
-	imageRows, err := h.db.QueryContext(ctx, imageQuery, exerciseIDs...)
-	if err != nil {
-		return status.Errorf(codes.Internal, "failed to retrieve exercise images: %v", err)
-	}
-	defer imageRows.Close()
-
-	for imageRows.Next() {
-		var (
-			image     pb.ExerciseImage
-			createdAt time.Time
-		)
-		if err := imageRows.Scan(&image.Id, &image.ExerciseId, &image.ImageData, &image.Filename, &image.MimeType, &image.Description, &createdAt); err != nil {
-			return status.Errorf(codes.Internal, "failed to parse exercise image: %v", err)
-		}
-		image.CreatedAt = timestamppb.New(createdAt)
-
-		if exercise, ok := exerciseMap[image.ExerciseId]; ok {
-			exercise.Images = append(exercise.Images, &image)
-		}
-	}
-	if err = imageRows.Err(); err != nil {
-		return status.Errorf(codes.Internal, "error reading exercise images: %v", err)
-	}
-
 	// Get last practice
 	lastPracticeQuery := `SELECT eh.exercise_id, latest.latest_start_time, latest.bpms, latest.notes
 	FROM exercise_history eh
