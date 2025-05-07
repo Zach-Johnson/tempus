@@ -168,7 +168,7 @@ export const useExercisesStore = defineStore("exercises", () => {
             i.id === id
           );
           if (index !== -1) {
-            currentExercise.value.images[index] = imgResp;
+            currentExercise.value.images[index] = imgResp.data;
           }
         }
       });
