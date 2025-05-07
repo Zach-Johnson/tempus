@@ -34,7 +34,7 @@ const categoriesStore = useCategoriesStore()
 const statsStore = useStatsStore()
 
 // For debugging
-const debug = ref(true)
+const debug = ref(false)
 
 // Generate colors for categories
 const categoryColors = computed(() => {
@@ -79,10 +79,15 @@ const chartData = computed(() => {
   // Sort the dates chronologically
   const sortedDates = dates.sort((a, b) => new Date(a) - new Date(b));
 
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+
   // Format the dates for display as labels
   const labels = sortedDates.map(dateStr => {
     const date = new Date(dateStr);
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`;
+    return `${monthNames[date.getUTCMonth()]} ${date.getUTCDate()}`;
   });
 
   // Create a map of category ID to dataset
