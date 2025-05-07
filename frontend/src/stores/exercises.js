@@ -145,25 +145,33 @@ export const useExercisesStore = defineStore("exercises", () => {
 
     try {
       const response = await exercisesAPI.get(id);
-      currentExercise.value = response.data;
+      const exercise = response.data;
+      currentExercise.value = exercise;
+
       // Retrieve images separately, image data is not included in original
       // exercise.
-      for (const img of response.data.images) {
-        try {
-          const imgResp = await exercisesAPI.getImage(
-            currentExercise.value.id,
-            img.id,
-          );
+      const imagePromises = exercise.images.map(
+        (img) =>
+          exercisesAPI.getImage(exercise.id, img.id)
+            .then((imgResp) => ({ success: true, imgResp, id: img.id }))
+            .catch((err) => {
+              console.warn(`Failed to fetch image ${img.id}:`, err);
+              return { success: false, id: img.id };
+            }),
+      );
+
+      const imageResults = await Promise.all(imagePromises);
+
+      imageResults.forEach(({ success, imgResp, id }) => {
+        if (success) {
           const index = currentExercise.value.images.findIndex((i) =>
-            i.id === img.id
+            i.id === id
           );
           if (index !== -1) {
-            currentExercise.value.images[index] = imgResp.data;
+            currentExercise.value.images[index] = imgResp;
           }
-        } catch (imgErr) {
-          console.warn(`Failed to fetch image ${img.id}:`, imgErr);
         }
-      }
+      });
 
       // Also update the exercise in the exercises array if it exists
       const index = exercises.value.findIndex((e) => e.id === id);
