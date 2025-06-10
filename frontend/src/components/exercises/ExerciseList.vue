@@ -12,7 +12,7 @@
     <div v-else>
       <div v-if="displayType === 'table'" class="exercise-table-container">
         <v-data-table :headers="tableHeaders" v-model:sort-by="sortBy" :items="exercises" :items-per-page="itemsPerPage"
-          density="compact" class="elevation-1">
+          hover density="compact" class="elevation-1">
           <template v-slot:item.description="{ item }">
             <span v-if="item.description">{{ truncateText(item.description, 80) }}</span>
             <span v-else class="text-grey">No description</span>

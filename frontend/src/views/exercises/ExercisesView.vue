@@ -41,7 +41,7 @@
       </v-card-text>
 
       <template v-else>
-        <v-data-table v-if="filteredExercises.length > 0" :headers="headers" :items="filteredExercises"
+        <v-data-table v-if="filteredExercises.length > 0" :headers="headers" :items="filteredExercises" hover
           :items-per-page="50" class="elevation-1">
           <template v-slot:item.description="{ item }">
             <span v-if="item.description">{{ truncateText(item.description, 80) }}</span>
