@@ -2,25 +2,25 @@
 set -x
 
 curl -X POST \
-  http://localhost:8080/api/v1/categories \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/categories \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Technique",
     "description": "Broad technical ability"
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/categories \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/categories \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Independence",
     "description": "Independence exercises"
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/categories \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/categories \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Songs & Creativity",
     "description": "Song practice, general creativity"
   }' | jq
@@ -37,41 +37,41 @@ curl -X POST \
 #   }'| jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/tags \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/tags \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Drumeo course 1.1"
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/tags \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/tags \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Feet",
     "category_ids": [1]
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/tags \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/tags \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Grooves",
     "category_ids": [2,3]
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/exercises \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/exercises \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Single Paradiddle",
     "description": "A basic drum rudiment pattern: RLRR LRLL",
     "tag_ids": [1]
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/exercises \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/exercises \
+    -H 'Content-Type: application/json' \
+    -d '{
     "name": "Fun Song",
     "description": "A cool groove",
     "tag_ids": [3]
@@ -89,7 +89,7 @@ curl -X GET "http://localhost:8080/api/v1/exercises?page_size=5" | jq
 curl -X GET "http://localhost:8080/api/v1/exercises?category_id=1" | jq
 
 # Filter by tag
-curl -X GET "http://localhost:8080/api/v1/exercises?tag_id=1"  | jq
+curl -X GET "http://localhost:8080/api/v1/exercises?tag_id=1" | jq
 
 # Filter by both category and tag
 curl -X GET "http://localhost:8080/api/v1/exercises?category_id=1&tag_id=1" | jq
@@ -132,9 +132,9 @@ curl -X GET "http://localhost:8080/api/v1/exercises?category_id=1&tag_id=1" | jq
 # curl -X DELETE http://localhost:8080/api/v1/exercise-images/1 | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/exercises/1/links \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/exercises/1/links \
+    -H 'Content-Type: application/json' \
+    -d '{
     "exercise_id": 1,
     "url": "https://example.com/tutorials/paradiddle",
     "description": "Tutorial video"
@@ -147,9 +147,9 @@ curl -X GET "http://localhost:8080/api/v1/exercises/1/stats" | jq
 # curl -X DELETE http://localhost:8080/api/v1/exercises/1 | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/sessions \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions \
+    -H 'Content-Type: application/json' \
+    -d '{
     "start_time": "2025-04-10T10:00:00Z",
     "end_time": "2025-04-10T11:30:00Z",
     "notes": "Morning practice session"
@@ -157,9 +157,9 @@ curl -X POST \
 
 # Should fail because there is a currently active one
 curl -X POST \
-  http://localhost:8080/api/v1/sessions \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions \
+    -H 'Content-Type: application/json' \
+    -d '{
     "start_time": "2025-04-10T18:00:00Z",
     "end_time": "2025-04-10T20:30:00Z",
     "notes": "Evening practice session"
@@ -184,9 +184,9 @@ curl -X GET "http://localhost:8080/api/v1/sessions?active=1" | jq
 
 # Update session notes
 curl -X PATCH \
-  http://localhost:8080/api/v1/sessions/1 \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions/1 \
+    -H 'Content-Type: application/json' \
+    -d '{
     "session": {
       "notes": "Morning practice session - focused on rudiments"
     },
@@ -195,9 +195,9 @@ curl -X PATCH \
 
 # Update start and end times
 curl -X PATCH \
-  http://localhost:8080/api/v1/sessions/1 \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions/1 \
+    -H 'Content-Type: application/json' \
+    -d '{
     "session": {
       "startTime": "2025-04-10T09:45:00Z",
       "endTime": "2025-04-10T11:45:02Z"
@@ -207,9 +207,9 @@ curl -X PATCH \
 
 # End the session
 curl -X PATCH \
-  http://localhost:8080/api/v1/sessions/1 \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions/1 \
+    -H 'Content-Type: application/json' \
+    -d '{
     "session": {
         "active": false
     },
@@ -218,18 +218,18 @@ curl -X PATCH \
 
 # Create another
 curl -X POST \
-  http://localhost:8080/api/v1/sessions \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions \
+    -H 'Content-Type: application/json' \
+    -d '{
     "start_time": "2025-04-10T18:00:00Z",
     "end_time": "2025-04-10T20:30:00Z",
     "notes": "Evening practice session"
   }' | jq
 
 curl -X PATCH \
-  http://localhost:8080/api/v1/sessions/2 \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/sessions/2 \
+    -H 'Content-Type: application/json' \
+    -d '{
     "session": {
         "active": false
     },
@@ -241,9 +241,9 @@ curl -X PATCH \
 
 # Create a history entry linked to a practice session
 curl -X POST \
-  http://localhost:8080/api/v1/history \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/history \
+    -H 'Content-Type: application/json' \
+    -d '{
     "exercise_id": 1,
     "session_id": 1,
     "start_time": "2025-04-10T10:00:00Z",
@@ -255,13 +255,41 @@ curl -X POST \
   }' | jq
 
 curl -X POST \
-  http://localhost:8080/api/v1/history \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/history \
+    -H 'Content-Type: application/json' \
+    -d '{
     "exercise_id": 2,
     "session_id": 2,
     "start_time": "2025-04-10T18:00:00Z",
     "end_time": "2025-04-10T18:15:00Z",
+    "bpms": [100],
+    "time_signature": "4/4",
+    "notes": "Practiced during my evening session",
+    "rating": 4
+  }' | jq
+
+curl -X POST \
+    http://localhost:8080/api/v1/history \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "exercise_id": 2,
+    "session_id": 2,
+    "start_time": "2025-04-01T18:00:00Z",
+    "end_time": "2025-04-01T18:15:00Z",
+    "bpms": [100],
+    "time_signature": "4/4",
+    "notes": "Practiced during my evening session",
+    "rating": 4
+  }' | jq
+
+curl -X POST \
+    http://localhost:8080/api/v1/history \
+    -H 'Content-Type: application/json' \
+    -d '{
+    "exercise_id": 1,
+    "session_id": 2,
+    "start_time": "2025-04-21T18:00:00Z",
+    "end_time": "2025-04-21T18:15:00Z",
     "bpms": [100],
     "time_signature": "4/4",
     "notes": "Practiced during my evening session",
@@ -285,9 +313,9 @@ curl -X GET "http://localhost:8080/api/v1/history?exercise_id=1&session_id=1&pag
 
 # Update BPM, rating
 curl -X PATCH \
-  http://localhost:8080/api/v1/history/1 \
-  -H 'Content-Type: application/json' \
-  -d '{
+    http://localhost:8080/api/v1/history/1 \
+    -H 'Content-Type: application/json' \
+    -d '{
     "history": {
       "bpms": [95],
       "rating": 5

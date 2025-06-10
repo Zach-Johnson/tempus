@@ -40,6 +40,10 @@
               <v-icon>{{ 'mdi-plus' }}</v-icon>
             </v-btn>
           </template>
+
+          <template v-slot:item.lastPractice="{ item }">
+            {{ appStore.formatDate(item.lastPractice) }}
+          </template>
         </v-data-table>
       </div>
 
@@ -123,7 +127,7 @@ const props = defineProps({
   },
   itemsPerPage: {
     type: Number,
-    default: 10
+    default: 50
   },
   page: {
     type: Number,
@@ -157,7 +161,7 @@ const tableHeaders = [
   { title: 'Description', key: 'description' },
   { title: 'Categories', key: 'categories' },
   { title: 'Tags', key: 'tags' },
-  { title: 'Last', key: 'lastPractice', value: item => { return appStore.formatDate(item.lastPractice) } },
+  { title: 'Last', key: 'lastPractice' },
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' }
 ]
 
