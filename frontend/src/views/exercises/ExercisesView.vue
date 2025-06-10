@@ -174,7 +174,7 @@ const filteredExercises = computed(() => {
   // Category filter - using derived categories through tags
   if (categoryFilter.value) {
     result = result.filter(exercise => {
-      const categoryIds = getCategoriesForExercise(exercise)
+      const categoryIds = exercisesStore.getCategoryIdsForExercise(exercise.id)
       return categoryIds.includes(parseInt(categoryFilter.value))
     })
   }
